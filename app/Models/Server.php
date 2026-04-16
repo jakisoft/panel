@@ -173,6 +173,7 @@ class Server extends Model implements Identifiable
         'database_limit' => 'present|nullable|integer|min:0',
         'allocation_limit' => 'sometimes|nullable|integer|min:0',
         'backup_limit' => 'present|nullable|integer|min:0',
+        'exp_date' => 'sometimes|nullable|date',
     ];
 
     /**
@@ -198,6 +199,7 @@ class Server extends Model implements Identifiable
         self::UPDATED_AT => 'datetime',
         'deleted_at' => 'datetime',
         'installed_at' => 'datetime',
+        'exp_date' => 'date',
     ];
 
     /**

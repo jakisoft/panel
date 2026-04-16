@@ -46,6 +46,11 @@
                         <textarea name="description" rows="3" class="form-control">{{ old('description', $server->description) }}</textarea>
                         <p class="text-muted small">A brief description of this server.</p>
                     </div>
+                    <div class="form-group">
+                        <label for="exp_date" class="control-label">Expiration date</label>
+                        <input type="date" name="exp_date" value="{{ old('exp_date', optional($server->exp_date)->toDateString()) }}" class="form-control" />
+                        <p class="text-muted small">The expiration date of this server. (Leave blank to keep the server from expiring)</p>
+                    </div>
                 </div>
                 <div class="box-footer">
                     {!! csrf_field() !!}

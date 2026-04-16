@@ -3,6 +3,7 @@
 namespace Pterodactyl\Console;
 
 use Ramsey\Uuid\Uuid;
+use Pterodactyl\Models\Server;
 use Pterodactyl\Models\ActivityLog;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Console\PruneCommand;
@@ -34,6 +35,22 @@ class Kernel extends ConsoleKernel
         // Execute scheduled commands for servers every minute, as if there was a normal cron running.
         $schedule->command(ProcessRunnableCommand::class)->everyMinute()->withoutOverlapping();
         $schedule->command(CleanServiceBackupFilesCommand::class)->daily();
+
+
+        $schedule->call(function () {
+            $servers = Server::query()
+                ->whereNotNull('exp_date')
+                ->whereDate('exp_date', '<', now())
+                ->get();
+
+            $suspensionService = app()->make('Pterodactyl\Services\Servers\SuspensionService');
+
+            foreach ($servers as $server) {
+                if ($server->status !== Server::STATUS_SUSPENDED && $server->status !== Server::STATUS_INSTALLING) {
+                    $suspensionService->toggle($server, 'suspend');
+                }
+            }
+        })->dailyAt('00:05');
 
         if (config('backups.prune_age')) {
             // Every 30 minutes, run the backup pruning command so that any abandoned backups can be deleted.

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+    faCalendarDay,
     faClock,
     faCloudDownloadAlt,
     faCloudUploadAlt,
@@ -46,6 +47,7 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
     const connected = ServerContext.useStoreState((state) => state.socket.connected);
     const instance = ServerContext.useStoreState((state) => state.socket.instance);
     const limits = ServerContext.useStoreState((state) => state.server.data!.limits);
+    const expDate = ServerContext.useStoreState((state) => state.server.data!.expDate);
 
     const textLimits = useMemo(
         () => ({
@@ -92,6 +94,9 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
         <div className={classNames('grid grid-cols-6 gap-2 md:gap-4', className)}>
             <StatBlock icon={faWifi} title={'Address'} copyOnClick={allocation}>
                 {allocation}
+            </StatBlock>
+            <StatBlock icon={faCalendarDay} title={'Expiration'}>
+                {expDate || 'Unlimited'}
             </StatBlock>
             <StatBlock
                 icon={faClock}

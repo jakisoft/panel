@@ -33,6 +33,7 @@ class StoreServerRequest extends ApplicationApiRequest
             'environment' => 'present|array',
             'skip_scripts' => 'sometimes|boolean',
             'oom_disabled' => 'sometimes|boolean',
+            'exp_date' => $rules['exp_date'],
 
             // Resource limitations
             'limits' => 'required|array',
@@ -95,6 +96,7 @@ class StoreServerRequest extends ApplicationApiRequest
             'allocation_limit' => array_get($data, 'feature_limits.allocations'),
             'backup_limit' => array_get($data, 'feature_limits.backups'),
             'oom_disabled' => array_get($data, 'oom_disabled'),
+            'exp_date' => array_get($data, 'exp_date'),
         ];
     }
 

@@ -50,6 +50,12 @@
                                 <label for="pStartOnCreation" class="strong">Start Server when Installed</label>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="exp_date">Expiration date</label>
+                            <input type="date" class="form-control" id="exp_date" name="exp_date" value="{{ old('exp_date') }}" placeholder="Expiration Date">
+                            <p class="small text-muted no-margin">The expiration date of this server. (Leave blank to keep the server from expiring)</p>
+                        </div>
+
                     </div>
                 </div>
             </div>
