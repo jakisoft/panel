@@ -13,9 +13,12 @@ import useSWR from 'swr';
 import { PaginatedResult } from '@/api/http';
 import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
+import { Dialog } from '@/components/elements/dialog';
+import { Button } from '@/components/elements/button/index';
 
 export default () => {
     const { search } = useLocation();
+    const [showDeniedModal, setShowDeniedModal] = useState(new URLSearchParams(search).get('access_denied') === '1');
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
 
     const [page, setPage] = useState(!isNaN(defaultPage) && defaultPage > 0 ? defaultPage : 1);
@@ -32,6 +35,16 @@ export default () => {
     useEffect(() => {
         setPage(1);
     }, [showOnlyAdmin]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(search);
+        if (params.get('access_denied') === '1') {
+            setShowDeniedModal(true);
+            params.delete('access_denied');
+            const query = params.toString();
+            window.history.replaceState(null, document.title, `/${query ? `?${query}` : ''}`);
+        }
+    }, [search]);
 
     useEffect(() => {
         if (!servers) return;
@@ -54,6 +67,16 @@ export default () => {
 
     return (
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
+            <Dialog
+                open={showDeniedModal}
+                title={'Access Denied'}
+                description={'You cannot open this server unless the owner adds you on the server Users page.'}
+                onClose={() => setShowDeniedModal(false)}
+            >
+                <Dialog.Footer>
+                    <Button onClick={() => setShowDeniedModal(false)}>OK</Button>
+                </Dialog.Footer>
+            </Dialog>
             {rootAdmin && (
                 <div css={tw`mb-2 flex justify-end items-center`}>
                     <p css={tw`uppercase text-xs text-neutral-400 mr-2`}>

@@ -49,6 +49,7 @@ class ServerTransformer extends BaseClientTransformer
             'internal_id' => $server->id,
             'uuid' => $server->uuid,
             'name' => $server->name,
+            'exp_date' => optional($server->exp_date)?->toDateString(),
             'node' => $server->node->name,
             'is_node_under_maintenance' => $server->node->isUnderMaintenance(),
             'sftp_details' => [
