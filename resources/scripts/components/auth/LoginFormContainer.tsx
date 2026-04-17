@@ -14,22 +14,35 @@ type Props = React.DetailedHTMLProps<
 };
 
 const Container = styled.div`
-  ${breakpoint("sm")` ${tw`mx-auto`} `};
-  ${breakpoint("md")` ${tw`p-10`} `};
-  ${breakpoint("xl")` ${tw`w-auto`} `};
+  ${breakpoint("sm")`
+        ${tw`mx-auto`}
+    `};
+
+  ${breakpoint("md")`
+        ${tw`p-10`}
+    `};
+
+  ${breakpoint("xl")`
+        ${tw`w-auto`}
+    `};
 `;
 
 export default forwardRef<HTMLFormElement, Props>(
   ({ title, ...props }, ref) => (
-    <div css={tw`flex justify-center flex-col bg-[#191919] min-h-screen font-mono`}>
+    <div css={tw`flex justify-center flex-col`}>
       <Container>
         <FlashMessageRender css={tw`mb-2 px-1`} />
         <div
-          css={tw`flex flex-col md:flex-row items-center bg-neutral-900 border border-neutral-800 rounded-3xl shadow-2xl md:py-16 md:px-12 py-12 px-6 md:mb-8 mb-4 ease-in-out duration-300`}
+          css={tw`flex flex-col md:flex-row items-center bg-elysium-color2 rounded-2xl shadow-lg md:py-16 md:px-12 py-12 px-6 md:mb-8 mb-4 ease-in-out duration-300`}
         >
+          <img
+            css={tw`w-48 md:mr-8`}
+            src={JSON.parse(getElysiumData("--logo"))}
+            alt="brand logo"
+          />
           <div css={tw`flex flex-col`}>
             {title && (
-              <h2 css={tw`text-xl text-white font-bold py-4 tracking-tight`}>
+              <h2 css={tw`text-base text-neutral-100 font-medium py-4`}>
                 {title}
               </h2>
             )}
