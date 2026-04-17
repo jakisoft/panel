@@ -24,6 +24,9 @@ const ServerRouter = lazy(
 const AuthenticationRouter = lazy(
   () => import(/* webpackChunkName: "auth" */ "@/routers/AuthenticationRouter")
 );
+const PlaygroundContainer = lazy(
+  () => import(/* webpackChunkName: "playground" */ "@/components/playground/PlaygroundContainer")
+);
 
 interface ExtendedWindow extends Window {
   SiteConfiguration?: SiteSettings;
@@ -72,6 +75,11 @@ const App = () => {
             <Route path={"/auth"}>
               <Spinner.Suspense>
                 <AuthenticationRouter />
+              </Spinner.Suspense>
+            </Route>
+            <Route path={"/playground"} exact>
+              <Spinner.Suspense>
+                <PlaygroundContainer />
               </Spinner.Suspense>
             </Route>
             <AuthenticatedRoute path={"/server/:id"}>
