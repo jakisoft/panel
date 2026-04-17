@@ -51,6 +51,15 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
 
         const parsed = new Date(expDate);
         if (Number.isNaN(parsed.getTime())) return expDate;
+        if (!expDate) {
+            return 'Unlimited';
+        }
+
+        const parsed = new Date(expDate);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return expDate;
+        }
 
         return parsed.toLocaleDateString();
     }, [expDate]);
@@ -103,6 +112,9 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
                 className={'col-span-12 md:col-span-6 xl:col-span-3'}
             >
                 {allocation}
+            </StatBlock>
+            <StatBlock icon={faClock} title={'Expiration'}>
+                {formattedExpDate}
             </StatBlock>
             <StatBlock
                 icon={<CalendarClock className={statIcon} />}

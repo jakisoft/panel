@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - codex/add-auto-suspend-and-expiration-system
   workflow_dispatch:
 
 permissions:
