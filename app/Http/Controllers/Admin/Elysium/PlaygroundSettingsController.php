@@ -26,9 +26,6 @@ class PlaygroundSettingsController extends Controller
 
         return view('admin.elysium.playground', [
             'elysium' => $elysium,
-            'pricingItems' => $this->decodeJson($elysium->playground_pricing_items ?? null, [
-                ['name' => 'Starter', 'price' => 'Rp 15.000/bulan', 'description' => 'Cocok untuk server kecil, performa stabil, support cepat.', 'features' => ['1 vCPU', '2 GB RAM', 'Proteksi DDoS dasar']],
-            ]),
             'faqItems' => $this->decodeJson($elysium->playground_faq_items ?? null, [
                 ['question' => 'Apakah panel ini aman?', 'answer' => 'Ya, panel menggunakan autentikasi berlapis dan monitoring aktivitas untuk keamanan tambahan.'],
             ]),
@@ -56,16 +53,9 @@ class PlaygroundSettingsController extends Controller
             'playground_brand_icon' => ['required', 'string', 'max:120'],
             'playground_hero_title' => ['required', 'string', 'max:255'],
             'playground_hero_description' => ['nullable', 'string', 'max:2000'],
-            'playground_pricing_title' => ['required', 'string', 'max:191'],
-            'playground_pricing_subtitle' => ['nullable', 'string', 'max:500'],
             'playground_faq_badge' => ['required', 'string', 'max:191'],
             'playground_faq_title' => ['required', 'string', 'max:191'],
             'playground_faq_subtitle' => ['nullable', 'string', 'max:500'],
-            'pricing' => ['nullable', 'array'],
-            'pricing.*.name' => ['required_with:pricing', 'string', 'max:120'],
-            'pricing.*.price' => ['required_with:pricing', 'string', 'max:120'],
-            'pricing.*.description' => ['nullable', 'string', 'max:1000'],
-            'pricing.*.features' => ['nullable', 'string', 'max:2000'],
             'faq' => ['nullable', 'array'],
             'faq.*.question' => ['required_with:faq', 'string', 'max:300'],
             'faq.*.answer' => ['required_with:faq', 'string', 'max:2000'],
@@ -81,19 +71,6 @@ class PlaygroundSettingsController extends Controller
             'social_links.*.url' => ['required_with:social_links', 'string', 'max:400'],
             'social_links.*.icon' => ['required_with:social_links', 'string', 'max:120'],
         ]);
-
-        $pricingItems = collect($data['pricing'] ?? [])->map(function (array $item) {
-            return [
-                'name' => trim($item['name']),
-                'price' => trim($item['price']),
-                'description' => trim((string) ($item['description'] ?? '')),
-                'features' => collect(preg_split('/\r\n|\r|\n/', (string) ($item['features'] ?? '')))
-                    ->map(fn ($feature) => trim($feature))
-                    ->filter()
-                    ->values()
-                    ->all(),
-            ];
-        })->filter(fn (array $item) => $item['name'] !== '' && $item['price'] !== '')->values()->all();
 
         $faqItems = collect($data['faq'] ?? [])->map(fn (array $item) => [
             'question' => trim($item['question']),
@@ -125,12 +102,9 @@ class PlaygroundSettingsController extends Controller
             'playground_brand_icon' => $data['playground_brand_icon'],
             'playground_hero_title' => $data['playground_hero_title'],
             'playground_hero_description' => $data['playground_hero_description'] ?? null,
-            'playground_pricing_title' => $data['playground_pricing_title'],
-            'playground_pricing_subtitle' => $data['playground_pricing_subtitle'] ?? null,
             'playground_faq_badge' => $data['playground_faq_badge'],
             'playground_faq_title' => $data['playground_faq_title'],
             'playground_faq_subtitle' => $data['playground_faq_subtitle'] ?? null,
-            'playground_pricing_items' => json_encode($pricingItems),
             'playground_faq_items' => json_encode($faqItems),
             'playground_visual_cards' => json_encode($visualCards),
             'playground_footer_links' => json_encode($footerLinks),

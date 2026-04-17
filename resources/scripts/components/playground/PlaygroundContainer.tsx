@@ -62,20 +62,20 @@ const Navbar = ({ brandName, brandIcon, footerLinks }: { brandName: string; bran
     }, []);
 
     return (
-        <nav className={'fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4 transition-all duration-500'}>
-            <div className={`glass-nav rounded-2xl px-5 flex justify-between items-center shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all duration-300 ${isScrolled ? 'py-2 scale-95' : 'py-2.5 scale-100'}`}>
+        <nav className={'fixed top-3 sm:top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-5xl px-3 sm:px-4 transition-all duration-500'}>
+            <div className={`glass-nav rounded-2xl px-3 sm:px-5 flex justify-between items-center gap-2 sm:gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all duration-300 ${isScrolled ? 'py-2 scale-[0.98]' : 'py-2.5 scale-100'}`}>
                 <div className={'flex items-center gap-2'}>
                     <div className={'w-7 h-7 bg-gradient-bright rounded-lg flex items-center justify-center text-white'}><IconByName name={brandIcon} size={16} /></div>
-                    <span className={'font-bold text-lg tracking-tight'}>{brandName}</span>
+                    <span className={'font-bold text-sm sm:text-lg tracking-tight max-w-[110px] sm:max-w-none truncate'}>{brandName}</span>
                 </div>
                 <div className={'hidden md:flex items-center gap-7 font-semibold text-[13px] text-slate-500'}>
                     {footerLinks.slice(0, 3).map((link) => (
                         <a key={`${link.label}-${link.url}`} href={link.url} className={'hover:text-indigo-600'}>{link.label}</a>
                     ))}
                 </div>
-                <div className={'flex items-center gap-3'}>
-                    <a href={'/auth/login'} className={'text-[13px] font-bold text-slate-600 hover:text-indigo-600 px-3'}>Masuk</a>
-                    <a href={'/auth/register'} className={'bg-slate-900 text-white px-4 py-2 rounded-xl text-[13px] font-bold hover:bg-indigo-600'}>Daftar</a>
+                <div className={'flex items-center gap-2 sm:gap-3 shrink-0'}>
+                    <a href={'/auth/login'} className={'text-[12px] sm:text-[13px] font-bold text-slate-600 hover:text-indigo-600 px-2 sm:px-3'}>Masuk</a>
+                    <a href={'/auth/register'} className={'bg-slate-900 text-white px-3 sm:px-4 py-2 rounded-xl text-[12px] sm:text-[13px] font-bold hover:bg-indigo-600 whitespace-nowrap'}>Daftar</a>
                 </div>
             </div>
         </nav>
@@ -202,7 +202,8 @@ export default () => {
                         {(pricingItems.length ? pricingItems : [{ name: 'Starter', price: 'Rp 15.000/bulan', description: 'Paket dasar panel.', features: ['Support cepat'] }]).map((item, idx) => (
                             <div key={`${item.name}-${idx}`} className={'bg-white rounded-[28px] p-8 border border-slate-100 shadow-[0_20px_40px_rgba(0,0,0,0.04)]'}>
                                 <h3 className={'text-xl font-extrabold'}>{item.name}</h3><p className={'text-indigo-600 font-black text-2xl mt-2'}>{item.price}</p><p className={'text-slate-400 text-[13px] mt-3 mb-6'}>{item.description}</p>
-                                <ul className={'space-y-3'}>{(item.features ?? []).map((feature) => <li key={feature} className={'flex items-center gap-2 text-[13px] text-slate-600'}><Check size={15} className={'text-green-500'} /> {feature}</li>)}</ul>
+                                <ul className={'space-y-3 mb-6'}>{(item.features ?? []).map((feature) => <li key={feature} className={'flex items-center gap-2 text-[13px] text-slate-600'}><Check size={15} className={'text-green-500'} /> {feature}</li>)}</ul>
+                                <a href={'/pricing'} className={'inline-flex w-full justify-center bg-slate-900 text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:bg-indigo-600 transition-colors'}>Pilih Paket</a>
                             </div>
                         ))}
                     </div>

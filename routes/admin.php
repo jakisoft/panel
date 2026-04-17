@@ -253,4 +253,7 @@ Route::group(['prefix' => 'elysium'], function () {
 
     Route::get('/playground', [Admin\Elysium\PlaygroundSettingsController::class, 'index'])->name('admin.elysium.playground');
     Route::post('/playground/update', [Admin\Elysium\PlaygroundSettingsController::class, 'update'])->name('admin.elysium.playground.update');
+
+    Route::get('/pricing', [Admin\Elysium\PricingSettingsController::class, 'index'])->name('admin.elysium.pricing');
+    Route::post('/pricing/update', [Admin\Elysium\PricingSettingsController::class, 'update'])->name('admin.elysium.pricing.update');
 });

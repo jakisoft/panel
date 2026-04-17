@@ -2,14 +2,14 @@ import tw from "twin.macro";
 import styled from "styled-components/macro";
 
 const LogoContainer = styled.div`
-  ${tw`w-12 flex justify-start items-center my-2 mx-2`};
+  ${tw`w-full flex justify-center sm:justify-start items-center my-2 px-3 py-1 gap-2`};
 
   & > img {
-    ${tw`max-w-full h-auto`};
+    ${tw`w-8 h-8 rounded-md object-contain flex-shrink-0`};
   }
 
   & > a {
-    ${tw`text-neutral-100 items-center text-3xl font-semibold ml-2`};
+    ${tw`text-neutral-100 items-center text-lg font-semibold leading-tight truncate`};
 
     @media (max-width: 639px) {
       ${tw`hidden`};
@@ -17,4 +17,4 @@ const LogoContainer = styled.div`
   }
 `;
 
-export default LogoContainer
+export default LogoContainer;
