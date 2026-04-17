@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - codex/update-pterodactyl-custom-panel-features
+      - codex/update-auth-component-styles-and-add-register
   workflow_dispatch:
 
 permissions:

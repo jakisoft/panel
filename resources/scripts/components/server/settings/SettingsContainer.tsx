@@ -14,37 +14,54 @@ import isEqual from "react-fast-compare";
 import CopyOnClick from "@/components/elements/CopyOnClick";
 import { ip } from "@/lib/formatters";
 import { Button } from "@/components/elements/button/index";
-import { faFileCode, faBug } from "@fortawesome/free-solid-svg-icons";
+import { Bug, CalendarClock, FileCode2 } from "lucide-react";
+
+const formatExpDate = (expDate: string | null) => {
+  if (!expDate) return { label: "Unlimited", expired: false };
+
+  const parsed = new Date(expDate);
+  if (Number.isNaN(parsed.getTime())) return { label: expDate, expired: false };
+
+  return {
+    label: parsed.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
+    expired: parsed.getTime() < Date.now(),
+  };
+};
 
 export default () => {
   const username = useStoreState((state) => state.user.data!.username);
   const id = ServerContext.useStoreState((state) => state.server.data!.id);
   const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
   const node = ServerContext.useStoreState((state) => state.server.data!.node);
-  const sftp = ServerContext.useStoreState(
-    (state) => state.server.data!.sftpDetails,
-    isEqual
-  );
+  const expDate = ServerContext.useStoreState((state) => state.server.data!.expDate);
+  const sftp = ServerContext.useStoreState((state) => state.server.data!.sftpDetails, isEqual);
+
+  const expInfo = formatExpDate(expDate);
 
   return (
     <ServerContentBlock title={"Settings"}>
       <FlashMessageRender byKey={"settings"} css={tw`mb-4`} />
+      <div css={tw`mb-4`}>
+        <div css={tw`inline-flex items-center rounded-xl border border-neutral-700 bg-elysium-color2 px-3 py-2 text-sm`}>
+          <CalendarClock size={16} css={tw`mr-2 text-neutral-300`} />
+          <span css={tw`text-neutral-300 mr-2`}>Expired Date:</span>
+          <span css={tw`font-semibold text-neutral-100`}>{expInfo.label}</span>
+          {expInfo.expired && (
+            <span css={tw`ml-2 text-[10px] uppercase px-2 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30`}>
+              Expired
+            </span>
+          )}
+        </div>
+      </div>
+
       <div css={tw`md:flex`}>
         <div css={tw`w-full md:flex-1 md:mr-10`}>
           <Can action={"file.sftp"}>
-            <TitledGreyBox
-              icon={faFileCode}
-              title={"SFTP Details"}
-              css={tw`mb-6 md:mb-10`}
-            >
+            <TitledGreyBox icon={<FileCode2 size={18} />} title={"SFTP Details"} css={tw`mb-6 md:mb-10`}>
               <div>
                 <Label>Server Address</Label>
                 <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
-                  <Input
-                    type={"text"}
-                    value={`sftp://${ip(sftp.ip)}:${sftp.port}`}
-                    readOnly
-                  />
+                  <Input type={"text"} value={`sftp://${ip(sftp.ip)}:${sftp.port}`} readOnly />
                 </CopyOnClick>
               </div>
               <div css={tw`mt-6`}>
@@ -55,48 +72,35 @@ export default () => {
               </div>
               <div css={tw`mt-6 flex items-center`}>
                 <div css={tw`flex-1`}>
-                  <div
-                    css={tw`bg-elysium-color3 border-l-4 border-cyan-500 rounded-2xl p-3`}
-                  >
+                  <div css={tw`bg-elysium-color3 border-l-4 border-cyan-500 rounded-2xl p-3`}>
                     <p css={tw`text-xs text-neutral-200`}>
-                      Your SFTP password is the same as the password you use to
-                      access this panel.
+                      Your SFTP password is the same as the password you use to access this panel.
                     </p>
                   </div>
                 </div>
                 <div css={tw`ml-4`}>
-                  <a
-                    href={`sftp://${username}.${id}@${ip(sftp.ip)}:${
-                      sftp.port
-                    }`}
-                  >
+                  <a href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`}>
                     <Button.Text>Launch SFTP</Button.Text>
                   </a>
                 </div>
               </div>
             </TitledGreyBox>
           </Can>
-          <TitledGreyBox
-            icon={faBug}
-            title={"Debug Information"}
-            css={tw`mb-6 md:mb-10`}
-          >
+
+          <TitledGreyBox icon={<Bug size={18} />} title={"Debug Information"} css={tw`mb-6 md:mb-10`}>
             <div css={tw`flex items-center justify-between text-sm`}>
               <p>Node</p>
-              <code css={tw`font-mono bg-elysium-color3 rounded py-1 px-2`}>
-                {node}
-              </code>
+              <code css={tw`font-mono bg-elysium-color3 rounded py-1 px-2`}>{node}</code>
             </div>
             <CopyOnClick text={uuid}>
               <div css={tw`flex items-center justify-between mt-2 text-sm`}>
                 <p>Server ID</p>
-                <code css={tw`font-mono bg-elysium-color3 rounded py-1 px-2`}>
-                  {uuid}
-                </code>
+                <code css={tw`font-mono bg-elysium-color3 rounded py-1 px-2`}>{uuid}</code>
               </div>
             </CopyOnClick>
           </TitledGreyBox>
         </div>
+
         <div css={tw`w-full mt-6 md:flex-1 md:mt-0`}>
           <Can action={"settings.rename"}>
             <div css={tw`mb-6 md:mb-10`}>

@@ -1,4 +1,5 @@
 import React, { lazy } from "react";
+import { LucideIcon, Activity, Archive, CalendarDays, Cog, Database, Folder, KeyRound, LayoutGrid, Network, PlayCircle, TerminalSquare, UserCircle2, Users, Wrench } from "lucide-react";
 import ServerConsole from "@/components/server/console/ServerConsoleContainer";
 import DatabasesContainer from "@/components/server/databases/DatabasesContainer";
 import ScheduleContainer from "@/components/server/schedules/ScheduleContainer";
@@ -13,41 +14,14 @@ import AccountApiContainer from "@/components/dashboard/AccountApiContainer";
 import AccountSSHContainer from "@/components/dashboard/ssh/AccountSSHContainer";
 import ActivityLogContainer from "@/components/dashboard/activity/ActivityLogContainer";
 import ServerActivityLogContainer from "@/components/server/ServerActivityLogContainer";
-import {
-  faUserCircle,
-  faKey,
-  faWrench,
-  faEnvelope,
-  faArchive,
-  faCalendarAlt,
-  faHistory,
-  faCog,
-  faDatabase,
-  faFolder,
-  faNetworkWired,
-  faPlayCircle,
-  faTerminal,
-  faUsers,
-} from "@fortawesome/free-solid-svg-icons";
 
-// Each of the router files is already code split out appropriately — so
-// all of the items above will only be loaded in when that router is loaded.
-//
-// These specific lazy loaded routes are to avoid loading in heavy screens
-// for the server dashboard when they're only needed for specific instances.
-const FileEditContainer = lazy(
-  () => import("@/components/server/files/FileEditContainer")
-);
-const ScheduleEditContainer = lazy(
-  () => import("@/components/server/schedules/ScheduleEditContainer")
-);
+const FileEditContainer = lazy(() => import("@/components/server/files/FileEditContainer"));
+const ScheduleEditContainer = lazy(() => import("@/components/server/schedules/ScheduleEditContainer"));
 
 interface RouteDefinition {
   path: string;
-  // If undefined is passed this route is still rendered into the router itself
-  // but no navigation link is displayed in the sub-navigation menu.
   name: string | undefined;
-  icon: any;
+  icon?: LucideIcon;
   component: React.ComponentType;
   exact?: boolean;
 }
@@ -57,123 +31,29 @@ interface ServerRouteDefinition extends RouteDefinition {
 }
 
 interface Routes {
-  // All of the routes available under "/account"
   account: RouteDefinition[];
-  // All of the routes available under "/server/:id"
   server: ServerRouteDefinition[];
 }
 
 export default {
   account: [
-    {
-      path: "/",
-      name: "Account",
-      icon: faUserCircle,
-      component: AccountOverviewContainer,
-      exact: true,
-    },
-    {
-      path: "/api",
-      name: "API Credentials",
-      icon: faKey,
-      component: AccountApiContainer,
-    },
-    {
-      path: "/ssh",
-      name: "SSH Keys",
-      icon: faWrench,
-      component: AccountSSHContainer,
-    },
-    {
-      path: "/activity",
-      name: "Activity",
-      icon: faEnvelope,
-      component: ActivityLogContainer,
-    },
+    { path: "/", name: "Account", icon: UserCircle2, component: AccountOverviewContainer, exact: true },
+    { path: "/api", name: "API Credentials", icon: KeyRound, component: AccountApiContainer },
+    { path: "/ssh", name: "SSH Keys", icon: Wrench, component: AccountSSHContainer },
+    { path: "/activity", name: "Activity", icon: Activity, component: ActivityLogContainer },
   ],
   server: [
-    {
-      path: "/",
-      permission: null,
-      name: "Console",
-      icon: faTerminal,
-      component: ServerConsole,
-      exact: true,
-    },
-    {
-      path: "/files",
-      permission: "file.*",
-      name: "Files",
-      icon: faFolder,
-      component: FileManagerContainer,
-    },
-    {
-      path: "/files/:action(edit|new)",
-      permission: "file.*",
-      name: undefined,
-      component: FileEditContainer,
-    },
-    {
-      path: "/databases",
-      permission: "database.*",
-      name: "Databases",
-      icon: faDatabase,
-      component: DatabasesContainer,
-    },
-    {
-      path: "/schedules",
-      permission: "schedule.*",
-      name: "Schedules",
-      icon: faCalendarAlt,
-      component: ScheduleContainer,
-    },
-    {
-      path: "/schedules/:id",
-      permission: "schedule.*",
-      name: undefined,
-      component: ScheduleEditContainer,
-    },
-    {
-      path: "/users",
-      permission: "user.*",
-      name: "Users",
-      icon: faUsers,
-      component: UsersContainer,
-    },
-    {
-      path: "/backups",
-      permission: "backup.*",
-      name: "Backups",
-      icon: faArchive,
-      component: BackupContainer,
-    },
-    {
-      path: "/network",
-      permission: "allocation.*",
-      name: "Network",
-      icon: faNetworkWired,
-      component: NetworkContainer,
-    },
-    {
-      path: "/startup",
-      permission: "startup.*",
-      name: "Startup",
-      icon: faPlayCircle,
-      component: StartupContainer,
-    },
-    {
-      path: "/settings",
-      permission: ["settings.*", "file.sftp"],
-      name: "Settings",
-      icon: faCog,
-      component: SettingsContainer,
-    },
-    {
-      path: "/activity",
-      permission: "activity.*",
-      name: "Activity",
-      icon: faHistory,
-      component: ServerActivityLogContainer,
-    },
+    { path: "/", permission: null, name: "Console", icon: TerminalSquare, component: ServerConsole, exact: true },
+    { path: "/files", permission: "file.*", name: "Files", icon: Folder, component: FileManagerContainer },
+    { path: "/files/:action(edit|new)", permission: "file.*", name: undefined, component: FileEditContainer },
+    { path: "/databases", permission: "database.*", name: "Databases", icon: Database, component: DatabasesContainer },
+    { path: "/schedules", permission: "schedule.*", name: "Schedules", icon: CalendarDays, component: ScheduleContainer },
+    { path: "/schedules/:id", permission: "schedule.*", name: undefined, component: ScheduleEditContainer },
+    { path: "/users", permission: "user.*", name: "Users", icon: Users, component: UsersContainer },
+    { path: "/backups", permission: "backup.*", name: "Backups", icon: Archive, component: BackupContainer },
+    { path: "/network", permission: "allocation.*", name: "Network", icon: Network, component: NetworkContainer },
+    { path: "/startup", permission: "startup.*", name: "Startup", icon: PlayCircle, component: StartupContainer },
+    { path: "/settings", permission: ["settings.*", "file.sftp"], name: "Settings", icon: Cog, component: SettingsContainer },
+    { path: "/activity", permission: "activity.*", name: "Activity", icon: LayoutGrid, component: ServerActivityLogContainer },
   ],
 } as Routes;
