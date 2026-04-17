@@ -20,17 +20,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build panel source archive
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install frontend dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build frontend assets
+        run: yarn build:production
+
+      - name: Create release archive
         run: |
           rm -f panel.tar.gz
-          git archive --format=tar.gz --output=panel.tar.gz HEAD
+          tar -czf panel.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.github' \
+            --exclude='tests' \
+            .
 
       - name: Publish latest release asset
         uses: ncipollo/release-action@v1
         with:
           tag: latest
           name: latest
-          body: Automated latest source archive release.
+          body: Automated latest source archive release with compiled frontend assets.
           allowUpdates: true
           replacesArtifacts: true
           removeArtifacts: true
