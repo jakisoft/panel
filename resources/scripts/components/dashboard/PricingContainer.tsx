@@ -107,7 +107,7 @@ export default () => {
                   return (
                     <li key={`${feature.text}-${featureIndex}`} css={tw`flex items-start gap-2`}>
                       {included ? (
-                        <CheckCircle2 size={16} css={tw`text-emerald-400 mt-0.5 flex-shrink-0`} />
+                        <CheckCircle2 size={16} css={tw`text-green-400 mt-0.5 flex-shrink-0`} />
                       ) : (
                         <XCircle size={16} css={tw`text-red-400 mt-0.5 flex-shrink-0`} />
                       )}
