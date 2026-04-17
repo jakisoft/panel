@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { ChevronDown, ChevronUp, Cpu, HardDrive, MemoryStick, Server } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, Cpu, HardDrive, MemoryStick, Server, XCircle } from 'lucide-react';
 import { getElysiumData } from '@/components/elements/elysium/getElysiumData';
 
 const customStyles = `
@@ -18,7 +18,8 @@ const customStyles = `
   .reveal.active { opacity: 1; transform: translateY(0); }
 `;
 
-type PricingItem = { name: string; monthly_price?: number; price?: string; cpu?: string; memory?: string; disk?: string; description?: string };
+type PricingFeature = { text: string; type?: 'include' | 'exclude' };
+type PricingItem = { name: string; monthly_price?: number; price?: string; cpu?: string; memory?: string; disk?: string; description?: string; features?: PricingFeature[] };
 type FaqItem = { question: string; answer: string };
 type VisualCard = { key: 'total_users' | 'total_servers'; title: string; description?: string };
 type FooterLink = { label: string; url: string };
@@ -210,15 +211,33 @@ export default () => {
                 <div className={'max-w-7xl mx-auto'}>
                     <div className={'text-center mb-16'}><ScrollReveal><h2 className={'text-3xl md:text-4xl font-extrabold mb-4 tracking-tight'}>{pricingTitle}</h2><p className={'text-slate-500 text-[14px]'}>{pricingSubtitle}</p></ScrollReveal></div>
                     <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
-                        {(pricingItems.length ? pricingItems : [{ name: 'Starter', monthly_price: 15000, cpu: '1 vCPU', memory: '2 GB', disk: '20 GB', description: 'Paket dasar panel.' }]).map((item, idx) => (
-                            <div key={`${item.name}-${idx}`} className={'bg-white rounded-[28px] p-8 border border-slate-100 shadow-[0_20px_40px_rgba(0,0,0,0.04)]'}>
-                                <h3 className={'text-xl font-extrabold'}>{item.name}</h3><p className={'text-indigo-600 font-black text-2xl mt-2'}>{formatPrice(toMonthlyPrice(item))}</p><p className={'text-slate-400 text-[13px] mt-3 mb-6'}>{item.description}</p>
-                                <ul className={'space-y-3 mb-6 text-[13px] text-slate-600'}>
-                                    <li className={'flex items-center gap-2'}><Cpu size={15} className={'text-indigo-500'} /> CPU: {item.cpu || '-'}</li>
-                                    <li className={'flex items-center gap-2'}><MemoryStick size={15} className={'text-indigo-500'} /> Memory: {item.memory || '-'}</li>
-                                    <li className={'flex items-center gap-2'}><HardDrive size={15} className={'text-indigo-500'} /> Disk: {item.disk || '-'}</li>
-                                </ul>
-                                <a href={'/pricing'} className={'inline-flex w-full justify-center bg-slate-900 text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:bg-indigo-600 transition-colors'}>Pilih Paket</a>
+                        {(pricingItems.length ? pricingItems : [{ name: 'Starter', monthly_price: 15000, cpu: '1 vCPU', memory: '2 GB', disk: '20 GB', description: 'Paket dasar panel.', features: [{ text: 'Proteksi DDoS dasar', type: 'include' }, { text: 'Priority support', type: 'exclude' }] }]).map((item, idx) => (
+                            <div key={`${item.name}-${idx}`} className={'rounded-3xl p-[1px] bg-gradient-to-br from-indigo-300 via-fuchsia-300 to-cyan-300 shadow-[0_20px_60px_rgba(79,70,229,0.20)]'}>
+                                <div className={'bg-white/95 backdrop-blur-xl rounded-3xl p-8 border border-white/70 h-full'}>
+                                    <div className={'flex items-start justify-between gap-3'}>
+                                        <h3 className={'text-xl font-extrabold'}>{item.name}</h3>
+                                        <span className={'text-[10px] uppercase tracking-widest px-2 py-1 rounded-full bg-indigo-50 text-indigo-600 font-bold'}>Premium</span>
+                                    </div>
+                                    <p className={'text-indigo-600 font-black text-2xl mt-2'}>{formatPrice(toMonthlyPrice(item))}</p>
+                                    <p className={'text-slate-500 text-[13px] mt-3 mb-4'}>{item.description}</p>
+                                    <div className={'grid grid-cols-3 gap-2 mb-4 text-[12px]'}>
+                                        <div className={'rounded-xl bg-slate-100 p-2 text-center text-slate-700'}><Cpu size={14} className={'mx-auto mb-1 text-indigo-500'} />{item.cpu || '-'}</div>
+                                        <div className={'rounded-xl bg-slate-100 p-2 text-center text-slate-700'}><MemoryStick size={14} className={'mx-auto mb-1 text-indigo-500'} />{item.memory || '-'}</div>
+                                        <div className={'rounded-xl bg-slate-100 p-2 text-center text-slate-700'}><HardDrive size={14} className={'mx-auto mb-1 text-indigo-500'} />{item.disk || '-'}</div>
+                                    </div>
+                                    <ul className={'space-y-2 mb-6 text-[13px]'}>
+                                        {(item.features ?? []).map((feature, featureIndex) => {
+                                            const included = (feature.type ?? 'include') !== 'exclude';
+                                            return (
+                                                <li key={`${feature.text}-${featureIndex}`} className={'flex items-start gap-2'}>
+                                                    {included ? <CheckCircle2 size={15} className={'text-emerald-500 mt-0.5'} /> : <XCircle size={15} className={'text-red-500 mt-0.5'} />}
+                                                    <span className={included ? 'text-slate-600' : 'text-red-500'}>{feature.text}</span>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                    <a href={'/pricing'} className={'inline-flex w-full justify-center bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:from-indigo-500 hover:to-fuchsia-500 transition-colors'}>Pilih Paket</a>
+                                </div>
                             </div>
                         ))}
                     </div>
