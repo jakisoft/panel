@@ -9,22 +9,25 @@
             <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
             <meta name="csrf-token" content="{{ csrf_token() }}">
             <meta name="robots" content="noindex">
-            <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
-            <link rel="manifest" href="/favicons/manifest.json">
-            <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#bc6e3c">
-            <meta name="msapplication-config" content="/favicons/browserconfig.xml">
+            
             
             <?php
             $elysium = \Illuminate\Support\Facades\DB::table('elysium')->first();
             ?>
 
+            @php
+                $favicon = !empty($elysium->logo) ? $elysium->logo : '/favicons/favicon.ico';
+            @endphp
+
+            <link rel="apple-touch-icon" sizes="180x180" href="{{ $favicon }}">
+            <link rel="icon" type="image/png" href="{{ $favicon }}" sizes="16x16">
+            <link rel="icon" type="image/png" href="{{ $favicon }}" sizes="32x32">
+            <link rel="shortcut icon" href="{{ $favicon }}">
+
             <meta property="og:type" content="website" />
             <meta property="og:title" content="<?php echo $elysium->title ?>">
             <meta property="og:image" content="<?php echo $elysium->logo ?>"/>
             <meta property="og:description" content="<?php echo $elysium->description ?>" />
-            <link rel="icon" type="image/png" href="<?php echo $elysium->logo ?>" sizes="16x16">
-            <link rel="icon" type="image/png" href="<?php echo $elysium->logo ?>" sizes="32x32">
-            <link rel="shortcut icon" href="<?php echo $elysium->logo ?>">
             <meta name="theme-color" content="<?php echo $elysium->color_meta; ?>">
             
             <style>
@@ -59,12 +62,20 @@
                     --auth-label-text-color:<?php echo $elysium->color_auth_label_text ?? '#9CA3AF'; ?>;
                     --oauth-google-enabled:<?php echo !empty($elysium->google_auth_enabled) ? '1' : '0'; ?>;
                     --oauth-github-enabled:<?php echo !empty($elysium->github_auth_enabled) ? '1' : '0'; ?>;
+                    --playground-badge:<?php echo json_encode($elysium->playground_badge ?? 'Pterodactyl + Elysium Theme') ?>;
+                    --playground-hero-title:<?php echo json_encode($elysium->playground_hero_title ?? 'Kelola Server Lebih Cepat dan Modern.') ?>;
+                    --playground-hero-description:<?php echo json_encode($elysium->playground_hero_description ?? 'Halaman playground untuk eksplorasi fitur panel, status server, keamanan akun, dan pembaruan Elysium Theme.') ?>;
+                    --playground-pricing-title:<?php echo json_encode($elysium->playground_pricing_title ?? 'Paket Pricing Panel') ?>;
+                    --playground-pricing-subtitle:<?php echo json_encode($elysium->playground_pricing_subtitle ?? 'Ringkasan paket server yang tersedia untuk kebutuhan komunitas hingga bisnis.') ?>;
+                    --playground-faq-badge:<?php echo json_encode($elysium->playground_faq_badge ?? 'Pusat Bantuan') ?>;
+                    --playground-faq-title:<?php echo json_encode($elysium->playground_faq_title ?? 'Pertanyaan Populer') ?>;
+                    --playground-faq-subtitle:<?php echo json_encode($elysium->playground_faq_subtitle ?? '') ?>;
+                    --playground-pricing-items:<?php echo json_encode($elysium->playground_pricing_items ?? '[]') ?>;
+                    --playground-faq-items:<?php echo json_encode($elysium->playground_faq_items ?? '[]') ?>;
+                    --playground-visual-cards:<?php echo json_encode($elysium->playground_visual_cards ?? '[]') ?>;
                 }
             </style>
 
-            <link rel="manifest" href="/favicons/manifest.json">
-            <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#bc6e3c">
-            <meta name="msapplication-config" content="/favicons/browserconfig.xml">
 
         @show
 

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useStoreState } from "easy-peasy";
-import { Cog, Key, Layers, LogOut, Mail, User, Wrench } from "lucide-react";
+import { AlertTriangle, Cog, Key, Layers, LogOut, Mail, User, Wrench } from "lucide-react";
 import { ApplicationStore } from "@/state";
 import SearchContainer from "@/components/dashboard/search/SearchContainer";
 import tw from "twin.macro";
@@ -13,6 +13,7 @@ import LogoContainer from "@/components/elements/elysium/navigation/LogoContaine
 import CategoryContainer from "@/components/elements/elysium/navigation/CategoryContainer";
 import NavigationButton from "@/components/elements/elysium/navigation/NavigationButton";
 import { getElysiumData } from "@/components/elements/elysium/getElysiumData";
+import { Dialog } from "@/components/elements/dialog";
 
 const iconProps = { size: 16 };
 
@@ -21,17 +22,19 @@ export default () => {
   const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
   const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const onTriggerLogout = () => {
-    const confirmed = window.confirm("Yakin mau logout dari panel?");
-    if (!confirmed) return;
-
+  const onConfirmLogout = () => {
+    setShowLogoutConfirm(false);
     setIsLoggingOut(true);
+
     http.post("/auth/logout").finally(() => {
       // @ts-expect-error this is valid
       window.location = "/";
     });
   };
+
+  const onTriggerLogout = () => setShowLogoutConfirm(true);
 
   return (
     <Navigation>
@@ -84,6 +87,21 @@ export default () => {
           <NavigationButton>{isLoggingOut ? "Signing Out..." : "Sign Out"}</NavigationButton>
         </a>
       </NavigationBar>
+
+      <Dialog.Confirm
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirmed={onConfirmLogout}
+        title={"Logout Confirmation"}
+        confirm={"Logout"}
+      >
+        <div css={tw`space-y-3 text-center`}>
+          <div css={tw`w-12 h-12 mx-auto rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400`}>
+            <AlertTriangle size={20} />
+          </div>
+          <p css={tw`text-sm text-neutral-300`}>Yakin mau logout dari panel ini?</p>
+        </div>
+      </Dialog.Confirm>
     </Navigation>
   );
 };
