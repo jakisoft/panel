@@ -17,7 +17,7 @@ const NavigationBar = styled.div`
     }
 
     &.active {
-      ${tw`text-white border-white/15`};
+      ${tw`text-white border-white/20`};
       background: linear-gradient(120deg, rgba(79, 70, 229, 0.38), rgba(147, 51, 234, 0.28));
       box-shadow: 0 10px 30px rgba(79, 70, 229, 0.28);
     }
