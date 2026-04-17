@@ -1,7 +1,9 @@
 import React, { useMemo } from "react";
 import tw from "twin.macro";
-import { Cpu, HardDrive, MemoryStick } from "lucide-react";
+import { CheckCircle2, Cpu, HardDrive, MemoryStick, XCircle } from "lucide-react";
 import { getElysiumData } from "@/components/elements/elysium/getElysiumData";
+
+type PricingFeature = { text: string; type?: "include" | "exclude" };
 
 type PricingItem = {
   name: string;
@@ -11,6 +13,7 @@ type PricingItem = {
   memory?: string;
   disk?: string;
   description?: string;
+  features?: PricingFeature[];
 };
 
 const parseStringVar = (name: string, fallback: string) => {
@@ -43,18 +46,27 @@ const toMonthlyPrice = (item: PricingItem): number => {
   return digits ? Number(digits) : 0;
 };
 
-const formatPrice = (value: number): string => {
-  return `Rp ${value.toLocaleString("id-ID")}/bulan`;
-};
+const formatPrice = (value: number): string => `Rp ${value.toLocaleString("id-ID")}/bulan`;
 
 export default () => {
   const title = parseStringVar("--playground-pricing-title", "Paket Pricing Panel");
-  const subtitle = parseStringVar("--playground-pricing-subtitle", "Pilih paket yang paling sesuai kebutuhan server kamu.");
+  const subtitle = parseStringVar("--playground-pricing-subtitle", "Pilih paket premium untuk performa maksimal.");
 
   const pricingItems = useMemo(
     () =>
       parseJsonVar<PricingItem[]>("--playground-pricing-items", [
-        { name: "Starter", monthly_price: 15000, cpu: "1 vCPU", memory: "2 GB", disk: "20 GB", description: "Paket dasar panel." },
+        {
+          name: "Starter",
+          monthly_price: 15000,
+          cpu: "1 vCPU",
+          memory: "2 GB",
+          disk: "20 GB",
+          description: "Paket dasar panel.",
+          features: [
+            { text: "Proteksi DDoS dasar", type: "include" },
+            { text: "Priority support", type: "exclude" },
+          ],
+        },
       ]),
     []
   );
@@ -66,26 +78,49 @@ export default () => {
         <p css={tw`text-neutral-400 mt-2 text-sm`}>{subtitle}</p>
       </div>
 
-      <div css={tw`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4`}>
+      <div css={tw`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5`}>
         {pricingItems.map((item, index) => (
-          <div key={`${item.name}-${index}`} css={tw`rounded-xl bg-elysium-color3 border border-white/5 p-5 flex flex-col gap-4`}>
-            <div>
-              <h2 css={tw`text-lg font-bold text-white truncate`} title={item.name}>
-                {item.name}
-              </h2>
-              <p css={tw`text-indigo-300 text-xl font-extrabold mt-1 break-words`}>{formatPrice(toMonthlyPrice(item))}</p>
-              {item.description && <p css={tw`text-neutral-300 text-sm mt-2 break-words`}>{item.description}</p>}
-            </div>
+          <div
+            key={`${item.name}-${index}`}
+            css={tw`rounded-2xl p-[1px] bg-gradient-to-br from-indigo-400/60 via-fuchsia-400/40 to-cyan-400/60 shadow-[0_20px_60px_rgba(79,70,229,0.25)]`}
+          >
+            <div css={tw`rounded-2xl bg-elysium-color3/95 backdrop-blur-xl border border-white/10 p-5 flex flex-col gap-4 h-full`}>
+              <div css={tw`flex items-start justify-between gap-3`}>
+                <h2 css={tw`text-lg font-extrabold text-white truncate`} title={item.name}>
+                  {item.name}
+                </h2>
+                <span css={tw`text-[10px] uppercase tracking-widest px-2 py-1 rounded-full bg-white/10 text-indigo-200`}>Premium</span>
+              </div>
 
-            <div css={tw`space-y-2 text-sm text-neutral-200 flex-1`}>
-              <p css={tw`flex items-center gap-2`}><Cpu size={14} css={tw`text-indigo-300`} /> CPU: {item.cpu || "-"}</p>
-              <p css={tw`flex items-center gap-2`}><MemoryStick size={14} css={tw`text-indigo-300`} /> Memory: {item.memory || "-"}</p>
-              <p css={tw`flex items-center gap-2`}><HardDrive size={14} css={tw`text-indigo-300`} /> Disk: {item.disk || "-"}</p>
-            </div>
+              <p css={tw`text-indigo-300 text-xl font-black`}>{formatPrice(toMonthlyPrice(item))}</p>
+              {item.description && <p css={tw`text-neutral-300 text-sm break-words`}>{item.description}</p>}
 
-            <button css={tw`w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white text-sm font-semibold py-2.5`}>
-              Pilih Paket
-            </button>
+              <div css={tw`grid grid-cols-3 gap-2 text-xs`}>
+                <div css={tw`rounded-lg bg-white/5 px-2 py-2 text-center text-neutral-100`}><Cpu size={13} css={tw`mx-auto mb-1 text-indigo-300`} />{item.cpu || "-"}</div>
+                <div css={tw`rounded-lg bg-white/5 px-2 py-2 text-center text-neutral-100`}><MemoryStick size={13} css={tw`mx-auto mb-1 text-indigo-300`} />{item.memory || "-"}</div>
+                <div css={tw`rounded-lg bg-white/5 px-2 py-2 text-center text-neutral-100`}><HardDrive size={13} css={tw`mx-auto mb-1 text-indigo-300`} />{item.disk || "-"}</div>
+              </div>
+
+              <ul css={tw`space-y-2 text-sm flex-1`}>
+                {(item.features ?? []).map((feature, featureIndex) => {
+                  const included = (feature.type ?? "include") !== "exclude";
+                  return (
+                    <li key={`${feature.text}-${featureIndex}`} css={tw`flex items-start gap-2`}>
+                      {included ? (
+                        <CheckCircle2 size={16} css={tw`text-emerald-400 mt-0.5 flex-shrink-0`} />
+                      ) : (
+                        <XCircle size={16} css={tw`text-red-400 mt-0.5 flex-shrink-0`} />
+                      )}
+                      <span css={[tw`break-words`, included ? tw`text-neutral-200` : tw`text-red-200`]}>{feature.text}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <button css={tw`w-full rounded-xl bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-400 hover:to-fuchsia-400 transition-colors text-white text-sm font-semibold py-2.5 shadow-lg`}>
+                Pilih Paket
+              </button>
+            </div>
           </div>
         ))}
       </div>

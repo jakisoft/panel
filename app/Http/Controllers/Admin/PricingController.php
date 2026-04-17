@@ -34,6 +34,10 @@ class PricingController extends Controller
                     'memory' => '2 GB',
                     'disk' => '20 GB',
                     'description' => 'Cocok untuk server kecil dan komunitas baru.',
+                    'features' => [
+                        ['text' => 'Proteksi DDoS dasar', 'type' => 'include'],
+                        ['text' => 'Priority support 24/7', 'type' => 'exclude'],
+                    ],
                 ],
             ]),
         ]);
@@ -51,9 +55,21 @@ class PricingController extends Controller
             'pricing.*.memory' => ['required_with:pricing', 'string', 'max:120'],
             'pricing.*.disk' => ['required_with:pricing', 'string', 'max:120'],
             'pricing.*.description' => ['nullable', 'string', 'max:1000'],
+            'pricing.*.included_features' => ['nullable', 'string', 'max:3000'],
+            'pricing.*.excluded_features' => ['nullable', 'string', 'max:3000'],
         ]);
 
         $pricingItems = collect($data['pricing'] ?? [])->map(function (array $item) {
+            $included = collect(preg_split('/\r\n|\r|\n/', (string) ($item['included_features'] ?? '')))
+                ->map(fn ($feature) => trim($feature))
+                ->filter()
+                ->map(fn ($feature) => ['text' => $feature, 'type' => 'include']);
+
+            $excluded = collect(preg_split('/\r\n|\r|\n/', (string) ($item['excluded_features'] ?? '')))
+                ->map(fn ($feature) => trim($feature))
+                ->filter()
+                ->map(fn ($feature) => ['text' => $feature, 'type' => 'exclude']);
+
             return [
                 'name' => trim($item['name']),
                 'monthly_price' => (int) $item['monthly_price'],
@@ -61,6 +77,7 @@ class PricingController extends Controller
                 'memory' => trim($item['memory']),
                 'disk' => trim($item['disk']),
                 'description' => trim((string) ($item['description'] ?? '')),
+                'features' => $included->concat($excluded)->values()->all(),
             ];
         })->filter(fn (array $item) => $item['name'] !== '')->values()->all();
 

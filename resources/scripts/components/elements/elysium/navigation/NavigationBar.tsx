@@ -7,12 +7,19 @@ const NavigationBar = styled.div`
   & > a,
   & > button,
   & > .navigation-link {
-    ${tw`w-full min-h-[40px] flex items-center px-3 py-2 my-1 no-underline text-neutral-300 cursor-pointer transition-all duration-150 rounded-lg`};
+    ${tw`w-full min-h-[40px] flex items-center px-3 py-2 my-1 no-underline text-neutral-300 cursor-pointer transition-all duration-150 rounded-lg border border-transparent`};
 
     &:hover,
-    &:focus-visible,
+    &:focus-visible {
+      ${tw`text-white border-white/10`};
+      background: linear-gradient(120deg, rgba(99, 102, 241, 0.22), rgba(217, 70, 239, 0.18));
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.22);
+    }
+
     &.active {
-      ${tw`bg-elysium-color3 text-neutral-100`};
+      ${tw`text-white border-white/15`};
+      background: linear-gradient(120deg, rgba(79, 70, 229, 0.38), rgba(147, 51, 234, 0.28));
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.28);
     }
   }
 

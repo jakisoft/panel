@@ -2,8 +2,10 @@ import tw from "twin.macro";
 import styled from "styled-components/macro";
 
 const Navigation = styled.aside`
-  ${tw`sticky top-0 h-screen bg-elysium-color2 border-r border-black/20 shadow-md overflow-y-auto overflow-x-hidden z-30`};
+  ${tw`sticky top-0 h-screen border-r border-white/10 shadow-2xl overflow-y-auto overflow-x-hidden z-30`};
   flex-shrink: 0;
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.95));
+  backdrop-filter: blur(10px);
 
   @media (max-width: 639px) {
     ${tw`w-16`};

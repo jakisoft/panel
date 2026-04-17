@@ -101,10 +101,41 @@ export default memo(({ server }: { server: Server }) => {
   }, [lifecycle.tone]);
 
   const BackgroundDiv = styled.div`
-    ${tw`w-full min-h-[170px] py-4 rounded-xl relative`}
+    ${tw`w-full min-h-[170px] py-4 rounded-xl relative overflow-hidden`}
     background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url(${serverBackground});
     background-size: cover;
     background-position: center;
+
+    .expired-chip {
+      ${tw`backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.35)] border border-white/20`}
+    }
+
+    @media (max-width: 640px) {
+      .expired-chip {
+        animation: marquee-expired 6.5s linear infinite;
+        will-change: transform, opacity;
+      }
+
+      @keyframes marquee-expired {
+        0% {
+          transform: translateX(110%);
+          opacity: 0;
+        }
+
+        10% {
+          opacity: 1;
+        }
+
+        85% {
+          opacity: 1;
+        }
+
+        100% {
+          transform: translateX(-120%);
+          opacity: 0;
+        }
+      }
+    }
   `;
 
   const defaultAllocation = server.allocations.find((alloc) => alloc.isDefault);
@@ -132,8 +163,8 @@ export default memo(({ server }: { server: Server }) => {
           </div>
         </div>
 
-        <div css={tw`absolute right-3 bottom-3 max-w-[45%]`}>
-          <span css={tw`text-[11px] bg-black/40 px-2.5 py-1 rounded-full inline-flex items-center gap-1 whitespace-nowrap`}>
+        <div css={tw`absolute right-3 bottom-3 max-w-[55%] sm:max-w-[45%] overflow-hidden`}>
+          <span className="expired-chip" css={tw`text-[11px] bg-black/35 px-2.5 py-1 rounded-full inline-flex items-center gap-1 whitespace-nowrap`}>
             <CalendarClock size={13} />
             <span>Expired:</span>
             <span css={tw`font-semibold truncate`}>{expInfo.label}</span>
