@@ -87,13 +87,23 @@ export default ({ server, className }: { server: Server; className?: string }) =
     const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : 'Unlimited';
     const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Unlimited';
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : 'Unlimited';
-    const formattedExpDate = server.expDate
-        ? new Date(server.expDate).toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-          })
-        : 'Unlimited';
+    const formattedExpDate = (() => {
+        if (!server.expDate) {
+            return 'Unlimited';
+        }
+
+        const parsed = new Date(server.expDate);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return server.expDate;
+        }
+
+        return parsed.toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    })();
 
     return (
         <StatusIndicatorBox as={Link} to={`/server/${server.id}`} className={className} $status={stats?.status}>
@@ -108,7 +118,8 @@ export default ({ server, className }: { server: Server; className?: string }) =
                     )}
                     <div css={tw`mt-2 flex items-center text-xs text-neutral-400`}>
                         <CalendarClock size={14} css={tw`mr-1.5`} />
-                        <span>Expired: {formattedExpDate}</span>
+                        <span css={tw`mr-2`}>Expired:</span>
+                        <span css={tw`px-2 py-0.5 rounded bg-neutral-900 text-neutral-200`}>{formattedExpDate}</span>
                     </div>
                 </div>
             </div>

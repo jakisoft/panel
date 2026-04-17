@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
 import { ServerContext } from '@/state/server';
 import { useStoreState } from 'easy-peasy';
@@ -14,13 +14,32 @@ import isEqual from 'react-fast-compare';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import { ip } from '@/lib/formatters';
 import { Button } from '@/components/elements/button/index';
+import { CalendarClock } from 'lucide-react';
 
 export default () => {
     const username = useStoreState((state) => state.user.data!.username);
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const node = ServerContext.useStoreState((state) => state.server.data!.node);
+    const expDate = ServerContext.useStoreState((state) => state.server.data!.expDate);
     const sftp = ServerContext.useStoreState((state) => state.server.data!.sftpDetails, isEqual);
+
+    const formattedExpDate = useMemo(() => {
+        if (!expDate) {
+            return 'Unlimited';
+        }
+
+        const parsed = new Date(expDate);
+        if (Number.isNaN(parsed.getTime())) {
+            return expDate;
+        }
+
+        return parsed.toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+    }, [expDate]);
 
     return (
         <ServerContentBlock title={'Settings'}>
@@ -68,6 +87,13 @@ export default () => {
                                 <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{uuid}</code>
                             </div>
                         </CopyOnClick>
+                        <div css={tw`flex items-center justify-between mt-2 text-sm`}>
+                            <p css={tw`flex items-center`}>
+                                <CalendarClock size={14} css={tw`mr-2`} />
+                                Expiration Date
+                            </p>
+                            <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{formattedExpDate}</code>
+                        </div>
                     </TitledGreyBox>
                 </div>
                 <div css={tw`w-full mt-6 md:flex-1 md:mt-0`}>

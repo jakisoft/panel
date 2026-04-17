@@ -54,6 +54,9 @@
                             <label for="exp_date">Expiration date</label>
                             <input type="date" class="form-control" id="exp_date" name="exp_date" value="{{ old('exp_date') }}" placeholder="Expiration Date">
                             <p class="small text-muted no-margin">The expiration date of this server. (Leave blank to keep the server from expiring)</p>
+                            <div id="expDateInfo" class="small text-muted" style="margin-top: 8px;">
+                                Information: This server will not expire.
+                            </div>
                         </div>
 
                     </div>
@@ -348,6 +351,18 @@
 
     <script type="application/javascript">
         $(document).ready(function() {
+            function updateExpirationInfo() {
+                var value = $('#exp_date').val();
+                var info = value
+                    ? 'Information: This server will expire on ' + value + '.'
+                    : 'Information: This server will not expire.';
+
+                $('#expDateInfo').text(info);
+            }
+
+            updateExpirationInfo();
+            $('#exp_date').on('change', updateExpirationInfo);
+
             // Persist 'Server Owner' select2
             @if (old('owner_id'))
                 $.ajax({
