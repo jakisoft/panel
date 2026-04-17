@@ -8,7 +8,7 @@ import GreyRowBox from '@/components/elements/GreyRowBox';
 import Spinner from '@/components/elements/Spinner';
 import styled from 'styled-components/macro';
 import isEqual from 'react-fast-compare';
-import { Calendar, Cpu, HardDrive, Server, Wifi, Database } from 'lucide-react';
+import { Calendar, Cpu, HardDrive, Server as ServerIcon, Wifi, Database } from 'lucide-react';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
@@ -109,7 +109,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         <StatusIndicatorBox as={Link} to={`/server/${server.id}`} className={className} $status={stats?.status}>
             <div css={tw`flex items-center col-span-12 sm:col-span-5 lg:col-span-6`}>
                 <div className={'icon mr-4'}>
-                    <Server size={20} />
+                    <ServerIcon size={20} />
                 </div>
                 <div>
                     <p css={tw`text-lg break-words`}>{server.name}</p>
