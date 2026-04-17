@@ -197,11 +197,11 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>UPTIME</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "starting" || resolvedStatus === "stopping"
-                ? capitalize(resolvedStatus)
+              {resolvedStatus === "offline"
+                ? "Offline"
                 : stats.uptime > 0
                 ? <UptimeDuration uptime={stats.uptime / 1000} />
-                : "Offline"}
+                : capitalize(resolvedStatus)}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -210,7 +210,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>CPU</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "running" ? `${stats.cpu.toFixed(2)}% / ${cpuLimit}` : statusLabel}
+              {resolvedStatus === "offline" ? "Offline" : `${stats.cpu.toFixed(2)}% / ${cpuLimit}`}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -219,7 +219,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>MEMORY</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "running" ? `${bytesToString(stats.memory)} / ${memoryLimit}` : statusLabel}
+              {resolvedStatus === "offline" ? "Offline" : `${bytesToString(stats.memory)} / ${memoryLimit}`}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -228,7 +228,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>DISK</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "running" ? `${bytesToString(stats.disk)} / ${diskLimit}` : statusLabel}
+              {resolvedStatus === "offline" ? "Offline" : `${bytesToString(stats.disk)} / ${diskLimit}`}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -236,7 +236,7 @@ const ServerDetailsBlock = () => {
               <Globe size={iconSize} />
               <span css={tw`ml-2 uppercase font-semibold`}>NETWORK</span>
             </div>
-            {resolvedStatus !== "running" ? (
+            {resolvedStatus === "offline" ? (
               <div css={tw`flex items-center mb-4`}>
                 {resolvedStatus === "install_failed" ? <TriangleAlert size={14} /> : <CircleOff size={14} />}
                 <p css={tw`ml-1`}>{statusLabel}</p>
