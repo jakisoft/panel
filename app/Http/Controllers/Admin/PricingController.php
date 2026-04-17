@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\Http\Controllers\Admin\Elysium;
+namespace Pterodactyl\Http\Controllers\Admin;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Prologue\Alerts\AlertsMessageBag;
 use Pterodactyl\Http\Controllers\Controller;
 
-class PricingSettingsController extends Controller
+class PricingController extends Controller
 {
     /**
      * @var \Prologue\Alerts\AlertsMessageBag
@@ -24,10 +24,17 @@ class PricingSettingsController extends Controller
     {
         $elysium = DB::table('elysium')->first();
 
-        return view('admin.elysium.pricing', [
+        return view('admin.pricing.index', [
             'elysium' => $elysium,
             'pricingItems' => $this->decodeJson($elysium->playground_pricing_items ?? null, [
-                ['name' => 'Starter', 'price' => 'Rp 15.000/bulan', 'description' => 'Cocok untuk server kecil, performa stabil, support cepat.', 'features' => ['1 vCPU', '2 GB RAM', 'Proteksi DDoS dasar']],
+                [
+                    'name' => 'Starter',
+                    'monthly_price' => 15000,
+                    'cpu' => '1 vCPU',
+                    'memory' => '2 GB',
+                    'disk' => '20 GB',
+                    'description' => 'Cocok untuk server kecil dan komunitas baru.',
+                ],
             ]),
         ]);
     }
@@ -39,23 +46,23 @@ class PricingSettingsController extends Controller
             'playground_pricing_subtitle' => ['nullable', 'string', 'max:500'],
             'pricing' => ['nullable', 'array'],
             'pricing.*.name' => ['required_with:pricing', 'string', 'max:120'],
-            'pricing.*.price' => ['required_with:pricing', 'string', 'max:120'],
+            'pricing.*.monthly_price' => ['required_with:pricing', 'integer', 'min:0', 'max:999999999'],
+            'pricing.*.cpu' => ['required_with:pricing', 'string', 'max:120'],
+            'pricing.*.memory' => ['required_with:pricing', 'string', 'max:120'],
+            'pricing.*.disk' => ['required_with:pricing', 'string', 'max:120'],
             'pricing.*.description' => ['nullable', 'string', 'max:1000'],
-            'pricing.*.features' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $pricingItems = collect($data['pricing'] ?? [])->map(function (array $item) {
             return [
                 'name' => trim($item['name']),
-                'price' => trim($item['price']),
+                'monthly_price' => (int) $item['monthly_price'],
+                'cpu' => trim($item['cpu']),
+                'memory' => trim($item['memory']),
+                'disk' => trim($item['disk']),
                 'description' => trim((string) ($item['description'] ?? '')),
-                'features' => collect(preg_split('/\r\n|\r|\n/', (string) ($item['features'] ?? '')))
-                    ->map(fn ($feature) => trim($feature))
-                    ->filter()
-                    ->values()
-                    ->all(),
             ];
-        })->filter(fn (array $item) => $item['name'] !== '' && $item['price'] !== '')->values()->all();
+        })->filter(fn (array $item) => $item['name'] !== '')->values()->all();
 
         $existing = DB::table('elysium')->first();
 

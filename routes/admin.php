@@ -227,6 +227,20 @@ Route::group(['prefix' => 'nests'], function () {
     Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Pricing Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/pricing
+|
+*/
+Route::group(['prefix' => 'pricing'], function () {
+    Route::get('/', [Admin\PricingController::class, 'index'])->name('admin.pricing');
+    Route::post('/update', [Admin\PricingController::class, 'update'])->name('admin.pricing.update');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Elysium Controller Routes
@@ -254,6 +268,4 @@ Route::group(['prefix' => 'elysium'], function () {
     Route::get('/playground', [Admin\Elysium\PlaygroundSettingsController::class, 'index'])->name('admin.elysium.playground');
     Route::post('/playground/update', [Admin\Elysium\PlaygroundSettingsController::class, 'update'])->name('admin.elysium.playground.update');
 
-    Route::get('/pricing', [Admin\Elysium\PricingSettingsController::class, 'index'])->name('admin.elysium.pricing');
-    Route::post('/pricing/update', [Admin\Elysium\PricingSettingsController::class, 'update'])->name('admin.elysium.pricing.update');
 });
