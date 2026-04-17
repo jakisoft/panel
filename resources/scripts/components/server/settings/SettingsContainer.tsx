@@ -14,7 +14,7 @@ import isEqual from 'react-fast-compare';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import { ip } from '@/lib/formatters';
 import { Button } from '@/components/elements/button/index';
-import { CalendarClock } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 export default () => {
     const username = useStoreState((state) => state.user.data!.username);
@@ -89,7 +89,7 @@ export default () => {
                         </CopyOnClick>
                         <div css={tw`flex items-center justify-between mt-2 text-sm`}>
                             <p css={tw`flex items-center`}>
-                                <CalendarClock size={14} css={tw`mr-2`} />
+                                <Calendar size={14} css={tw`mr-2`} />
                                 Expiration Date
                             </p>
                             <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{formattedExpDate}</code>

@@ -3,7 +3,8 @@ import { useField } from 'formik';
 import Label from '@/components/elements/Label';
 import Input from '@/components/elements/Input';
 import tw from 'twin.macro';
-import { Eye, EyeOff, LucideIcon } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'name'> {
     name: string;
