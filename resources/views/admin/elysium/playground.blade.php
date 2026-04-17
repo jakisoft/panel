@@ -49,22 +49,6 @@
                         </div>
 
                         <hr>
-                        <h4>Pricing Section</h4>
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Pricing Title</label>
-                                <input type="text" class="form-control" name="playground_pricing_title" value="{{ old('playground_pricing_title', $elysium->playground_pricing_title ?? 'Paket Pricing Panel') }}" required>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Pricing Subtitle</label>
-                                <input type="text" class="form-control" name="playground_pricing_subtitle" value="{{ old('playground_pricing_subtitle', $elysium->playground_pricing_subtitle ?? '') }}">
-                            </div>
-                        </div>
-
-                        <div id="pricing_items"></div>
-                        <button type="button" class="btn btn-default btn-sm" id="add_pricing">Add Pricing Item</button>
-
-                        <hr>
                         <h4>FAQ Section</h4>
                         <div class="row">
                             <div class="form-group col-md-4">
@@ -111,13 +95,11 @@
     @parent
     <script>
         (function () {
-            const pricingContainer = document.getElementById('pricing_items');
             const faqContainer = document.getElementById('faq_items');
             const visualContainer = document.getElementById('visual_cards');
             const footerContainer = document.getElementById('footer_links');
             const socialContainer = document.getElementById('social_links');
 
-            const initialPricing = @json($pricingItems);
             const initialFaq = @json($faqItems);
             const initialVisual = @json($visualCards);
             const initialFooterLinks = @json($footerLinks);
@@ -144,22 +126,6 @@
 
                 card.appendChild(header);
                 return card;
-            };
-
-            const addPricingItem = (item = { name: '', price: '', description: '', features: [] }) => {
-                const index = pricingContainer.querySelectorAll('.pricing-item').length;
-                const card = createCardWrapper('Pricing Item');
-                card.classList.add('pricing-item');
-
-                card.innerHTML += `
-                    <div class="row">
-                        <div class="form-group col-md-4"><label>Name</label><input type="text" class="form-control" name="pricing[${index}][name]" value="${item.name || ''}" required></div>
-                        <div class="form-group col-md-4"><label>Price</label><input type="text" class="form-control" name="pricing[${index}][price]" value="${item.price || ''}" required></div>
-                        <div class="form-group col-md-4"><label>Description</label><input type="text" class="form-control" name="pricing[${index}][description]" value="${item.description || ''}"></div>
-                        <div class="form-group col-md-12"><label>Features (one per line)</label><textarea class="form-control" rows="3" name="pricing[${index}][features]">${Array.isArray(item.features) ? item.features.join('\n') : ''}</textarea></div>
-                    </div>`;
-
-                pricingContainer.appendChild(card);
             };
 
             const addFaqItem = (item = { question: '', answer: '' }) => {
@@ -226,12 +192,10 @@
                 socialContainer.appendChild(card);
             };
 
-            document.getElementById('add_pricing').addEventListener('click', () => addPricingItem());
             document.getElementById('add_faq').addEventListener('click', () => addFaqItem());
             document.getElementById('add_footer_link').addEventListener('click', () => addFooterLink());
             document.getElementById('add_social_link').addEventListener('click', () => addSocialLink());
 
-            (initialPricing.length ? initialPricing : [{ name: '', price: '', description: '', features: [] }]).forEach(addPricingItem);
             (initialFaq.length ? initialFaq : [{ question: '', answer: '' }]).forEach(addFaqItem);
             (initialVisual.length ? initialVisual : [{ key: 'total_users', title: 'Total Users', description: '' }, { key: 'total_servers', title: 'Total Servers', description: '' }]).forEach(addVisualCard);
             (initialFooterLinks.length ? initialFooterLinks : [{ label: 'Beranda', url: '#home' }]).forEach(addFooterLink);

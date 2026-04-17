@@ -1,20 +1,16 @@
 import tw from "twin.macro";
 import styled from "styled-components/macro";
 
-const Navigation = styled.div`
-  ${tw`absolute bg-elysium-color2 rounded-r-none sm:rounded-r-3xl shadow-md overflow-y-auto ease-linear duration-200 sticky top-0 h-screen`};
+const Navigation = styled.aside`
+  ${tw`sticky top-0 h-screen bg-elysium-color2 border-r border-black/20 shadow-md overflow-y-auto overflow-x-hidden z-30`};
   flex-shrink: 0;
-
-  & > div {
-    ${tw`flex items-center justify-center`};
-  }
 
   @media (max-width: 639px) {
     ${tw`w-16`};
   }
 
   @media (min-width: 640px) and (max-width: 1023px) {
-    ${tw`w-52`};
+    ${tw`w-64`};
   }
 
   @media (min-width: 1024px) {

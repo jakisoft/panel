@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Link, NavLink, useRouteMatch } from "react-router-dom";
 import { useStoreState } from "easy-peasy";
-import { AlertTriangle, Cog, ExternalLink, Layers, LogOut, User } from "lucide-react";
+import { AlertTriangle, BadgeDollarSign, Cog, ExternalLink, Layers, LogOut, User } from "lucide-react";
 import { ApplicationStore } from "@/state";
 import { ServerContext } from "@/state/server";
 import SearchContainer from "@/components/dashboard/search/SearchContainer";
@@ -109,13 +109,18 @@ export default () => {
           <User {...iconProps} />
           <NavigationButton>Account</NavigationButton>
         </NavLink>
+
+        <NavLink to={"/pricing"} exact>
+          <BadgeDollarSign {...iconProps} />
+          <NavigationButton>Pricing</NavigationButton>
+        </NavLink>
         {rootAdmin && (
           <a href={"/admin"} rel={"noreferrer"} css={tw`text-yellow-400!`}>
             <Cog {...iconProps} />
             <NavigationButton>Admin</NavigationButton>
           </a>
         )}
-        <a onClick={onTriggerLogout}>
+        <a onClick={onTriggerLogout} className={"navigation-link"}>
           <LogOut {...iconProps} />
           <NavigationButton>{isLoggingOut ? "Signing Out..." : "Sign Out"}</NavigationButton>
         </a>
@@ -128,11 +133,12 @@ export default () => {
         title={"Logout Confirmation"}
         confirm={"Logout"}
       >
-        <div css={tw`space-y-3 text-center`}>
+        <div css={tw`space-y-3 text-center px-1`}>
           <div css={tw`w-12 h-12 mx-auto rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400`}>
             <AlertTriangle size={20} />
           </div>
-          <p css={tw`text-sm text-neutral-300`}>Yakin mau logout dari panel ini?</p>
+          <p css={tw`text-sm text-neutral-200 font-medium`}>Yakin mau logout dari panel ini?</p>
+          <p css={tw`text-xs text-neutral-400`}>Kamu perlu login ulang untuk akses server dan pengaturan akun.</p>
         </div>
       </Dialog.Confirm>
     </Navigation>

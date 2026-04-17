@@ -96,11 +96,12 @@ export default memo(({ server }: { server: Server }) => {
     if (lifecycle.tone === "success") return tw`bg-green-500/90 text-white`;
     if (lifecycle.tone === "warning") return tw`bg-yellow-500/90 text-black`;
     if (lifecycle.tone === "suspended") return tw`bg-red-700/90 text-white`;
+
     return tw`bg-red-500/90 text-white`;
   }, [lifecycle.tone]);
 
   const BackgroundDiv = styled.div`
-    ${tw`w-full py-10 rounded-xl`}
+    ${tw`w-full min-h-[170px] py-4 rounded-xl relative`}
     background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url(${serverBackground});
     background-size: cover;
     background-position: center;
@@ -110,35 +111,34 @@ export default memo(({ server }: { server: Server }) => {
 
   return (
     <div css={tw`text-neutral-50 bg-elysium-color3 rounded-xl shadow-lg p-3 relative`}>
-      {lifecycle.label === 'Suspended' && (
-        <div css={tw`absolute top-2 right-2 z-20 bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl uppercase tracking-wider shadow-lg`}>
-          Suspended
-        </div>
-      )}
       <BackgroundDiv>
-        <div css={tw`px-4 flex flex-col items-center gap-2`}>
-          <p css={tw`font-bold text-center truncate w-full`}>{server.name}</p>
+        <span css={[tw`absolute top-3 right-3 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide`, statusStyle]}>
+          {lifecycle.label}
+        </span>
 
-          <div css={tw`uppercase text-sm font-semibold text-center w-full truncate`}>
+        <div css={tw`absolute left-4 bottom-4 right-36 sm:right-44`}>
+          <p css={tw`font-bold text-left w-full truncate`} title={server.name}>
+            {server.name}
+          </p>
+
+          <div css={tw`uppercase text-sm font-semibold text-left w-full truncate`}>
             {defaultAllocation && (
               <CopyOnClick text={`${defaultAllocation.alias || defaultAllocation.ip}:${defaultAllocation.port}`}>
-                <span css={tw`cursor-pointer`}>
+                <span css={tw`cursor-pointer`} title={`${defaultAllocation.alias || defaultAllocation.ip}:${defaultAllocation.port}`}>
                   {defaultAllocation.alias || defaultAllocation.ip}:{defaultAllocation.port}
                 </span>
               </CopyOnClick>
             )}
           </div>
+        </div>
 
-          <div css={tw`w-full flex items-center justify-center`}>
-            <span css={tw`text-[11px] bg-black/40 px-3 py-1 rounded-full flex items-center gap-1`}>
-              <CalendarClock size={13} />
-              <span>Expired:</span>
-              <span css={tw`font-semibold`}>{expInfo.label}</span>
-              {expInfo.expired && <span css={tw`text-red-300`}>(Expired)</span>}
-            </span>
-          </div>
-
-          <span css={[tw`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide`, statusStyle]}>{lifecycle.label}</span>
+        <div css={tw`absolute right-3 bottom-3 max-w-[45%]`}>
+          <span css={tw`text-[11px] bg-black/40 px-2.5 py-1 rounded-full inline-flex items-center gap-1 whitespace-nowrap`}>
+            <CalendarClock size={13} />
+            <span>Expired:</span>
+            <span css={tw`font-semibold truncate`}>{expInfo.label}</span>
+            {expInfo.expired && <span css={tw`text-red-300`}>(Expired)</span>}
+          </span>
         </div>
       </BackgroundDiv>
 
