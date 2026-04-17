@@ -29,6 +29,15 @@
                                 <label class="control-label">Hero Badge</label>
                                 <input type="text" class="form-control" name="playground_badge" value="{{ old('playground_badge', $elysium->playground_badge ?? 'Pterodactyl + Elysium Theme') }}" required>
                             </div>
+                            <div class="form-group col-md-4">
+                                <label class="control-label">Brand Name (Header & Footer)</label>
+                                <input type="text" class="form-control" name="playground_brand_name" value="{{ old('playground_brand_name', $elysium->playground_brand_name ?? 'Elysium Panel') }}" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="control-label">Brand Icon (Lucide Name)</label>
+                                <input type="text" class="form-control" name="playground_brand_icon" value="{{ old('playground_brand_icon', $elysium->playground_brand_icon ?? 'Server') }}" required>
+                                <p class="text-muted"><small>Example: <code>Server</code>, <code>Shield</code>, <code>Rocket</code>, <code>Cloud</code>.</small></p>
+                            </div>
                             <div class="form-group col-md-8">
                                 <label class="control-label">Hero Title</label>
                                 <input type="text" class="form-control" name="playground_hero_title" value="{{ old('playground_hero_title', $elysium->playground_hero_title ?? 'Kelola Server Lebih Cepat dan Modern.') }}" required>
@@ -76,9 +85,18 @@
                         <button type="button" class="btn btn-default btn-sm" id="add_faq">Add FAQ Item</button>
 
                         <hr>
-                        <h4>Asymmetry Visual Cards</h4>
+                        <h4>Asymmetry Visual Cards (Value auto dari API Pterodactyl)</h4>
                         <div id="visual_cards"></div>
-                        <button type="button" class="btn btn-default btn-sm" id="add_visual">Add Visual Card</button>
+
+                        <hr>
+                        <h4>Footer Navigation Links</h4>
+                        <div id="footer_links"></div>
+                        <button type="button" class="btn btn-default btn-sm" id="add_footer_link">Add Footer Link</button>
+
+                        <hr>
+                        <h4>Footer Social Links</h4>
+                        <div id="social_links"></div>
+                        <button type="button" class="btn btn-default btn-sm" id="add_social_link">Add Social Link</button>
                     </div>
                     <div class="box-footer">
                         <button type="submit" class="btn btn-primary btn-sm pull-right">Save</button>
@@ -96,10 +114,14 @@
             const pricingContainer = document.getElementById('pricing_items');
             const faqContainer = document.getElementById('faq_items');
             const visualContainer = document.getElementById('visual_cards');
+            const footerContainer = document.getElementById('footer_links');
+            const socialContainer = document.getElementById('social_links');
 
             const initialPricing = @json($pricingItems);
             const initialFaq = @json($faqItems);
             const initialVisual = @json($visualCards);
+            const initialFooterLinks = @json($footerLinks);
+            const initialSocialLinks = @json($socialLinks);
 
             const createCardWrapper = (title) => {
                 const card = document.createElement('div');
@@ -121,7 +143,6 @@
                 header.appendChild(removeButton);
 
                 card.appendChild(header);
-
                 return card;
             };
 
@@ -132,24 +153,11 @@
 
                 card.innerHTML += `
                     <div class="row">
-                        <div class="form-group col-md-4">
-                            <label>Name</label>
-                            <input type="text" class="form-control" name="pricing[${index}][name]" value="${item.name || ''}" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label>Price</label>
-                            <input type="text" class="form-control" name="pricing[${index}][price]" value="${item.price || ''}" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label>Description</label>
-                            <input type="text" class="form-control" name="pricing[${index}][description]" value="${item.description || ''}">
-                        </div>
-                        <div class="form-group col-md-12">
-                            <label>Features (one per line)</label>
-                            <textarea class="form-control" rows="3" name="pricing[${index}][features]">${Array.isArray(item.features) ? item.features.join('\n') : ''}</textarea>
-                        </div>
-                    </div>
-                `;
+                        <div class="form-group col-md-4"><label>Name</label><input type="text" class="form-control" name="pricing[${index}][name]" value="${item.name || ''}" required></div>
+                        <div class="form-group col-md-4"><label>Price</label><input type="text" class="form-control" name="pricing[${index}][price]" value="${item.price || ''}" required></div>
+                        <div class="form-group col-md-4"><label>Description</label><input type="text" class="form-control" name="pricing[${index}][description]" value="${item.description || ''}"></div>
+                        <div class="form-group col-md-12"><label>Features (one per line)</label><textarea class="form-control" rows="3" name="pricing[${index}][features]">${Array.isArray(item.features) ? item.features.join('\n') : ''}</textarea></div>
+                    </div>`;
 
                 pricingContainer.appendChild(card);
             };
@@ -161,52 +169,73 @@
 
                 card.innerHTML += `
                     <div class="row">
-                        <div class="form-group col-md-5">
-                            <label>Question</label>
-                            <input type="text" class="form-control" name="faq[${index}][question]" value="${item.question || ''}" required>
-                        </div>
-                        <div class="form-group col-md-7">
-                            <label>Answer</label>
-                            <textarea class="form-control" rows="2" name="faq[${index}][answer]" required>${item.answer || ''}</textarea>
-                        </div>
-                    </div>
-                `;
+                        <div class="form-group col-md-5"><label>Question</label><input type="text" class="form-control" name="faq[${index}][question]" value="${item.question || ''}" required></div>
+                        <div class="form-group col-md-7"><label>Answer</label><textarea class="form-control" rows="2" name="faq[${index}][answer]" required>${item.answer || ''}</textarea></div>
+                    </div>`;
 
                 faqContainer.appendChild(card);
             };
 
-            const addVisualCard = (item = { title: '', value: '', description: '' }) => {
+            const addVisualCard = (item = { key: 'total_users', title: '', description: '' }) => {
                 const index = visualContainer.querySelectorAll('.visual-item').length;
                 const card = createCardWrapper('Visual Card');
                 card.classList.add('visual-item');
 
                 card.innerHTML += `
                     <div class="row">
-                        <div class="form-group col-md-4">
-                            <label>Title</label>
-                            <input type="text" class="form-control" name="visual_cards[${index}][title]" value="${item.title || ''}" required>
+                        <div class="form-group col-md-3">
+                            <label>Source</label>
+                            <select class="form-control" name="visual_cards[${index}][key]" required>
+                                <option value="total_users" ${item.key === 'total_users' ? 'selected' : ''}>Total Users</option>
+                                <option value="total_servers" ${item.key === 'total_servers' ? 'selected' : ''}>Total Servers</option>
+                            </select>
                         </div>
-                        <div class="form-group col-md-4">
-                            <label>Value</label>
-                            <input type="text" class="form-control" name="visual_cards[${index}][value]" value="${item.value || ''}" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label>Description</label>
-                            <input type="text" class="form-control" name="visual_cards[${index}][description]" value="${item.description || ''}">
-                        </div>
-                    </div>
-                `;
+                        <div class="form-group col-md-4"><label>Title</label><input type="text" class="form-control" name="visual_cards[${index}][title]" value="${item.title || ''}" required></div>
+                        <div class="form-group col-md-5"><label>Description</label><input type="text" class="form-control" name="visual_cards[${index}][description]" value="${item.description || ''}"></div>
+                    </div>`;
 
                 visualContainer.appendChild(card);
             };
 
+            const addFooterLink = (item = { label: '', url: '' }) => {
+                const index = footerContainer.querySelectorAll('.footer-link-item').length;
+                const card = createCardWrapper('Footer Link');
+                card.classList.add('footer-link-item');
+
+                card.innerHTML += `
+                    <div class="row">
+                        <div class="form-group col-md-5"><label>Label</label><input type="text" class="form-control" name="footer_links[${index}][label]" value="${item.label || ''}" required></div>
+                        <div class="form-group col-md-7"><label>URL</label><input type="text" class="form-control" name="footer_links[${index}][url]" value="${item.url || ''}" required></div>
+                    </div>`;
+
+                footerContainer.appendChild(card);
+            };
+
+            const addSocialLink = (item = { label: '', url: '', icon: 'Globe' }) => {
+                const index = socialContainer.querySelectorAll('.social-link-item').length;
+                const card = createCardWrapper('Social Link');
+                card.classList.add('social-link-item');
+
+                card.innerHTML += `
+                    <div class="row">
+                        <div class="form-group col-md-3"><label>Icon (Lucide)</label><input type="text" class="form-control" name="social_links[${index}][icon]" value="${item.icon || 'Globe'}" required></div>
+                        <div class="form-group col-md-3"><label>Label</label><input type="text" class="form-control" name="social_links[${index}][label]" value="${item.label || ''}" required></div>
+                        <div class="form-group col-md-6"><label>URL</label><input type="text" class="form-control" name="social_links[${index}][url]" value="${item.url || ''}" required></div>
+                    </div>`;
+
+                socialContainer.appendChild(card);
+            };
+
             document.getElementById('add_pricing').addEventListener('click', () => addPricingItem());
             document.getElementById('add_faq').addEventListener('click', () => addFaqItem());
-            document.getElementById('add_visual').addEventListener('click', () => addVisualCard());
+            document.getElementById('add_footer_link').addEventListener('click', () => addFooterLink());
+            document.getElementById('add_social_link').addEventListener('click', () => addSocialLink());
 
             (initialPricing.length ? initialPricing : [{ name: '', price: '', description: '', features: [] }]).forEach(addPricingItem);
             (initialFaq.length ? initialFaq : [{ question: '', answer: '' }]).forEach(addFaqItem);
-            (initialVisual.length ? initialVisual : [{ title: 'Total Users', value: '0', description: '' }, { title: 'Total Servers', value: '0', description: '' }]).forEach(addVisualCard);
+            (initialVisual.length ? initialVisual : [{ key: 'total_users', title: 'Total Users', description: '' }, { key: 'total_servers', title: 'Total Servers', description: '' }]).forEach(addVisualCard);
+            (initialFooterLinks.length ? initialFooterLinks : [{ label: 'Beranda', url: '#home' }]).forEach(addFooterLink);
+            (initialSocialLinks.length ? initialSocialLinks : [{ label: 'Website', url: '#', icon: 'Globe' }]).forEach(addSocialLink);
         })();
     </script>
 @endsection

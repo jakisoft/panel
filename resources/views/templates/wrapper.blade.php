@@ -63,6 +63,8 @@
                     --oauth-google-enabled:<?php echo !empty($elysium->google_auth_enabled) ? '1' : '0'; ?>;
                     --oauth-github-enabled:<?php echo !empty($elysium->github_auth_enabled) ? '1' : '0'; ?>;
                     --playground-badge:<?php echo json_encode($elysium->playground_badge ?? 'Pterodactyl + Elysium Theme') ?>;
+                    --playground-brand-name:<?php echo json_encode($elysium->playground_brand_name ?? 'Elysium Panel') ?>;
+                    --playground-brand-icon:<?php echo json_encode($elysium->playground_brand_icon ?? 'Server') ?>;
                     --playground-hero-title:<?php echo json_encode($elysium->playground_hero_title ?? 'Kelola Server Lebih Cepat dan Modern.') ?>;
                     --playground-hero-description:<?php echo json_encode($elysium->playground_hero_description ?? 'Halaman playground untuk eksplorasi fitur panel, status server, keamanan akun, dan pembaruan Elysium Theme.') ?>;
                     --playground-pricing-title:<?php echo json_encode($elysium->playground_pricing_title ?? 'Paket Pricing Panel') ?>;
@@ -73,6 +75,8 @@
                     --playground-pricing-items:<?php echo json_encode($elysium->playground_pricing_items ?? '[]') ?>;
                     --playground-faq-items:<?php echo json_encode($elysium->playground_faq_items ?? '[]') ?>;
                     --playground-visual-cards:<?php echo json_encode($elysium->playground_visual_cards ?? '[]') ?>;
+                    --playground-footer-links:<?php echo json_encode($elysium->playground_footer_links ?? '[]') ?>;
+                    --playground-social-links:<?php echo json_encode($elysium->playground_social_links ?? '[]') ?>;
                 }
             </style>
 
