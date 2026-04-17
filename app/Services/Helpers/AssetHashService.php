@@ -16,8 +16,6 @@ class AssetHashService
 
     private Filesystem $filesystem;
 
-    protected static mixed $manifest = null;
-
     /**
      * AssetHashService constructor.
      */
@@ -33,8 +31,14 @@ class AssetHashService
     {
         $file = last(explode('/', $resource));
         $data = Arr::get($this->manifest(), $file) ?? $file;
+        $resolved = Arr::get($data, 'src') ?? $file;
+        $relative = ltrim($resolved, '/');
 
-        return str_replace($file, Arr::get($data, 'src') ?? $file, $resource);
+        if (!$this->filesystem->exists($relative)) {
+            $resolved = $file;
+        }
+
+        return str_replace($file, $resolved, $resource);
     }
 
     /**
@@ -100,14 +104,10 @@ class AssetHashService
      */
     protected function manifest(): array
     {
-        if (static::$manifest === null) {
-            self::$manifest = json_decode(
-                $this->filesystem->get(self::MANIFEST_PATH),
-                true
-            );
-        }
-
-        $manifest = static::$manifest;
+        $manifest = json_decode(
+            $this->filesystem->get(self::MANIFEST_PATH),
+            true
+        );
         if ($manifest === null) {
             throw new ManifestDoesNotExistException();
         }
