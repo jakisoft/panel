@@ -37,6 +37,9 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->routes(function () {
             Route::middleware('web')->group(function () {
+                Route::get('/playground', [\Pterodactyl\Http\Controllers\Base\IndexController::class, 'index'])
+                    ->name('playground');
+
                 Route::middleware(['auth.session', RequireTwoFactorAuthentication::class])
                     ->group(base_path('routes/base.php'));
 
