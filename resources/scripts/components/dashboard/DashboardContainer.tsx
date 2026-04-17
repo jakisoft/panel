@@ -15,6 +15,7 @@ import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/elements/button/index';
+import { Activity, ShieldCheck } from 'lucide-react';
 
 export default () => {
     const { search } = useLocation();
@@ -67,6 +68,18 @@ export default () => {
 
     return (
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
+            <div css={tw`mb-4 grid grid-cols-1 md:grid-cols-2 gap-3`}>
+                <div css={tw`rounded-xl border border-neutral-700 bg-neutral-800/60 px-4 py-3`}>
+                    <p css={tw`text-xs uppercase tracking-wide text-neutral-400 mb-1`}>Server Overview</p>
+                    <p css={tw`text-sm text-neutral-200`}>
+                        Monitor expiration dates, resource usage, and status in one place.
+                    </p>
+                </div>
+                <div css={tw`rounded-xl border border-neutral-700 bg-neutral-800/60 px-4 py-3`}>
+                    <p css={tw`text-xs uppercase tracking-wide text-neutral-400 mb-1`}>Security</p>
+                    <p css={tw`text-sm text-neutral-200`}>Access to other users' servers remains protected by policy checks.</p>
+                </div>
+            </div>
             <Dialog
                 open={showDeniedModal}
                 title={'Access Denied'}
@@ -79,17 +92,21 @@ export default () => {
             </Dialog>
             {rootAdmin && (
                 <div css={tw`mb-4 flex justify-between items-center bg-neutral-800/60 border border-neutral-700 rounded-xl px-4 py-3`}>
-                    <div css={tw`text-sm text-neutral-300`}>
-                        Monitor resource usage, expiration dates, and quick server status in one place.
+                    <div css={tw`text-sm text-neutral-300 flex items-center`}>
+                        <Activity size={14} css={tw`mr-2`} />
+                        <span>Admin view toggle for personal and all managed servers.</span>
                     </div>
-                    <p css={tw`uppercase text-xs text-neutral-400 mr-2`}>
-                        {showOnlyAdmin ? "Showing others' servers" : 'Showing your servers'}
-                    </p>
-                    <Switch
-                        name={'show_all_servers'}
-                        defaultChecked={showOnlyAdmin}
-                        onChange={() => setShowOnlyAdmin((s) => !s)}
-                    />
+                    <div css={tw`flex items-center`}>
+                        <ShieldCheck size={14} css={tw`mr-2 text-neutral-400`} />
+                        <p css={tw`uppercase text-xs text-neutral-400 mr-2`}>
+                            {showOnlyAdmin ? "Showing others' servers" : 'Showing your servers'}
+                        </p>
+                        <Switch
+                            name={'show_all_servers'}
+                            defaultChecked={showOnlyAdmin}
+                            onChange={() => setShowOnlyAdmin((s) => !s)}
+                        />
+                    </div>
                 </div>
             )}
             {!servers ? (

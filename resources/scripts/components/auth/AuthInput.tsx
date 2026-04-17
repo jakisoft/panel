@@ -45,7 +45,9 @@ export default ({
                 </Label>
             )}
             <div css={tw`relative`}>
-                <span css={tw`absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none`}>
+                <span
+                    css={tw`absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none bg-neutral-100 rounded-md p-1`}
+                >
                     <Icon size={18} />
                 </span>
                 <Input
@@ -56,7 +58,7 @@ export default ({
                     type={inputType}
                     disabled={disabled}
                     hasError={hasError}
-                    css={[tw`pl-10`, isPassword && tw`pr-12`]}
+                    css={[tw`pl-12`, isPassword && tw`pr-12`]}
                 />
                 {isPassword && (
                     <button
