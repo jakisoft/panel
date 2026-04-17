@@ -124,7 +124,7 @@ export default memo(({ server }: { server: Server }) => {
           </div>
 
           <div css={tw`w-full flex items-center justify-center`}>
-            <span css={tw`text-[11px] bg-black/45 px-3 py-1 rounded-full flex items-center gap-1`}>
+            <span css={tw`text-[11px] bg-black/40 px-3 py-1 rounded-full flex items-center gap-1`}>
               <CalendarClock size={13} />
               <span>Expired:</span>
               <span css={tw`font-semibold`}>{expInfo.label}</span>
