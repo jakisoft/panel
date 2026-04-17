@@ -10,7 +10,7 @@ import { FlashStore } from '@/state/flashes';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import AuthInput from '@/components/auth/AuthInput';
-import { KeyRound, ShieldCheck } from 'lucide-react';
+import { Key, ShieldCheck } from 'lucide-react';
 
 interface Values {
     code: string;
@@ -42,7 +42,7 @@ const LoginCheckpointContainer = () => {
                     type={'text'}
                     autoComplete={'one-time-code'}
                     autoFocus
-                    icon={isMissingDevice ? KeyRound : ShieldCheck}
+                    icon={isMissingDevice ? Key : ShieldCheck}
                 />
             </div>
             <div css={tw`mt-6`}>

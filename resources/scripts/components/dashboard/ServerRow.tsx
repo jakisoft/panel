@@ -8,7 +8,7 @@ import GreyRowBox from '@/components/elements/GreyRowBox';
 import Spinner from '@/components/elements/Spinner';
 import styled from 'styled-components/macro';
 import isEqual from 'react-fast-compare';
-import { CalendarClock, Cpu, EthernetPort, HardDrive, MemoryStick, ServerIcon } from 'lucide-react';
+import { Calendar, Cpu, HardDrive, Server, Wifi, Database } from 'lucide-react';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
@@ -109,7 +109,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         <StatusIndicatorBox as={Link} to={`/server/${server.id}`} className={className} $status={stats?.status}>
             <div css={tw`flex items-center col-span-12 sm:col-span-5 lg:col-span-6`}>
                 <div className={'icon mr-4'}>
-                    <ServerIcon size={20} />
+                    <Server size={20} />
                 </div>
                 <div>
                     <p css={tw`text-lg break-words`}>{server.name}</p>
@@ -117,7 +117,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                         <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
                     )}
                     <div css={tw`mt-2 flex items-center text-xs text-neutral-400`}>
-                        <CalendarClock size={14} css={tw`mr-1.5`} />
+                        <Calendar size={14} css={tw`mr-1.5`} />
                         <span css={tw`mr-2`}>Expired:</span>
                         <span css={tw`px-2 py-0.5 rounded bg-neutral-900 text-neutral-200`}>{formattedExpDate}</span>
                     </div>
@@ -125,7 +125,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
             </div>
             <div css={tw`flex-1 ml-4 lg:block lg:col-span-2 hidden`}>
                 <div css={tw`flex justify-center`}>
-                    <EthernetPort size={16} css={tw`text-neutral-500`} />
+                    <Wifi size={16} css={tw`text-neutral-500`} />
                     <p css={tw`text-sm text-neutral-400 ml-2`}>
                         {server.allocations
                             .filter((alloc) => alloc.isDefault)
@@ -176,7 +176,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                         <div css={tw`flex-1 ml-4 sm:block hidden`}>
                             <div css={tw`flex justify-center`}>
                                 <Icon $alarm={alarms.memory}>
-                                    <MemoryStick size={16} />
+                                    <Database size={16} />
                                 </Icon>
                                 <IconDescription $alarm={alarms.memory}>
                                     {bytesToString(stats.memoryUsageInBytes)}

@@ -10,7 +10,7 @@ import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import AuthInput from '@/components/auth/AuthInput';
-import { Lock, UserRound } from 'lucide-react';
+import { Lock, User } from 'lucide-react';
 
 interface Values {
     username: string;
@@ -82,7 +82,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         label={'Username or Email'}
                         name={'username'}
                         disabled={isSubmitting}
-                        icon={UserRound}
+                        icon={User}
                     />
                     <div css={tw`mt-6`}>
                         <AuthInput

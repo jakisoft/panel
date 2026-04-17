@@ -8,11 +8,11 @@ import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import classNames from 'classnames';
 import { capitalize } from '@/lib/strings';
 import {
-    CalendarClock,
-    Clock3,
+    Calendar,
+    Clock,
     Cpu,
+    Database,
     HardDrive,
-    MemoryStick,
     Network,
     Upload,
     Download,
@@ -109,11 +109,11 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
             <StatBlock icon={<Network className={'w-6 h-6'} />} title={'Address'} copyOnClick={allocation}>
                 {allocation}
             </StatBlock>
-            <StatBlock icon={<CalendarClock className={'w-6 h-6'} />} title={'Expiration'}>
+            <StatBlock icon={<Calendar className={'w-6 h-6'} />} title={'Expiration'}>
                 {formattedExpDate}
             </StatBlock>
             <StatBlock
-                icon={<Clock3 className={'w-6 h-6'} />}
+                icon={<Clock className={'w-6 h-6'} />}
                 title={'Uptime'}
                 color={getBackgroundColor(status === 'running' ? 0 : status !== 'offline' ? 9 : 10, 10)}
             >
@@ -133,7 +133,7 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
                 )}
             </StatBlock>
             <StatBlock
-                icon={<MemoryStick className={'w-6 h-6'} />}
+                icon={<Database className={'w-6 h-6'} />}
                 title={'Memory'}
                 color={getBackgroundColor(stats.memory / 1024, limits.memory * 1024)}
             >
