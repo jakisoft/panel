@@ -33,8 +33,17 @@ class PlaygroundSettingsController extends Controller
                 ['question' => 'Apakah panel ini aman?', 'answer' => 'Ya, panel menggunakan autentikasi berlapis dan monitoring aktivitas untuk keamanan tambahan.'],
             ]),
             'visualCards' => $this->decodeJson($elysium->playground_visual_cards ?? null, [
-                ['title' => 'Total Users', 'value' => '1,250+', 'description' => 'Pengguna aktif di panel setiap bulan.'],
-                ['title' => 'Total Servers', 'value' => '3,800+', 'description' => 'Server dikelola stabil dengan uptime tinggi.'],
+                ['key' => 'total_users', 'title' => 'Total Users', 'description' => 'Pengguna aktif di panel setiap bulan.'],
+                ['key' => 'total_servers', 'title' => 'Total Servers', 'description' => 'Server dikelola stabil dengan uptime tinggi.'],
+            ]),
+            'footerLinks' => $this->decodeJson($elysium->playground_footer_links ?? null, [
+                ['label' => 'Beranda', 'url' => '#home'],
+                ['label' => 'Pricing', 'url' => '#pricing'],
+                ['label' => 'FAQ', 'url' => '#faq'],
+            ]),
+            'socialLinks' => $this->decodeJson($elysium->playground_social_links ?? null, [
+                ['label' => 'Discord', 'url' => '#', 'icon' => 'MessageCircle'],
+                ['label' => 'Telegram', 'url' => '#', 'icon' => 'Send'],
             ]),
         ]);
     }
@@ -43,6 +52,8 @@ class PlaygroundSettingsController extends Controller
     {
         $data = $request->validate([
             'playground_badge' => ['required', 'string', 'max:191'],
+            'playground_brand_name' => ['required', 'string', 'max:191'],
+            'playground_brand_icon' => ['required', 'string', 'max:120'],
             'playground_hero_title' => ['required', 'string', 'max:255'],
             'playground_hero_description' => ['nullable', 'string', 'max:2000'],
             'playground_pricing_title' => ['required', 'string', 'max:191'],
@@ -59,9 +70,16 @@ class PlaygroundSettingsController extends Controller
             'faq.*.question' => ['required_with:faq', 'string', 'max:300'],
             'faq.*.answer' => ['required_with:faq', 'string', 'max:2000'],
             'visual_cards' => ['nullable', 'array'],
+            'visual_cards.*.key' => ['required_with:visual_cards', 'in:total_users,total_servers'],
             'visual_cards.*.title' => ['required_with:visual_cards', 'string', 'max:120'],
-            'visual_cards.*.value' => ['required_with:visual_cards', 'string', 'max:120'],
             'visual_cards.*.description' => ['nullable', 'string', 'max:600'],
+            'footer_links' => ['nullable', 'array'],
+            'footer_links.*.label' => ['required_with:footer_links', 'string', 'max:120'],
+            'footer_links.*.url' => ['required_with:footer_links', 'string', 'max:400'],
+            'social_links' => ['nullable', 'array'],
+            'social_links.*.label' => ['required_with:social_links', 'string', 'max:120'],
+            'social_links.*.url' => ['required_with:social_links', 'string', 'max:400'],
+            'social_links.*.icon' => ['required_with:social_links', 'string', 'max:120'],
         ]);
 
         $pricingItems = collect($data['pricing'] ?? [])->map(function (array $item) {
@@ -83,15 +101,28 @@ class PlaygroundSettingsController extends Controller
         ])->filter(fn (array $item) => $item['question'] !== '' && $item['answer'] !== '')->values()->all();
 
         $visualCards = collect($data['visual_cards'] ?? [])->map(fn (array $item) => [
+            'key' => trim($item['key']),
             'title' => trim($item['title']),
-            'value' => trim($item['value']),
             'description' => trim((string) ($item['description'] ?? '')),
-        ])->filter(fn (array $item) => $item['title'] !== '' && $item['value'] !== '')->values()->all();
+        ])->filter(fn (array $item) => $item['key'] !== '' && $item['title'] !== '')->values()->all();
+
+        $footerLinks = collect($data['footer_links'] ?? [])->map(fn (array $item) => [
+            'label' => trim($item['label']),
+            'url' => trim($item['url']),
+        ])->filter(fn (array $item) => $item['label'] !== '' && $item['url'] !== '')->values()->all();
+
+        $socialLinks = collect($data['social_links'] ?? [])->map(fn (array $item) => [
+            'label' => trim($item['label']),
+            'url' => trim($item['url']),
+            'icon' => trim($item['icon']),
+        ])->filter(fn (array $item) => $item['label'] !== '' && $item['url'] !== '' && $item['icon'] !== '')->values()->all();
 
         $existing = DB::table('elysium')->first();
 
         DB::table('elysium')->where('id', $existing->id)->update([
             'playground_badge' => $data['playground_badge'],
+            'playground_brand_name' => $data['playground_brand_name'],
+            'playground_brand_icon' => $data['playground_brand_icon'],
             'playground_hero_title' => $data['playground_hero_title'],
             'playground_hero_description' => $data['playground_hero_description'] ?? null,
             'playground_pricing_title' => $data['playground_pricing_title'],
@@ -102,6 +133,8 @@ class PlaygroundSettingsController extends Controller
             'playground_pricing_items' => json_encode($pricingItems),
             'playground_faq_items' => json_encode($faqItems),
             'playground_visual_cards' => json_encode($visualCards),
+            'playground_footer_links' => json_encode($footerLinks),
+            'playground_social_links' => json_encode($socialLinks),
             'updated_at' => Carbon::now(),
         ]);
 
