@@ -70,11 +70,33 @@
             url: '{{ route('admin.nodes.view.configuration.token', $node->id) }}',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         }).done(function (data) {
+            var command = 'cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}';
             swal({
                 type: 'success',
                 title: 'Token created.',
-                text: '<p>To auto-configure your node run the following command:<br /><small><pre>cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}</pre></small></p>',
-                html: true
+                text:
+                    '<p>To auto-configure your node run the following command:</p>' +
+                    '<textarea id="nodeConfigCommand" class="form-control" rows="4" readonly style="margin-top:10px; resize: vertical; font-family: monospace;">' + command + '</textarea>',
+                html: true,
+                showCancelButton: true,
+                confirmButtonText: 'Copy',
+                cancelButtonText: 'OK',
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (!isConfirm) {
+                    return;
+                }
+
+                var textarea = document.getElementById('nodeConfigCommand');
+                if (!textarea) {
+                    return;
+                }
+
+                textarea.focus();
+                textarea.select();
+                document.execCommand('copy');
+                swal('Copied!', 'Command copied to clipboard.', 'success');
             })
         }).fail(function () {
             swal({

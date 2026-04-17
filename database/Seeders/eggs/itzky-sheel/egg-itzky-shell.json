@@ -1,0 +1,68 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2025-02-13T00:11:18+07:00",
+    "name": "Itzky Shell",
+    "author": "kiicodeofficial@gmail.com",
+    "description": "Shell + Cloudflare Tunnel Support. Support Node.js, Python, PHP, C#, C++. Auto add domain via Startup (Optional).",
+    "features": null,
+    "docker_images": {
+        "Itzky Shell": "docker.io/itzky/shell:latest"
+    },
+    "file_denylist": [],
+    "startup": "bash /index.sh",
+    "config": {
+        "files": "{}",
+        "startup": "{ \"done\": \"running\" }",
+        "logs": "{}",
+        "stop": "^^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "echo Installation completed.",
+            "container": "node:lts-buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "PORT",
+            "description": "Port project aplikasi yang akan diproxy oleh Cloudflare Tunnel.",
+            "env_variable": "PORT",
+            "default_value": "3000",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric"
+        },
+        {
+            "name": "USE_CLOUDFLARE_TUNNEL",
+            "description": "Aktifkan Cloudflare Tunnel untuk domain",
+            "env_variable": "USE_CLOUDFLARE_TUNNEL",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean"
+        },
+        {
+            "name": "CLOUDFLARE_TUNNEL_TOKEN",
+            "description": "Token Cloudflare Tunnel dari dashboard Zero Trust. Format: eyJhIjoixx...",
+            "env_variable": "CLOUDFLARE_TUNNEL_TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "DOMAIN",
+            "description": "Domain untuk website (contoh: app.domain.com)",
+            "env_variable": "DOMAIN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:100"
+        }
+    ]
+}

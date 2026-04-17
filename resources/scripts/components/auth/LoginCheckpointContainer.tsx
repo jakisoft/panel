@@ -7,9 +7,10 @@ import { StaticContext } from 'react-router';
 import { useFormikContext, withFormik } from 'formik';
 import useFlash from '@/plugins/useFlash';
 import { FlashStore } from '@/state/flashes';
-import Field from '@/components/elements/Field';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
+import AuthInput from '@/components/auth/AuthInput';
+import { KeyRound, ShieldCheck } from 'lucide-react';
 
 interface Values {
     code: string;
@@ -29,10 +30,10 @@ const LoginCheckpointContainer = () => {
     return (
         <LoginFormContainer title={'Device Checkpoint'} css={tw`w-full flex`}>
             <div css={tw`mt-6`}>
-                <Field
+                <AuthInput
                     light
                     name={isMissingDevice ? 'recoveryCode' : 'code'}
-                    title={isMissingDevice ? 'Recovery Code' : 'Authentication Code'}
+                    label={isMissingDevice ? 'Recovery Code' : 'Authentication Code'}
                     description={
                         isMissingDevice
                             ? 'Enter one of the recovery codes generated when you setup 2-Factor authentication on this account in order to continue.'
@@ -41,6 +42,7 @@ const LoginCheckpointContainer = () => {
                     type={'text'}
                     autoComplete={'one-time-code'}
                     autoFocus
+                    icon={isMissingDevice ? KeyRound : ShieldCheck}
                 />
             </div>
             <div css={tw`mt-6`}>
