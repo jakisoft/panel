@@ -164,7 +164,7 @@ export default memo(({ server }: { server: Server }) => {
         </div>
 
         <div css={tw`absolute right-3 bottom-3 max-w-[55%] sm:max-w-[45%] overflow-hidden`}>
-          <span className="expired-chip" css={tw`text-[11px] bg-black/35 px-2.5 py-1 rounded-full inline-flex items-center gap-1 whitespace-nowrap`}>
+          <span className="expired-chip" css={tw`text-[11px] bg-black/30 px-2.5 py-1 rounded-full inline-flex items-center gap-1 whitespace-nowrap`}>
             <CalendarClock size={13} />
             <span>Expired:</span>
             <span css={tw`font-semibold truncate`}>{expInfo.label}</span>

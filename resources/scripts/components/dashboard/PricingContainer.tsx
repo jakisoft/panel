@@ -82,7 +82,7 @@ export default () => {
         {pricingItems.map((item, index) => (
           <div
             key={`${item.name}-${index}`}
-            css={tw`rounded-2xl p-[1px] bg-gradient-to-br from-indigo-400/60 via-fuchsia-400/40 to-cyan-400/60 shadow-[0_20px_60px_rgba(79,70,229,0.25)]`}
+            css={tw`rounded-2xl p-[1px] bg-gradient-to-br from-indigo-400/60 via-purple-400/40 to-cyan-400/60 shadow-[0_20px_60px_rgba(79,70,229,0.25)]`}
           >
             <div css={tw`rounded-2xl bg-elysium-color3/95 backdrop-blur-xl border border-white/10 p-5 flex flex-col gap-4 h-full`}>
               <div css={tw`flex items-start justify-between gap-3`}>
@@ -117,7 +117,7 @@ export default () => {
                 })}
               </ul>
 
-              <button css={tw`w-full rounded-xl bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-400 hover:to-fuchsia-400 transition-colors text-white text-sm font-semibold py-2.5 shadow-lg`}>
+              <button css={tw`w-full rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 transition-colors text-white text-sm font-semibold py-2.5 shadow-lg`}>
                 Pilih Paket
               </button>
             </div>

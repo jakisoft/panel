@@ -212,7 +212,7 @@ export default () => {
                     <div className={'text-center mb-16'}><ScrollReveal><h2 className={'text-3xl md:text-4xl font-extrabold mb-4 tracking-tight'}>{pricingTitle}</h2><p className={'text-slate-500 text-[14px]'}>{pricingSubtitle}</p></ScrollReveal></div>
                     <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
                         {(pricingItems.length ? pricingItems : [{ name: 'Starter', monthly_price: 15000, cpu: '1 vCPU', memory: '2 GB', disk: '20 GB', description: 'Paket dasar panel.', features: [{ text: 'Proteksi DDoS dasar', type: 'include' }, { text: 'Priority support', type: 'exclude' }] }]).map((item, idx) => (
-                            <div key={`${item.name}-${idx}`} className={'rounded-3xl p-[1px] bg-gradient-to-br from-indigo-300 via-fuchsia-300 to-cyan-300 shadow-[0_20px_60px_rgba(79,70,229,0.20)]'}>
+                            <div key={`${item.name}-${idx}`} className={'rounded-3xl p-[1px] bg-gradient-to-br from-indigo-300 via-purple-300 to-cyan-300 shadow-[0_20px_60px_rgba(79,70,229,0.20)]'}>
                                 <div className={'bg-white/95 backdrop-blur-xl rounded-3xl p-8 border border-white/70 h-full'}>
                                     <div className={'flex items-start justify-between gap-3'}>
                                         <h3 className={'text-xl font-extrabold'}>{item.name}</h3>
@@ -236,7 +236,7 @@ export default () => {
                                             );
                                         })}
                                     </ul>
-                                    <a href={'/pricing'} className={'inline-flex w-full justify-center bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:from-indigo-500 hover:to-fuchsia-500 transition-colors'}>Pilih Paket</a>
+                                    <a href={'/pricing'} className={'inline-flex w-full justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:from-indigo-500 hover:to-purple-500 transition-colors'}>Pilih Paket</a>
                                 </div>
                             </div>
                         ))}
