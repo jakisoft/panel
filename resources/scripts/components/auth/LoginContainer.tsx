@@ -4,7 +4,7 @@ import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import Reaptcha from 'reaptcha';
 import tw from 'twin.macro';
-import { ArrowRight, Eye, EyeOff, Github, Info, Lock, User } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Github, Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStoreState } from 'easy-peasy';
 import login from '@/api/auth/login';
@@ -173,22 +173,19 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         <button
                             type={'button'}
                             css={tw`py-3 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold`}
-                            onClick={() => toast.info('Google OAuth belum diaktifkan.')}
+                            onClick={() => (window.location.href = '/auth/google')}
                         >
                             Google
                         </button>
                         <button
                             type={'button'}
                             css={tw`py-3 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold flex items-center justify-center`}
-                            onClick={() => toast.info('GitHub OAuth belum diaktifkan.')}
+                            onClick={() => (window.location.href = '/auth/github')}
                         >
                             <Github size={16} css={tw`mr-2`} /> GitHub
                         </button>
                     </div>
 
-                    <p css={tw`text-xs text-neutral-500 flex items-center justify-center`}>
-                        <Info size={13} css={tw`mr-1`} /> OAuth buttons are UI-only for now.
-                    </p>
                 </LoginFormContainer>
             )}
         </Formik>

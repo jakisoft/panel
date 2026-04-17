@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useStoreState } from "easy-peasy";
-import { Cogs, KeyRound, Layers, LogOut, Mail, UserCircle2, Wrench } from "lucide-react";
+import { Cog, Key, Layers, LogOut, Mail, User, Wrench } from "lucide-react";
 import { ApplicationStore } from "@/state";
 import SearchContainer from "@/components/dashboard/search/SearchContainer";
 import tw from "twin.macro";
@@ -56,11 +56,11 @@ export default () => {
           <a>Management</a>
         </CategoryContainer>
         <NavLink to={"/account"} exact>
-          <UserCircle2 {...iconProps} />
+          <User {...iconProps} />
           <NavigationButton>Account</NavigationButton>
         </NavLink>
         <NavLink to={"/account/api"} exact>
-          <KeyRound {...iconProps} />
+          <Key {...iconProps} />
           <NavigationButton>Api Key</NavigationButton>
         </NavLink>
         <NavLink to={"/account/ssh"} exact>
@@ -74,7 +74,7 @@ export default () => {
 
         {rootAdmin && (
           <a href={"/admin"} rel={"noreferrer"} css={tw`text-yellow-400!`}>
-            <Cogs {...iconProps} />
+            <Cog {...iconProps} />
             <NavigationButton>Admin</NavigationButton>
           </a>
         )}

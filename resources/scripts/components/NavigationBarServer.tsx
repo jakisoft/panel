@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Link, NavLink, useRouteMatch } from "react-router-dom";
 import { useStoreState } from "easy-peasy";
-import { Cogs, ExternalLink, Layers, LogOut, UserCircle2 } from "lucide-react";
+import { Cog, ExternalLink, Layers, LogOut, User } from "lucide-react";
 import { ApplicationStore } from "@/state";
 import { ServerContext } from "@/state/server";
 import SearchContainer from "@/components/dashboard/search/SearchContainer";
@@ -103,12 +103,12 @@ export default () => {
           <a>Management</a>
         </CategoryContainer>
         <NavLink to={"/account"} exact>
-          <UserCircle2 {...iconProps} />
+          <User {...iconProps} />
           <NavigationButton>Account</NavigationButton>
         </NavLink>
         {rootAdmin && (
           <a href={"/admin"} rel={"noreferrer"} css={tw`text-yellow-400!`}>
-            <Cogs {...iconProps} />
+            <Cog {...iconProps} />
             <NavigationButton>Admin</NavigationButton>
           </a>
         )}

@@ -11,7 +11,7 @@ import {
   HardDrive,
   Lightbulb,
   MapPin,
-  Network,
+  Globe,
   Server,
   Timer,
   TriangleAlert,
@@ -233,7 +233,7 @@ const ServerDetailsBlock = () => {
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <Network size={iconSize} />
+              <Globe size={iconSize} />
               <span css={tw`ml-2 uppercase font-semibold`}>NETWORK</span>
             </div>
             {resolvedStatus !== "running" ? (
