@@ -35,12 +35,18 @@ jobs:
       - name: Create release archive
         run: |
           rm -f panel.tar.gz
-          tar -czf panel.tar.gz \
+          rm -rf release-src
+          mkdir -p release-src
+
+          rsync -a ./ release-src/ \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.github' \
             --exclude='tests' \
-            .
+            --exclude='release-src' \
+            --exclude='panel.tar.gz'
+
+          tar -czf panel.tar.gz -C release-src .
 
       - name: Publish latest release asset
         uses: ncipollo/release-action@v1
