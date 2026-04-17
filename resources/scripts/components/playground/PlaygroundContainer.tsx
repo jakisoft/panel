@@ -230,7 +230,7 @@ export default () => {
                                             const included = (feature.type ?? 'include') !== 'exclude';
                                             return (
                                                 <li key={`${feature.text}-${featureIndex}`} className={'flex items-start gap-2'}>
-                                                    {included ? <CheckCircle2 size={15} className={'text-emerald-500 mt-0.5'} /> : <XCircle size={15} className={'text-red-500 mt-0.5'} />}
+                                                    {included ? <CheckCircle2 size={15} className={'text-green-500 mt-0.5'} /> : <XCircle size={15} className={'text-red-500 mt-0.5'} />}
                                                     <span className={included ? 'text-slate-600' : 'text-red-500'}>{feature.text}</span>
                                                 </li>
                                             );
