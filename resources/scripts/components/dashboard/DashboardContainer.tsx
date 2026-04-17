@@ -78,7 +78,10 @@ export default () => {
                 </Dialog.Footer>
             </Dialog>
             {rootAdmin && (
-                <div css={tw`mb-2 flex justify-end items-center`}>
+                <div css={tw`mb-4 flex justify-between items-center bg-neutral-800/60 border border-neutral-700 rounded-xl px-4 py-3`}>
+                    <div css={tw`text-sm text-neutral-300`}>
+                        Monitor resource usage, expiration dates, and quick server status in one place.
+                    </div>
                     <p css={tw`uppercase text-xs text-neutral-400 mr-2`}>
                         {showOnlyAdmin ? "Showing others' servers" : 'Showing your servers'}
                     </p>

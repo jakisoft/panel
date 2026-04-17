@@ -53,6 +53,16 @@
                                 <td>{{ $server->name }}</td>
                             </tr>
                             <tr>
+                                <td>Expiration Date</td>
+                                <td>
+                                    @if(is_null($server->exp_date))
+                                        <span class="label label-success">Unlimited</span>
+                                    @else
+                                        <code>{{ $server->exp_date->format('d M Y') }}</code>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>CPU Limit</td>
                                 <td>
                                     @if($server->cpu === 0)
@@ -155,6 +165,18 @@
                             <div class="icon"><i class="fa fa-user"></i></div>
                             <a href="{{ route('admin.users.view', $server->user->id) }}" class="small-box-footer">
                                 More info <i class="fa fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="small-box {{ is_null($server->exp_date) ? 'bg-green' : 'bg-gray' }}">
+                            <div class="inner">
+                                <h3>{{ is_null($server->exp_date) ? 'Unlimited' : $server->exp_date->format('d M Y') }}</h3>
+                                <p>Server Expiration</p>
+                            </div>
+                            <div class="icon"><i class="fa fa-calendar"></i></div>
+                            <a href="{{ route('admin.servers.view.details', $server->id) }}" class="small-box-footer">
+                                Manage expiration <i class="fa fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>

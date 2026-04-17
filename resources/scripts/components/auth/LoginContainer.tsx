@@ -5,11 +5,12 @@ import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
-import Field from '@/components/elements/Field';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import AuthInput from '@/components/auth/AuthInput';
+import { Lock, UserRound } from 'lucide-react';
 
 interface Values {
     username: string;
@@ -75,9 +76,23 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
                 <LoginFormContainer title={'Login to Continue'} css={tw`w-full flex`}>
-                    <Field light type={'text'} label={'Username or Email'} name={'username'} disabled={isSubmitting} />
+                    <AuthInput
+                        light
+                        type={'text'}
+                        label={'Username or Email'}
+                        name={'username'}
+                        disabled={isSubmitting}
+                        icon={UserRound}
+                    />
                     <div css={tw`mt-6`}>
-                        <Field light type={'password'} label={'Password'} name={'password'} disabled={isSubmitting} />
+                        <AuthInput
+                            light
+                            type={'password'}
+                            label={'Password'}
+                            name={'password'}
+                            disabled={isSubmitting}
+                            icon={Lock}
+                        />
                     </div>
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>

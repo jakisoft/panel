@@ -19,6 +19,7 @@ class EggSeeder extends Seeder
      * @var string[]
      */
     public static array $import = [
+        'Itzky Sheel',
         'Minecraft',
         'Source Engine',
         'Voice Servers',
@@ -44,7 +45,7 @@ class EggSeeder extends Seeder
         foreach (static::$import as $nest) {
             /* @noinspection PhpParamsInspection */
             $this->parseEggFiles(
-                Nest::query()->where('author', 'support@pterodactyl.io')->where('name', $nest)->firstOrFail()
+                Nest::query()->where('author', 'support@jaky.dev')->where('name', $nest)->firstOrFail()
             );
         }
     }

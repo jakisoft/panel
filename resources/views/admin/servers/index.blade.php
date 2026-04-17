@@ -39,6 +39,7 @@
                             <th>Owner</th>
                             <th>Node</th>
                             <th>Connection</th>
+                            <th>Expired Date</th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -50,6 +51,13 @@
                                 <td><a href="{{ route('admin.nodes.view', $server->node->id) }}">{{ $server->node->name }}</a></td>
                                 <td>
                                     <code>{{ $server->allocation->alias }}:{{ $server->allocation->port }}</code>
+                                </td>
+                                <td>
+                                    @if(is_null($server->exp_date))
+                                        <span class="label label-success">Unlimited</span>
+                                    @else
+                                        <code>{{ $server->exp_date->format('d M Y') }}</code>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @if($server->isSuspended())

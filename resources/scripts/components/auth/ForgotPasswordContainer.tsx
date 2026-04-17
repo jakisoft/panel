@@ -5,13 +5,14 @@ import requestPasswordResetEmail from '@/api/auth/requestPasswordResetEmail';
 import { httpErrorToHuman } from '@/api/http';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
-import Field from '@/components/elements/Field';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import AuthInput from '@/components/auth/AuthInput';
+import { Mail } from 'lucide-react';
 
 interface Values {
     email: string;
@@ -73,7 +74,7 @@ export default () => {
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
                 <LoginFormContainer title={'Request Password Reset'} css={tw`w-full flex`}>
-                    <Field
+                    <AuthInput
                         light
                         label={'Email'}
                         description={
@@ -81,6 +82,7 @@ export default () => {
                         }
                         name={'email'}
                         type={'email'}
+                        icon={Mail}
                     />
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>

@@ -8,10 +8,11 @@ import { Actions, useStoreActions } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { Formik, FormikHelpers } from 'formik';
 import { object, ref, string } from 'yup';
-import Field from '@/components/elements/Field';
 import Input from '@/components/elements/Input';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
+import AuthInput from '@/components/auth/AuthInput';
+import { Lock, Mail } from 'lucide-react';
 
 interface Values {
     password: string;
@@ -64,19 +65,31 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                 <LoginFormContainer title={'Reset Password'} css={tw`w-full flex`}>
                     <div>
                         <label>Email</label>
-                        <Input value={email} isLight disabled />
+                        <div css={tw`relative`}>
+                            <span css={tw`absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400`}>
+                                <Mail size={18} />
+                            </span>
+                            <Input value={email} isLight disabled css={tw`pl-10`} />
+                        </div>
                     </div>
                     <div css={tw`mt-6`}>
-                        <Field
+                        <AuthInput
                             light
                             label={'New Password'}
                             name={'password'}
                             type={'password'}
                             description={'Passwords must be at least 8 characters in length.'}
+                            icon={Lock}
                         />
                     </div>
                     <div css={tw`mt-6`}>
-                        <Field light label={'Confirm New Password'} name={'passwordConfirmation'} type={'password'} />
+                        <AuthInput
+                            light
+                            label={'Confirm New Password'}
+                            name={'passwordConfirmation'}
+                            type={'password'}
+                            icon={Lock}
+                        />
                     </div>
                     <div css={tw`mt-6`}>
                         <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>
