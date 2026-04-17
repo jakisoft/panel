@@ -95,15 +95,15 @@
                         <div class="form-group col-md-12">
                             <label class="control-label">Author</label>
                             <div>
-                                <input class="form-control" value="Flydev Studio"readonly />
+                                <input class="form-control" value="JKSoft Production"readonly />
                             </div>
                         </div>
                         <div class="form-group col-md-12">
                             <label class="control-label">Get Support</label>
-                            <a href="https://discord.gg/rBuseTnRBq" target="_blank">
+                            <a href="https://t.me/otnexa" target="_blank">
                                 <button class="btn btn-warning" style="width:100%;" >
                                     <i class="fa fa-fw fa-support"></i>
-                                    Discord
+                                    Telegram
                                 </button>
                             </a>
                         </div>
