@@ -1,0 +1,23 @@
+import React from "react";
+import classNames from "classnames";
+
+interface CodeProps {
+  dark?: boolean | undefined;
+  className?: string;
+  children: React.ReactChild | React.ReactFragment | React.ReactPortal;
+}
+
+export default ({ dark, className, children }: CodeProps) => (
+  <code
+    className={classNames(
+      "font-mono text-sm px-2 py-1 inline-block rounded-2xl",
+      className,
+      {
+        "bg-elysium-color3": !dark,
+        "bg-elysium-color3 text-gray-100": dark,
+      }
+    )}
+  >
+    {children}
+  </code>
+);
