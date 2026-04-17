@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{{ config('app.name', 'Pterodactyl') }}</title>
+        @php
+            $elysium = \Illuminate\Support\Facades\DB::table('elysium')->first();
+            $metaTitle = !empty($elysium->title) ? $elysium->title : config('app.name', 'Pterodactyl');
+            $metaDescription = !empty($elysium->description) ? $elysium->description : 'Manage your server very easily';
+        @endphp
+
+        <title>{{ $metaTitle }}</title>
 
         @section('meta')
             <meta charset="utf-8">
@@ -9,12 +15,9 @@
             <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
             <meta name="csrf-token" content="{{ csrf_token() }}">
             <meta name="robots" content="noindex">
+            <meta name="description" content="{{ $metaDescription }}">
             
             
-            <?php
-            $elysium = \Illuminate\Support\Facades\DB::table('elysium')->first();
-            ?>
-
             @php
                 $favicon = !empty($elysium->logo) ? $elysium->logo : '/favicons/favicon.ico';
             @endphp
@@ -25,9 +28,9 @@
             <link rel="shortcut icon" href="{{ $favicon }}">
 
             <meta property="og:type" content="website" />
-            <meta property="og:title" content="<?php echo $elysium->title ?>">
+            <meta property="og:title" content="{{ $metaTitle }}">
             <meta property="og:image" content="<?php echo $elysium->logo ?>"/>
-            <meta property="og:description" content="<?php echo $elysium->description ?>" />
+            <meta property="og:description" content="{{ $metaDescription }}" />
             <meta name="theme-color" content="<?php echo $elysium->color_meta; ?>">
             
             <style>
