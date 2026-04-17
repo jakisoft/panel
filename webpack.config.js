@@ -1,9 +1,22 @@
+const fs = require('node:fs');
 const path = require('node:path');
 const webpack = require('webpack');
 const { WebpackAssetsManifest } = require('webpack-assets-manifest');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+
+const entryCandidates = [
+    './resources/scripts/index',
+    './resources/scripts/index.ts',
+    './resources/scripts/index.tsx',
+];
+const appEntry = entryCandidates.find((candidate) => fs.existsSync(path.join(__dirname, candidate.replace('./', ''))));
+
+if (!appEntry) {
+    throw new Error('Unable to find frontend entry file. Expected one of: resources/scripts/index, index.ts, or index.tsx');
+}
 
 module.exports = {
     cache: true,
@@ -13,7 +26,7 @@ module.exports = {
     performance: {
         hints: false,
     },
-    entry: ['react-hot-loader/patch', './resources/scripts/index.tsx'],
+    entry: ['react-hot-loader/patch', appEntry],
     output: {
         path: path.join(__dirname, '/public/assets'),
         filename: isProduction ? 'bundle.[chunkhash:8].js' : 'bundle.[fullhash:8].js',
