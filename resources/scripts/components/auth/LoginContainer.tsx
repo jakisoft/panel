@@ -20,7 +20,7 @@ interface Values {
 
 
 const GoogleIcon = () => (
-    <svg className={'w-4 h-4 mr-2'} viewBox={'0 0 24 24'}>
+    <svg className={'w-5 h-5 mr-2.5 shrink-0'} viewBox={'0 0 24 24'}>
         <path fill={'#4285F4'} d={'M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'} />
         <path fill={'#34A853'} d={'M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'} />
         <path fill={'#FBBC05'} d={'M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z'} />
@@ -29,7 +29,7 @@ const GoogleIcon = () => (
 );
 
 const GithubIcon = () => (
-    <svg className={'w-4 h-4 mr-2'} viewBox={'0 0 24 24'} fill={'currentColor'}>
+    <svg className={'w-5 h-5 mr-2.5 shrink-0'} viewBox={'0 0 24 24'} fill={'currentColor'}>
         <path d={'M12 2C6.477 2 2 6.596 2 12.266c0 4.536 2.865 8.385 6.839 9.743.5.096.682-.223.682-.495 0-.245-.009-.893-.014-1.753-2.782.617-3.369-1.382-3.369-1.382-.455-1.187-1.11-1.503-1.11-1.503-.908-.638.069-.625.069-.625 1.004.073 1.532 1.057 1.532 1.057.892 1.566 2.341 1.114 2.91.852.092-.667.35-1.114.636-1.37-2.22-.259-4.555-1.14-4.555-5.074 0-1.12.39-2.036 1.03-2.753-.103-.26-.447-1.306.098-2.723 0 0 .84-.276 2.75 1.052A9.299 9.299 0 0 1 12 7.087a9.3 9.3 0 0 1 2.504.349c1.909-1.328 2.748-1.052 2.748-1.052.546 1.417.202 2.463.1 2.723.64.717 1.028 1.633 1.028 2.753 0 3.944-2.338 4.812-4.566 5.067.359.317.678.944.678 1.904 0 1.374-.012 2.48-.012 2.817 0 .275.18.596.688.494C19.137 20.647 22 16.8 22 12.266 22 6.596 17.523 2 12 2z'} />
     </svg>
 );
@@ -203,17 +203,19 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                     <div css={tw`grid grid-cols-2 gap-3`}>
                         <button
                             type={'button'}
-                            css={tw`py-3 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold`}
+                            css={tw`py-3 px-4 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold flex items-center justify-center transition-all`}
                             onClick={() => handleSocialLogin('google')}
                         >
-                            <><GoogleIcon />Google</>
+                            <GoogleIcon />
+                            <span css={tw`leading-none`}>Google</span>
                         </button>
                         <button
                             type={'button'}
-                            css={tw`py-3 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold flex items-center justify-center`}
+                            css={tw`py-3 px-4 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold flex items-center justify-center transition-all`}
                             onClick={() => handleSocialLogin('github')}
                         >
-                            <><GithubIcon />GitHub</>
+                            <GithubIcon />
+                            <span css={tw`leading-none`}>GitHub</span>
                         </button>
                     </div>
 

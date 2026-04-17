@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Link, NavLink, useRouteMatch } from "react-router-dom";
 import { useStoreState } from "easy-peasy";
-import { Cog, ExternalLink, Layers, LogOut, User } from "lucide-react";
+import { AlertTriangle, Cog, ExternalLink, Layers, LogOut, User } from "lucide-react";
 import { ApplicationStore } from "@/state";
 import { ServerContext } from "@/state/server";
 import SearchContainer from "@/components/dashboard/search/SearchContainer";
@@ -11,6 +11,7 @@ import http from "@/api/http";
 import routes from "@/routers/routes";
 import Can from "@/components/elements/Can";
 import { getElysiumData } from "@/components/elements/elysium/getElysiumData";
+import { Dialog } from "@/components/elements/dialog";
 import Navigation from "@/components/elements/elysium/navigation/Navigation";
 import NavigationBar from "@/components/elements/elysium/navigation/NavigationBar";
 import LogoContainer from "@/components/elements/elysium/navigation/LogoContainer";
@@ -24,18 +25,20 @@ export default () => {
   const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
   const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const match = useRouteMatch<{ id: string }>();
 
-  const onTriggerLogout = () => {
-    const confirmed = window.confirm("Yakin mau logout dari panel?");
-    if (!confirmed) return;
-
+  const onConfirmLogout = () => {
+    setShowLogoutConfirm(false);
     setIsLoggingOut(true);
+
     http.post("/auth/logout").finally(() => {
       // @ts-expect-error this is valid
       window.location = "/";
     });
   };
+
+  const onTriggerLogout = () => setShowLogoutConfirm(true);
 
   const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
 
@@ -117,6 +120,21 @@ export default () => {
           <NavigationButton>{isLoggingOut ? "Signing Out..." : "Sign Out"}</NavigationButton>
         </a>
       </NavigationBar>
+
+      <Dialog.Confirm
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirmed={onConfirmLogout}
+        title={"Logout Confirmation"}
+        confirm={"Logout"}
+      >
+        <div css={tw`space-y-3 text-center`}>
+          <div css={tw`w-12 h-12 mx-auto rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400`}>
+            <AlertTriangle size={20} />
+          </div>
+          <p css={tw`text-sm text-neutral-300`}>Yakin mau logout dari panel ini?</p>
+        </div>
+      </Dialog.Confirm>
     </Navigation>
   );
 };
