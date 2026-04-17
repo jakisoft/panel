@@ -247,4 +247,7 @@ Route::group(['prefix' => 'elysium'], function () {
 
     Route::get('/announcement', [Admin\Elysium\AnnouncementController::class, 'index'])->name('admin.elysium.announcement');
     Route::post('/announcement/update', [Admin\Elysium\AnnouncementController::class, 'update'])->name('admin.elysium.announcement.update');
+
+    Route::get('/auth', [Admin\Elysium\AuthSettingsController::class, 'index'])->name('admin.elysium.auth');
+    Route::post('/auth/update', [Admin\Elysium\AuthSettingsController::class, 'update'])->name('admin.elysium.auth.update');
 });

@@ -17,6 +17,10 @@ use Pterodactyl\Http\Controllers\Auth;
 Route::get('/login', [Auth\LoginController::class, 'index'])->name('auth.login');
 Route::get('/password', [Auth\LoginController::class, 'index'])->name('auth.forgot-password');
 Route::get('/register', [Auth\LoginController::class, 'index'])->name('auth.register');
+Route::get('/google', [Auth\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/google/callback', [Auth\SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/github', [Auth\SocialAuthController::class, 'redirectToGithub'])->name('auth.github');
+Route::get('/github/callback', [Auth\SocialAuthController::class, 'handleGithubCallback'])->name('auth.github.callback');
 Route::get('/password/reset/{token}', [Auth\LoginController::class, 'index'])->name('auth.reset');
 
 // Apply a throttle to authentication action endpoints, in addition to the
