@@ -54,6 +54,11 @@
                     --color-green:<?php echo $elysium->color_6; ?>;
                     --color-yellow:<?php echo $elysium->color_7; ?>;
                     --color-red:<?php echo $elysium->color_8; ?>;
+                    --auth-input-text-color:<?php echo $elysium->color_auth_input_text ?? '#F8FAFC'; ?>;
+                    --auth-input-placeholder-color:<?php echo $elysium->color_auth_input_placeholder ?? '#94A3B8'; ?>;
+                    --auth-label-text-color:<?php echo $elysium->color_auth_label_text ?? '#9CA3AF'; ?>;
+                    --oauth-google-enabled:<?php echo !empty($elysium->google_auth_enabled) ? '1' : '0'; ?>;
+                    --oauth-github-enabled:<?php echo !empty($elysium->github_auth_enabled) ? '1' : '0'; ?>;
                 }
             </style>
 

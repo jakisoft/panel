@@ -40,6 +40,9 @@ class ColorController extends Controller
             'color_6' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'color_7' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'color_8' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'color_auth_label_text' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'color_auth_input_placeholder' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'color_auth_input_text' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ]);
 
         $existing = DB::table('elysium')->first();
@@ -54,6 +57,9 @@ class ColorController extends Controller
             'color_6' => $data['color_6'],
             'color_7' => $data['color_7'],
             'color_8' => $data['color_8'],
+            'color_auth_label_text' => $data['color_auth_label_text'],
+            'color_auth_input_placeholder' => $data['color_auth_input_placeholder'],
+            'color_auth_input_text' => $data['color_auth_input_text'],
             'updated_at' => Carbon::now(),
         ]);
 

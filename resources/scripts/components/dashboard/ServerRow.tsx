@@ -26,7 +26,7 @@ const getExpInfo = (expDate: string | null) => {
 
 const getLifecycleLabel = (server: Server, stats: ServerStats | null) => {
   if (server.status === "suspended" || stats?.isSuspended) {
-    return { label: "Suspended", tone: "danger" as const };
+    return { label: "Suspended", tone: "suspended" as const };
   }
 
   if (server.isTransferring) {
@@ -53,9 +53,9 @@ const getLifecycleLabel = (server: Server, stats: ServerStats | null) => {
     case "running":
       return { label: "Running", tone: "success" as const };
     case "starting":
-      return { label: "Starting", tone: "warning" as const };
+      return { label: "Starting", tone: "success" as const };
     case "stopping":
-      return { label: "Stopping", tone: "warning" as const };
+      return { label: "Stopping", tone: "danger" as const };
     default:
       return { label: "Stopped", tone: "danger" as const };
   }
@@ -95,6 +95,7 @@ export default memo(({ server }: { server: Server }) => {
   const statusStyle = useMemo(() => {
     if (lifecycle.tone === "success") return tw`bg-green-500/90 text-white`;
     if (lifecycle.tone === "warning") return tw`bg-yellow-500/90 text-black`;
+    if (lifecycle.tone === "suspended") return tw`bg-red-700/90 text-white`;
     return tw`bg-red-500/90 text-white`;
   }, [lifecycle.tone]);
 
@@ -108,7 +109,12 @@ export default memo(({ server }: { server: Server }) => {
   const defaultAllocation = server.allocations.find((alloc) => alloc.isDefault);
 
   return (
-    <div css={tw`text-neutral-50 bg-elysium-color3 rounded-xl shadow-lg p-3`}>
+    <div css={tw`text-neutral-50 bg-elysium-color3 rounded-xl shadow-lg p-3 relative`}>
+      {lifecycle.label === 'Suspended' && (
+        <div css={tw`absolute top-2 right-2 z-20 bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl uppercase tracking-wider shadow-lg`}>
+          Suspended
+        </div>
+      )}
       <BackgroundDiv>
         <div css={tw`px-4 flex flex-col items-center gap-2`}>
           <p css={tw`font-bold text-center truncate w-full`}>{server.name}</p>
