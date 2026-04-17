@@ -5,7 +5,7 @@ import tw from "twin.macro";
 import isEqual from "react-fast-compare";
 
 interface Props {
-  icon?: IconProp;
+  icon?: IconProp | React.ReactNode;
   title: string | React.ReactNode;
   className?: string;
   children: React.ReactNode;
@@ -15,9 +15,11 @@ const TitledGreyBox = ({ icon, title, children, className }: Props) => (
   <div css={tw`rounded-2xl shadow-lg bg-elysium-color2`} className={className}>
     <div css={tw`bg-elysium-color2 rounded-2xl p-3`}>
       {typeof title === "string" ? (
-        <p css={tw`text-xl font-semibold uppercase`}>
+        <p css={tw`text-xl font-semibold uppercase flex items-center`}>
           {icon && (
-            <FontAwesomeIcon icon={icon} css={tw`mr-2 text-neutral-300`} />
+            <span css={tw`mr-2 text-neutral-300 inline-flex items-center`}>
+              {React.isValidElement(icon) ? icon : <FontAwesomeIcon icon={icon as IconProp} />}
+            </span>
           )}
           {title}
         </p>

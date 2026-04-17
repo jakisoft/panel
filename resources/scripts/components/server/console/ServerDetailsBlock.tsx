@@ -1,26 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faDesktop,
-  faClock,
-  faCloudDownloadAlt,
-  faCloudUploadAlt,
-  faHdd,
-  faMemory,
-  faMicrochip,
-  faWifi,
-  faLightbulb,
-  faBox,
-  faLocationArrow,
-  faSignal,
-  faServer,
-  faFingerprint,
-} from "@fortawesome/free-solid-svg-icons";
+  Activity,
+  Box,
+  CheckCircle2,
+  CircleOff,
+  CloudDownload,
+  CloudUpload,
+  Cpu,
+  Fingerprint,
+  HardDrive,
+  Lightbulb,
+  MapPin,
+  Network,
+  Server,
+  Timer,
+  TriangleAlert,
+} from "lucide-react";
 import { bytesToString, ip, mbToBytes } from "@/lib/formatters";
 import { ServerContext } from "@/state/server";
 import { SocketEvent, SocketRequest } from "@/components/server/events";
 import UptimeDuration from "@/components/server/UptimeDuration";
-import StatBlock from "@/components/server/console/StatBlock";
 import useWebsocketEvent from "@/plugins/useWebsocketEvent";
 import tw from "twin.macro";
 import CopyOnClick from "@/components/elements/CopyOnClick";
@@ -28,6 +27,28 @@ import { capitalize } from "@/lib/strings";
 import TitledGreyBox from "@/components/elements/TitledGreyBox";
 
 type Stats = Record<"memory" | "cpu" | "disk" | "uptime" | "rx" | "tx", number>;
+
+const iconSize = 15;
+
+const formatExpDate = (expDate: string | null) => {
+  if (!expDate) {
+    return { label: "Unlimited", expired: false };
+  }
+
+  const parsed = new Date(expDate);
+  if (Number.isNaN(parsed.getTime())) {
+    return { label: expDate, expired: false };
+  }
+
+  return {
+    label: parsed.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+    expired: parsed.getTime() < Date.now(),
+  };
+};
 
 const ServerDetailsBlock = () => {
   const [stats, setStats] = useState<Stats>({
@@ -39,115 +60,127 @@ const ServerDetailsBlock = () => {
     rx: 0,
   });
 
-  const status = ServerContext.useStoreState((state) => state.status.value);
-  const connected = ServerContext.useStoreState(
-    (state) => state.socket.connected
-  );
-  const instance = ServerContext.useStoreState(
-    (state) => state.socket.instance
-  );
+  const powerStatus = ServerContext.useStoreState((state) => state.status.value);
+  const connected = ServerContext.useStoreState((state) => state.socket.connected);
+  const instance = ServerContext.useStoreState((state) => state.socket.instance);
+  const serverData = ServerContext.useStoreState((state) => state.server.data!);
 
-  const name = ServerContext.useStoreState((state) => state.server.data!.name);
-  const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
-  const node = ServerContext.useStoreState((state) => state.server.data!.node);
-  const limits = ServerContext.useStoreState(
-    (state) => state.server.data!.limits
-  );
+  const diskLimit = serverData.limits.disk !== 0 ? bytesToString(mbToBytes(serverData.limits.disk)) : "Unlimited";
+  const memoryLimit = serverData.limits.memory !== 0 ? bytesToString(mbToBytes(serverData.limits.memory)) : "Unlimited";
+  const cpuLimit = serverData.limits.cpu !== 0 ? `${serverData.limits.cpu}%` : "Unlimited";
 
-  const diskLimit =
-    limits.disk !== 0 ? bytesToString(mbToBytes(limits.disk)) : "Unlimited";
-  const memoryLimit =
-    limits.memory !== 0 ? bytesToString(mbToBytes(limits.memory)) : "Unlimited";
-  const cpuLimit = limits.cpu !== 0 ? limits.cpu + "%" : "Unlimited";
-
-  const allocation = ServerContext.useStoreState((state) => {
-    const match = state.server.data!.allocations.find(
-      (allocation) => allocation.isDefault
-    );
-
+  const allocation = useMemo(() => {
+    const match = serverData.allocations.find((item) => item.isDefault);
     return !match ? "n/a" : `${match.alias || ip(match.ip)}:${match.port}`;
-  });
+  }, [serverData.allocations]);
+
+  const resolvedStatus = useMemo(() => {
+    if (serverData.status === "suspended") return "suspended";
+    if (serverData.status === "installing") return "installing";
+    if (serverData.status === "restoring_backup") return "restoring_backup";
+    if (serverData.status === "install_failed" || serverData.status === "reinstall_failed") return "install_failed";
+
+    return powerStatus ?? "offline";
+  }, [powerStatus, serverData.status]);
+
+  const statusLabel = useMemo(() => {
+    switch (resolvedStatus) {
+      case "running":
+        return "Running";
+      case "starting":
+        return "Starting";
+      case "stopping":
+        return "Stopping";
+      case "suspended":
+        return "Suspended";
+      case "installing":
+        return "Installing";
+      case "restoring_backup":
+        return "Restoring Backup";
+      case "install_failed":
+        return "Install Failed";
+      default:
+        return "Offline";
+    }
+  }, [resolvedStatus]);
+
+  const expInfo = formatExpDate(serverData.expDate);
 
   useEffect(() => {
-    if (!connected || !instance) {
-      return;
-    }
-
+    if (!connected || !instance) return;
     instance.send(SocketRequest.SEND_STATS);
   }, [instance, connected]);
 
   useWebsocketEvent(SocketEvent.STATS, (data) => {
-    let stats: any = {};
+    let parsed: any = {};
     try {
-      stats = JSON.parse(data);
-    } catch (e) {
+      parsed = JSON.parse(data);
+    } catch {
       return;
     }
 
     setStats({
-      memory: stats.memory_bytes,
-      cpu: stats.cpu_absolute,
-      disk: stats.disk_bytes,
-      tx: stats.network.tx_bytes,
-      rx: stats.network.rx_bytes,
-      uptime: stats.uptime || 0,
+      memory: parsed.memory_bytes,
+      cpu: parsed.cpu_absolute,
+      disk: parsed.disk_bytes,
+      tx: parsed.network.tx_bytes,
+      rx: parsed.network.rx_bytes,
+      uptime: parsed.uptime || 0,
     });
   });
 
   return (
     <div css={tw`w-full md:flex gap-6`}>
       <div css={tw`w-full md:flex-1 md:mb-0 mb-5`}>
-        <TitledGreyBox icon={faServer} title={"Server Info"}>
+        <TitledGreyBox icon={<Server size={18} />} title={"Server Info"}>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faFingerprint} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>NAME</a>
+              <Fingerprint size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>NAME</span>
             </div>
-            <p css={tw`mb-4`}>{name}</p>
+            <p css={tw`mb-4`}>{serverData.name}</p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faLightbulb} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>STATUS</a>
+              <Lightbulb size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>STATUS</span>
             </div>
-            <p css={tw`mb-4`}>
-              {status === "starting" ||
-              status === "stopping" ||
-              status === "running"
-                ? capitalize(status)
-                : "Offline"}
-            </p>
+            <p css={tw`mb-4`}>{statusLabel}</p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faBox} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>UUID</a>
+              <Timer size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>EXPIRED DATE</span>
             </div>
-            <CopyOnClick text={uuid}>
-              <p css={tw`mb-4`}>{uuid}</p>
+            <div css={tw`mb-4 flex items-center`}>
+              <span>{expInfo.label}</span>
+              {expInfo.expired && (
+                <span css={tw`ml-2 text-[10px] uppercase px-2 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30`}>
+                  Expired
+                </span>
+              )}
+            </div>
+          </div>
+          <div css={tw`overflow-hidden whitespace-nowrap`}>
+            <div css={tw`flex items-center`}>
+              <Box size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>UUID</span>
+            </div>
+            <CopyOnClick text={serverData.uuid}>
+              <p css={tw`mb-4`}>{serverData.uuid}</p>
             </CopyOnClick>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faLocationArrow} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>NODE</a>
+              <MapPin size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>NODE</span>
             </div>
-            <p css={tw`mb-4`}>{node}</p>
+            <p css={tw`mb-4`}>{serverData.node}</p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faSignal} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>ADDRESS</a>
+              <Activity size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>ADDRESS</span>
             </div>
             <CopyOnClick text={allocation}>
               <p css={tw`mb-4`}>{allocation}</p>
@@ -155,90 +188,66 @@ const ServerDetailsBlock = () => {
           </div>
         </TitledGreyBox>
       </div>
+
       <div css={tw`w-full md:flex-1`}>
-        <TitledGreyBox icon={faDesktop} title={"System Info"}>
+        <TitledGreyBox icon={<Cpu size={18} />} title={"System Info"}>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faClock} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold `}>UPTIME</a>
+              <Timer size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>UPTIME</span>
             </div>
             <p css={tw`mb-4`}>
-              {status === "starting" || status === "stopping" ? (
-                capitalize(status)
-              ) : stats.uptime > 0 ? (
-                <UptimeDuration uptime={stats.uptime / 1000} />
-              ) : (
-                "Offline"
-              )}
+              {resolvedStatus === "starting" || resolvedStatus === "stopping"
+                ? capitalize(resolvedStatus)
+                : stats.uptime > 0
+                ? <UptimeDuration uptime={stats.uptime / 1000} />
+                : "Offline"}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faMicrochip} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>CPU</a>
+              <Cpu size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>CPU</span>
             </div>
-            {status === "offline" ? (
-              <p css={tw`mb-4`}>Offline</p>
-            ) : (
-              <p css={tw`mb-4`}>
-                {stats.cpu.toFixed(2)}% / {cpuLimit}
-              </p>
-            )}
+            <p css={tw`mb-4`}>
+              {resolvedStatus === "running" ? `${stats.cpu.toFixed(2)}% / ${cpuLimit}` : statusLabel}
+            </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faMemory} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>MEMORY</a>
+              <Server size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>MEMORY</span>
             </div>
-            {status === "offline" ? (
-              <p css={tw`mb-4`}>Offline</p>
-            ) : (
-              <p css={tw`mb-4`}>
-                {bytesToString(stats.memory)} / {memoryLimit}
-              </p>
-            )}
+            <p css={tw`mb-4`}>
+              {resolvedStatus === "running" ? `${bytesToString(stats.memory)} / ${memoryLimit}` : statusLabel}
+            </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faHdd} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>DISK</a>
+              <HardDrive size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>DISK</span>
             </div>
-            {status === "offline" ? (
-              <p css={tw`mb-4`}>Offline</p>
-            ) : (
-              <p css={tw`mb-4`}>
-                {bytesToString(stats.disk)} / {diskLimit}
-              </p>
-            )}
+            <p css={tw`mb-4`}>
+              {resolvedStatus === "running" ? `${bytesToString(stats.disk)} / ${diskLimit}` : statusLabel}
+            </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
             <div css={tw`flex items-center`}>
-              <div>
-                <FontAwesomeIcon icon={faWifi} />
-              </div>
-              <a css={tw`ml-2 uppercase font-semibold`}>NETWORK</a>
+              <Network size={iconSize} />
+              <span css={tw`ml-2 uppercase font-semibold`}>NETWORK</span>
             </div>
-            {status === "offline" ? (
+            {resolvedStatus !== "running" ? (
               <div css={tw`flex items-center mb-4`}>
-                <p css={tw`ml-1`}>Offline</p>
+                {resolvedStatus === "install_failed" ? <TriangleAlert size={14} /> : <CircleOff size={14} />}
+                <p css={tw`ml-1`}>{statusLabel}</p>
               </div>
             ) : (
               <div css={tw`flex items-center mb-4`}>
-                <FontAwesomeIcon icon={faCloudDownloadAlt} css={tw`text-sm`} />
+                <CloudDownload size={14} />
                 <p css={tw`ml-1`}>{bytesToString(stats.rx)}</p>
-                <FontAwesomeIcon
-                  icon={faCloudUploadAlt}
-                  css={tw`text-sm ml-3`}
-                />
+                <CloudUpload size={14} css={tw`ml-3`} />
                 <p css={tw`ml-1`}>{bytesToString(stats.tx)}</p>
+                <CheckCircle2 size={14} css={tw`ml-3 text-green-400`} />
               </div>
             )}
           </div>
