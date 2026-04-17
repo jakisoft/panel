@@ -46,6 +46,21 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
         clearFlashes();
     }, []);
 
+
+    const handleSocialLogin = (provider: 'google' | 'github') => {
+        const cssVar = provider === 'google' ? '--oauth-google-enabled' : '--oauth-github-enabled';
+        const enabled = getElysiumData(cssVar).trim() === '1';
+
+        if (!enabled) {
+            toast.info(`${provider === 'google' ? 'Google' : 'GitHub'} OAuth belum di-setup.`, {
+                description: 'Silakan hubungi admin untuk mengaktifkan social login.',
+            });
+            return;
+        }
+
+        window.location.href = provider === 'google' ? '/auth/google' : '/auth/github';
+    };
+
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes();
 
@@ -189,14 +204,14 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         <button
                             type={'button'}
                             css={tw`py-3 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold`}
-                            onClick={() => (window.location.href = '/auth/google')}
+                            onClick={() => handleSocialLogin('google')}
                         >
                             <><GoogleIcon />Google</>
                         </button>
                         <button
                             type={'button'}
                             css={tw`py-3 rounded-2xl border border-neutral-700 bg-elysium-color3 hover:bg-elysium-color4 text-sm font-semibold flex items-center justify-center`}
-                            onClick={() => (window.location.href = '/auth/github')}
+                            onClick={() => handleSocialLogin('github')}
                         >
                             <><GithubIcon />GitHub</>
                         </button>

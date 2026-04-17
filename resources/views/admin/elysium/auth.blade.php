@@ -16,6 +16,15 @@
 @section('content')
     @yield('elysium::nav')
 
+    <style>
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #d1d5db; transition: .3s; border-radius: 999px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; top: 3px; background-color: white; transition: .3s; border-radius: 999px; }
+        input:checked + .slider { background-color: #4f46e5; }
+        input:checked + .slider:before { transform: translateX(22px); }
+    </style>
+
     <div class="row">
         <div class="col-md-12">
             <div class="box">
@@ -28,11 +37,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <h4 style="margin-top:0;">Google OAuth</h4>
-                                <div class="checkbox">
-                                    <label>
+                                <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+                                    <label class="switch">
                                         <input type="checkbox" name="google_auth_enabled" value="1" {{ !empty($elysium->google_auth_enabled) ? 'checked' : '' }}>
-                                        Enable Google Login
+                                        <span class="slider"></span>
                                     </label>
+                                    <span><strong>{{ !empty($elysium->google_auth_enabled) ? 'Enabled' : 'Disabled' }}</strong> - Toggle Google Login</span>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">Google Client ID</label>
@@ -50,11 +60,12 @@
 
                             <div class="col-md-6">
                                 <h4 style="margin-top:0;">GitHub OAuth</h4>
-                                <div class="checkbox">
-                                    <label>
+                                <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+                                    <label class="switch">
                                         <input type="checkbox" name="github_auth_enabled" value="1" {{ !empty($elysium->github_auth_enabled) ? 'checked' : '' }}>
-                                        Enable GitHub Login
+                                        <span class="slider"></span>
                                     </label>
+                                    <span><strong>{{ !empty($elysium->github_auth_enabled) ? 'Enabled' : 'Disabled' }}</strong> - Toggle GitHub Login</span>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">GitHub Client ID</label>

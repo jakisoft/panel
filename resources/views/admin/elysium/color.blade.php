@@ -25,6 +25,10 @@
         ['name' => 'color_6', 'label' => 'Button Primary', 'default' => '#2DCE89'],
         ['name' => 'color_7', 'label' => 'Button Text', 'default' => '#EAB208'],
         ['name' => 'color_8', 'label' => 'Button Danger', 'default' => '#F5365C'],
+
+        ['name' => 'color_auth_input_text', 'label' => 'Auth Input Text', 'default' => '#F8FAFC'],
+        ['name' => 'color_auth_input_placeholder', 'label' => 'Auth Input Placeholder', 'default' => '#94A3B8'],
+        ['name' => 'color_auth_label_text', 'label' => 'Auth Label Text', 'default' => '#9CA3AF'],
     ];
 @endphp
 

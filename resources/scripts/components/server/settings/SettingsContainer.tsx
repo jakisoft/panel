@@ -41,19 +41,6 @@ export default () => {
   return (
     <ServerContentBlock title={"Settings"}>
       <FlashMessageRender byKey={"settings"} css={tw`mb-4`} />
-      <div css={tw`mb-4`}>
-        <div css={tw`inline-flex items-center rounded-xl border border-neutral-700 bg-elysium-color2 px-3 py-2 text-sm`}>
-          <CalendarClock size={16} css={tw`mr-2 text-neutral-300`} />
-          <span css={tw`text-neutral-300 mr-2`}>Expired Date:</span>
-          <span css={tw`font-semibold text-neutral-100`}>{expInfo.label}</span>
-          {expInfo.expired && (
-            <span css={tw`ml-2 text-[10px] uppercase px-2 py-1 rounded bg-red-500/20 text-red-300 border border-red-500/30`}>
-              Expired
-            </span>
-          )}
-        </div>
-      </div>
-
       <div css={tw`md:flex`}>
         <div css={tw`w-full md:flex-1 md:mr-10`}>
           <Can action={"file.sftp"}>
@@ -91,6 +78,13 @@ export default () => {
             <div css={tw`flex items-center justify-between text-sm`}>
               <p>Node</p>
               <code css={tw`font-mono bg-elysium-color3 rounded py-1 px-2`}>{node}</code>
+            </div>
+            <div css={tw`flex items-center justify-between mt-2 text-sm`}>
+              <p css={tw`flex items-center`}><CalendarClock size={14} css={tw`mr-1`} />Expired Date</p>
+              <code css={tw`font-mono bg-elysium-color3 rounded py-1 px-2`}>
+                {expInfo.label}
+                {expInfo.expired ? ' (Expired)' : ''}
+              </code>
             </div>
             <CopyOnClick text={uuid}>
               <div css={tw`flex items-center justify-between mt-2 text-sm`}>
