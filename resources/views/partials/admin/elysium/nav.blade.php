@@ -9,7 +9,6 @@
                     <li @if($activeTab === 'auth')class="active"@endif><a href="{{ route('admin.elysium.auth') }}">Auth Settings</a></li>
                     <li @if($activeTab === 'announcement')class="active"@endif><a href="{{ route('admin.elysium.announcement') }}">Announcement Settings</a></li>
                     <li @if($activeTab === 'playground')class="active"@endif><a href="{{ route('admin.elysium.playground') }}">Playground Settings</a></li>
-                    <li @if($activeTab === 'pricing')class="active"@endif><a href="{{ route('admin.elysium.pricing') }}">Pricing Settings</a></li>
                 </ul>
             </div>
         </div>

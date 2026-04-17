@@ -124,6 +124,11 @@
                                 <i class="fa fa-th-large"></i> <span>Nests</span>
                             </a>
                         </li>
+                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.pricing') ?: 'active' }}">
+                            <a href="{{ route('admin.pricing') }}">
+                                <i class="fa fa-money"></i> <span>Pricing</span>
+                            </a>
+                        </li>
                         <li class="header">ELYSIUM MANAGEMENT</li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.elysium') ?: 'active' }}">
                             <a href="{{ route('admin.elysium') }}">

@@ -1,9 +1,17 @@
 import React, { useMemo } from "react";
 import tw from "twin.macro";
-import { Check } from "lucide-react";
+import { Cpu, HardDrive, MemoryStick } from "lucide-react";
 import { getElysiumData } from "@/components/elements/elysium/getElysiumData";
 
-type PricingItem = { name: string; price: string; description?: string; features?: string[] };
+type PricingItem = {
+  name: string;
+  monthly_price?: number;
+  price?: string;
+  cpu?: string;
+  memory?: string;
+  disk?: string;
+  description?: string;
+};
 
 const parseStringVar = (name: string, fallback: string) => {
   try {
@@ -27,6 +35,18 @@ const parseJsonVar = <T,>(name: string, fallback: T): T => {
   }
 };
 
+const toMonthlyPrice = (item: PricingItem): number => {
+  if (typeof item.monthly_price === "number") return item.monthly_price;
+  if (!item.price) return 0;
+  const digits = item.price.replace(/\D/g, "");
+
+  return digits ? Number(digits) : 0;
+};
+
+const formatPrice = (value: number): string => {
+  return `Rp ${value.toLocaleString("id-ID")}/bulan`;
+};
+
 export default () => {
   const title = parseStringVar("--playground-pricing-title", "Paket Pricing Panel");
   const subtitle = parseStringVar("--playground-pricing-subtitle", "Pilih paket yang paling sesuai kebutuhan server kamu.");
@@ -34,7 +54,7 @@ export default () => {
   const pricingItems = useMemo(
     () =>
       parseJsonVar<PricingItem[]>("--playground-pricing-items", [
-        { name: "Starter", price: "Rp 15.000/bulan", description: "Paket dasar panel.", features: ["Support cepat"] },
+        { name: "Starter", monthly_price: 15000, cpu: "1 vCPU", memory: "2 GB", disk: "20 GB", description: "Paket dasar panel." },
       ]),
     []
   );
@@ -53,18 +73,15 @@ export default () => {
               <h2 css={tw`text-lg font-bold text-white truncate`} title={item.name}>
                 {item.name}
               </h2>
-              <p css={tw`text-indigo-300 text-xl font-extrabold mt-1 break-words`}>{item.price}</p>
+              <p css={tw`text-indigo-300 text-xl font-extrabold mt-1 break-words`}>{formatPrice(toMonthlyPrice(item))}</p>
               {item.description && <p css={tw`text-neutral-300 text-sm mt-2 break-words`}>{item.description}</p>}
             </div>
 
-            <ul css={tw`space-y-2 text-sm text-neutral-200 flex-1`}>
-              {(item.features ?? []).map((feature) => (
-                <li key={feature} css={tw`flex items-start gap-2`}>
-                  <Check size={15} css={tw`text-green-400 mt-0.5 flex-shrink-0`} />
-                  <span css={tw`break-words`}>{feature}</span>
-                </li>
-              ))}
-            </ul>
+            <div css={tw`space-y-2 text-sm text-neutral-200 flex-1`}>
+              <p css={tw`flex items-center gap-2`}><Cpu size={14} css={tw`text-indigo-300`} /> CPU: {item.cpu || "-"}</p>
+              <p css={tw`flex items-center gap-2`}><MemoryStick size={14} css={tw`text-indigo-300`} /> Memory: {item.memory || "-"}</p>
+              <p css={tw`flex items-center gap-2`}><HardDrive size={14} css={tw`text-indigo-300`} /> Disk: {item.disk || "-"}</p>
+            </div>
 
             <button css={tw`w-full rounded-lg bg-indigo-500 hover:bg-indigo-400 transition-colors text-white text-sm font-semibold py-2.5`}>
               Pilih Paket

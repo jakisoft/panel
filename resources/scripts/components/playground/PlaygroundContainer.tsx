@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { Check, ChevronDown, ChevronUp, Server } from 'lucide-react';
+import { ChevronDown, ChevronUp, Cpu, HardDrive, MemoryStick, Server } from 'lucide-react';
 import { getElysiumData } from '@/components/elements/elysium/getElysiumData';
 
 const customStyles = `
@@ -18,7 +18,7 @@ const customStyles = `
   .reveal.active { opacity: 1; transform: translateY(0); }
 `;
 
-type PricingItem = { name: string; price: string; description?: string; features?: string[] };
+type PricingItem = { name: string; monthly_price?: number; price?: string; cpu?: string; memory?: string; disk?: string; description?: string };
 type FaqItem = { question: string; answer: string };
 type VisualCard = { key: 'total_users' | 'total_servers'; title: string; description?: string };
 type FooterLink = { label: string; url: string };
@@ -44,6 +44,17 @@ const parseJsonVar = <T,>(name: string, fallback: T): T => {
         return fallback;
     }
 };
+
+
+const toMonthlyPrice = (item: PricingItem): number => {
+    if (typeof item.monthly_price === 'number') return item.monthly_price;
+    if (!item.price) return 0;
+
+    const digits = item.price.replace(/\D/g, '');
+    return digits ? Number(digits) : 0;
+};
+
+const formatPrice = (value: number): string => `Rp ${value.toLocaleString('id-ID')}/bulan`;
 
 const IconByName = ({ name, size = 16 }: { name: string; size?: number }) => {
     const iconMap = LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>;
@@ -199,10 +210,14 @@ export default () => {
                 <div className={'max-w-7xl mx-auto'}>
                     <div className={'text-center mb-16'}><ScrollReveal><h2 className={'text-3xl md:text-4xl font-extrabold mb-4 tracking-tight'}>{pricingTitle}</h2><p className={'text-slate-500 text-[14px]'}>{pricingSubtitle}</p></ScrollReveal></div>
                     <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
-                        {(pricingItems.length ? pricingItems : [{ name: 'Starter', price: 'Rp 15.000/bulan', description: 'Paket dasar panel.', features: ['Support cepat'] }]).map((item, idx) => (
+                        {(pricingItems.length ? pricingItems : [{ name: 'Starter', monthly_price: 15000, cpu: '1 vCPU', memory: '2 GB', disk: '20 GB', description: 'Paket dasar panel.' }]).map((item, idx) => (
                             <div key={`${item.name}-${idx}`} className={'bg-white rounded-[28px] p-8 border border-slate-100 shadow-[0_20px_40px_rgba(0,0,0,0.04)]'}>
-                                <h3 className={'text-xl font-extrabold'}>{item.name}</h3><p className={'text-indigo-600 font-black text-2xl mt-2'}>{item.price}</p><p className={'text-slate-400 text-[13px] mt-3 mb-6'}>{item.description}</p>
-                                <ul className={'space-y-3 mb-6'}>{(item.features ?? []).map((feature) => <li key={feature} className={'flex items-center gap-2 text-[13px] text-slate-600'}><Check size={15} className={'text-green-500'} /> {feature}</li>)}</ul>
+                                <h3 className={'text-xl font-extrabold'}>{item.name}</h3><p className={'text-indigo-600 font-black text-2xl mt-2'}>{formatPrice(toMonthlyPrice(item))}</p><p className={'text-slate-400 text-[13px] mt-3 mb-6'}>{item.description}</p>
+                                <ul className={'space-y-3 mb-6 text-[13px] text-slate-600'}>
+                                    <li className={'flex items-center gap-2'}><Cpu size={15} className={'text-indigo-500'} /> CPU: {item.cpu || '-'}</li>
+                                    <li className={'flex items-center gap-2'}><MemoryStick size={15} className={'text-indigo-500'} /> Memory: {item.memory || '-'}</li>
+                                    <li className={'flex items-center gap-2'}><HardDrive size={15} className={'text-indigo-500'} /> Disk: {item.disk || '-'}</li>
+                                </ul>
                                 <a href={'/pricing'} className={'inline-flex w-full justify-center bg-slate-900 text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:bg-indigo-600 transition-colors'}>Pilih Paket</a>
                             </div>
                         ))}

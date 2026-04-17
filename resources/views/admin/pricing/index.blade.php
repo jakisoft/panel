@@ -1,12 +1,11 @@
 @extends('layouts.admin')
-@include('partials/admin.elysium.nav', ['activeTab' => 'pricing'])
 
 @section('title')
-    Elysium Pricing Settings
+    Pricing Settings
 @endsection
 
 @section('content-header')
-    <h1>Elysium Pricing<small>Configure pricing cards for playground & user pricing page.</small></h1>
+    <h1>Pricing Settings<small>Configure pricing cards for playground and user pricing page.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
         <li class="active">Pricing</li>
@@ -14,14 +13,13 @@
 @endsection
 
 @section('content')
-    @yield('elysium::nav')
     <div class="row">
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Pricing Settings</h3>
+                    <h3 class="box-title">Pricing</h3>
                 </div>
-                <form action="{{ route('admin.elysium.pricing.update') }}" method="POST">
+                <form action="{{ route('admin.pricing.update') }}" method="POST">
                     {!! csrf_field() !!}
                     <div class="box-body">
                         <div class="row">
@@ -77,23 +75,25 @@
                 return card;
             };
 
-            const addPricingItem = (item = { name: '', price: '', description: '', features: [] }) => {
+            const addPricingItem = (item = { name: '', monthly_price: 15000, cpu: '1 vCPU', memory: '2 GB', disk: '20 GB', description: '' }) => {
                 const index = pricingContainer.querySelectorAll('.pricing-item').length;
                 const card = createCardWrapper('Pricing Item');
 
                 card.innerHTML += `
                     <div class="row">
-                        <div class="form-group col-md-4"><label>Name</label><input type="text" class="form-control" name="pricing[${index}][name]" value="${item.name || ''}" required></div>
-                        <div class="form-group col-md-4"><label>Price</label><input type="text" class="form-control" name="pricing[${index}][price]" value="${item.price || ''}" required></div>
-                        <div class="form-group col-md-4"><label>Description</label><input type="text" class="form-control" name="pricing[${index}][description]" value="${item.description || ''}"></div>
-                        <div class="form-group col-md-12"><label>Features (one per line)</label><textarea class="form-control" rows="3" name="pricing[${index}][features]">${Array.isArray(item.features) ? item.features.join('\n') : ''}</textarea></div>
+                        <div class="form-group col-md-3"><label>Name</label><input type="text" class="form-control" name="pricing[${index}][name]" value="${item.name || ''}" required></div>
+                        <div class="form-group col-md-3"><label>Harga Bulanan (angka)</label><input type="number" min="0" class="form-control" name="pricing[${index}][monthly_price]" value="${Number(item.monthly_price || 0)}" required></div>
+                        <div class="form-group col-md-2"><label>CPU</label><input type="text" class="form-control" name="pricing[${index}][cpu]" value="${item.cpu || ''}" required></div>
+                        <div class="form-group col-md-2"><label>Memory</label><input type="text" class="form-control" name="pricing[${index}][memory]" value="${item.memory || ''}" required></div>
+                        <div class="form-group col-md-2"><label>Disk</label><input type="text" class="form-control" name="pricing[${index}][disk]" value="${item.disk || ''}" required></div>
+                        <div class="form-group col-md-12"><label>Description</label><textarea class="form-control" rows="2" name="pricing[${index}][description]">${item.description || ''}</textarea></div>
                     </div>`;
 
                 pricingContainer.appendChild(card);
             };
 
             document.getElementById('add_pricing').addEventListener('click', () => addPricingItem());
-            (initialPricing.length ? initialPricing : [{ name: '', price: '', description: '', features: [] }]).forEach(addPricingItem);
+            (initialPricing.length ? initialPricing : [{ name: '', monthly_price: 15000, cpu: '1 vCPU', memory: '2 GB', disk: '20 GB', description: '' }]).forEach(addPricingItem);
         })();
     </script>
 @endsection
