@@ -1,0 +1,37 @@
+name: Release Latest Archive
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-latest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build panel source archive
+        run: |
+          rm -f panel.tar.gz
+          git archive --format=tar.gz --output=panel.tar.gz HEAD
+
+      - name: Publish latest release asset
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: latest
+          body: Automated latest source archive release.
+          allowUpdates: true
+          replacesArtifacts: true
+          removeArtifacts: true
+          artifacts: panel.tar.gz

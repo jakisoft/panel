@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-    faCalendarDay,
     faClock,
     faCloudDownloadAlt,
     faCloudUploadAlt,
@@ -49,6 +48,20 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
     const limits = ServerContext.useStoreState((state) => state.server.data!.limits);
     const expDate = ServerContext.useStoreState((state) => state.server.data!.expDate);
 
+    const formattedExpDate = useMemo(() => {
+        if (!expDate) {
+            return 'Unlimited';
+        }
+
+        const parsed = new Date(expDate);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return expDate;
+        }
+
+        return parsed.toLocaleDateString();
+    }, [expDate]);
+
     const textLimits = useMemo(
         () => ({
             cpu: limits?.cpu ? `${limits.cpu}%` : null,
@@ -95,8 +108,8 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
             <StatBlock icon={faWifi} title={'Address'} copyOnClick={allocation}>
                 {allocation}
             </StatBlock>
-            <StatBlock icon={faCalendarDay} title={'Expiration'}>
-                {expDate || 'Unlimited'}
+            <StatBlock icon={faClock} title={'Expiration'}>
+                {formattedExpDate}
             </StatBlock>
             <StatBlock
                 icon={faClock}
