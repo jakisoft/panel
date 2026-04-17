@@ -95,10 +95,22 @@ export default ({ server, className }: { server: Server; className?: string }) =
                     <FontAwesomeIcon icon={faServer} />
                 </div>
                 <div>
-                    <p css={tw`text-lg break-words`}>{server.name}</p>
+                    <p css={tw`text-lg break-words font-semibold`}>{server.name}</p>
                     {!!server.description && (
                         <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
                     )}
+                    <div css={tw`mt-2 flex items-center gap-2 flex-wrap`}>
+                        <span
+                            css={tw`text-[10px] uppercase tracking-wide bg-neutral-700 text-neutral-200 rounded px-2 py-1`}
+                        >
+                            {stats?.status || server.status || 'offline'}
+                        </span>
+                        <span
+                            css={tw`text-[10px] uppercase tracking-wide bg-neutral-700 text-neutral-200 rounded px-2 py-1`}
+                        >
+                            Exp: {server.expDate || 'Unlimited'}
+                        </span>
+                    </div>
                 </div>
             </div>
             <div css={tw`flex-1 ml-4 lg:block lg:col-span-2 hidden`}>

@@ -37,13 +37,30 @@ class NestSeeder extends Seeder
     public function run()
     {
         $items = $this->repository->findWhere([
-            'author' => 'support@pterodactyl.io',
+            'author' => 'support@jaky.dev',
         ])->keyBy('name')->toArray();
 
+        $this->createItzkySheelNest(array_get($items, 'Itzky Sheel'));
         $this->createMinecraftNest(array_get($items, 'Minecraft'));
         $this->createSourceEngineNest(array_get($items, 'Source Engine'));
         $this->createVoiceServersNest(array_get($items, 'Voice Servers'));
         $this->createRustNest(array_get($items, 'Rust'));
+    }
+
+
+    /**
+     * Create the Itzky Sheel nest to be used later on.
+     *
+     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     */
+    private function createItzkySheelNest(?array $nest = null)
+    {
+        if (is_null($nest)) {
+            $this->creationService->handle([
+                'name' => 'Itzky Sheel',
+                'description' => 'Itzky custom shell workloads and utility containers.',
+            ], 'support@jaky.dev');
+        }
     }
 
     /**
@@ -57,7 +74,7 @@ class NestSeeder extends Seeder
             $this->creationService->handle([
                 'name' => 'Minecraft',
                 'description' => 'Minecraft - the classic game from Mojang. With support for Vanilla MC, Spigot, and many others!',
-            ], 'support@pterodactyl.io');
+            ], 'support@jaky.dev');
         }
     }
 
@@ -72,7 +89,7 @@ class NestSeeder extends Seeder
             $this->creationService->handle([
                 'name' => 'Source Engine',
                 'description' => 'Includes support for most Source Dedicated Server games.',
-            ], 'support@pterodactyl.io');
+            ], 'support@jaky.dev');
         }
     }
 
@@ -87,7 +104,7 @@ class NestSeeder extends Seeder
             $this->creationService->handle([
                 'name' => 'Voice Servers',
                 'description' => 'Voice servers such as Mumble and Teamspeak 3.',
-            ], 'support@pterodactyl.io');
+            ], 'support@jaky.dev');
         }
     }
 
@@ -102,7 +119,7 @@ class NestSeeder extends Seeder
             $this->creationService->handle([
                 'name' => 'Rust',
                 'description' => 'Rust - A game where you must fight to survive.',
-            ], 'support@pterodactyl.io');
+            ], 'support@jaky.dev');
         }
     }
 }

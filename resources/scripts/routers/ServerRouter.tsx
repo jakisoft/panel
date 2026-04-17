@@ -1,6 +1,6 @@
 import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
-import { NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { NavLink, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
 import TransitionRouter from '@/TransitionRouter';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
@@ -24,6 +24,7 @@ import routes from '@/routers/routes';
 export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
+    const history = useHistory();
 
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [error, setError] = useState('');
@@ -54,13 +55,19 @@ export default () => {
 
         getServer(match.params.id).catch((error) => {
             console.error(error);
+
+            if (rootAdmin && error?.response?.status === 403) {
+                history.replace('/?access_denied=1');
+                return;
+            }
+
             setError(httpErrorToHuman(error));
         });
 
         return () => {
             clearServerState();
         };
-    }, [match.params.id]);
+    }, [match.params.id, rootAdmin, history]);
 
     return (
         <React.Fragment key={'server-router'}>

@@ -10,6 +10,7 @@ import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import { Eye, EyeOff, Lock, UserRound } from 'lucide-react';
 
 interface Values {
     username: string;
@@ -22,6 +23,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
 
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const { enabled: recaptchaEnabled, siteKey } = useStoreState((state) => state.settings.data!.recaptcha);
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         clearFlashes();
@@ -75,9 +77,36 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
                 <LoginFormContainer title={'Login to Continue'} css={tw`w-full flex`}>
-                    <Field light type={'text'} label={'Username or Email'} name={'username'} disabled={isSubmitting} />
+                    <div css={tw`relative`}>
+                        <UserRound css={tw`absolute left-3 top-11 z-10 h-4 w-4 text-neutral-500`} />
+                        <Field
+                            light
+                            type={'text'}
+                            label={'Username or Email'}
+                            name={'username'}
+                            disabled={isSubmitting}
+                            className={'pl-10'}
+                        />
+                    </div>
                     <div css={tw`mt-6`}>
-                        <Field light type={'password'} label={'Password'} name={'password'} disabled={isSubmitting} />
+                        <div css={tw`relative`}>
+                            <Lock css={tw`absolute left-3 top-11 z-10 h-4 w-4 text-neutral-500`} />
+                            <button
+                                type={'button'}
+                                onClick={() => setShowPassword((s) => !s)}
+                                css={tw`absolute right-3 top-10 z-10 text-neutral-500 hover:text-neutral-300`}
+                            >
+                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                            <Field
+                                light
+                                type={showPassword ? 'text' : 'password'}
+                                label={'Password'}
+                                name={'password'}
+                                disabled={isSubmitting}
+                                className={'pl-10 pr-10'}
+                            />
+                        </div>
                     </div>
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>

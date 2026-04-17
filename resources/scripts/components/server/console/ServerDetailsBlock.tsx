@@ -1,13 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-    faClock,
-    faCloudDownloadAlt,
-    faCloudUploadAlt,
-    faHdd,
-    faMemory,
-    faMicrochip,
-    faWifi,
-} from '@fortawesome/free-solid-svg-icons';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import { ServerContext } from '@/state/server';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
@@ -16,6 +7,7 @@ import StatBlock from '@/components/server/console/StatBlock';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import classNames from 'classnames';
 import { capitalize } from '@/lib/strings';
+import { Activity, CalendarClock, HardDrive, MemoryStick, Network, Timer, Upload } from 'lucide-react';
 
 type Stats = Record<'memory' | 'cpu' | 'disk' | 'uptime' | 'rx' | 'tx', number>;
 
@@ -39,6 +31,12 @@ const Limit = ({ limit, children }: { limit: string | null; children: React.Reac
     </>
 );
 
+const statIcon = 'h-5 w-5';
+
+const DownloadIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <Upload {...props} className={classNames(props.className, 'rotate-180')} />
+);
+
 const ServerDetailsBlock = ({ className }: { className?: string }) => {
     const [stats, setStats] = useState<Stats>({ memory: 0, cpu: 0, disk: 0, uptime: 0, tx: 0, rx: 0 });
 
@@ -46,6 +44,16 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
     const connected = ServerContext.useStoreState((state) => state.socket.connected);
     const instance = ServerContext.useStoreState((state) => state.socket.instance);
     const limits = ServerContext.useStoreState((state) => state.server.data!.limits);
+    const expDate = ServerContext.useStoreState((state) => state.server.data!.expDate);
+
+    const formattedExpDate = useMemo(() => {
+        if (!expDate) return 'Unlimited';
+
+        const parsed = new Date(expDate);
+        if (Number.isNaN(parsed.getTime())) return expDate;
+
+        return parsed.toLocaleDateString();
+    }, [expDate]);
 
     const textLimits = useMemo(
         () => ({
@@ -63,9 +71,7 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
     });
 
     useEffect(() => {
-        if (!connected || !instance) {
-            return;
-        }
+        if (!connected || !instance) return;
 
         instance.send(SocketRequest.SEND_STATS);
     }, [instance, connected]);
@@ -89,14 +95,27 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
     });
 
     return (
-        <div className={classNames('grid grid-cols-6 gap-2 md:gap-4', className)}>
-            <StatBlock icon={faWifi} title={'Address'} copyOnClick={allocation}>
+        <div className={classNames('grid grid-cols-12 gap-3 md:gap-4', className)}>
+            <StatBlock
+                icon={<Network className={statIcon} />}
+                title={'Address'}
+                copyOnClick={allocation}
+                className={'col-span-12 md:col-span-6 xl:col-span-3'}
+            >
                 {allocation}
             </StatBlock>
             <StatBlock
-                icon={faClock}
+                icon={<CalendarClock className={statIcon} />}
+                title={'Expiration'}
+                className={'col-span-6 md:col-span-3 xl:col-span-2'}
+            >
+                {formattedExpDate}
+            </StatBlock>
+            <StatBlock
+                icon={<Timer className={statIcon} />}
                 title={'Uptime'}
                 color={getBackgroundColor(status === 'running' ? 0 : status !== 'offline' ? 9 : 10, 10)}
+                className={'col-span-6 md:col-span-3 xl:col-span-2'}
             >
                 {status === null ? (
                     'Offline'
@@ -106,7 +125,12 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
                     capitalize(status)
                 )}
             </StatBlock>
-            <StatBlock icon={faMicrochip} title={'CPU Load'} color={getBackgroundColor(stats.cpu, limits.cpu)}>
+            <StatBlock
+                icon={<Activity className={statIcon} />}
+                title={'CPU Load'}
+                color={getBackgroundColor(stats.cpu, limits.cpu)}
+                className={'col-span-6 md:col-span-4 xl:col-span-2'}
+            >
                 {status === 'offline' ? (
                     <span className={'text-gray-400'}>Offline</span>
                 ) : (
@@ -114,9 +138,10 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
                 )}
             </StatBlock>
             <StatBlock
-                icon={faMemory}
+                icon={<MemoryStick className={statIcon} />}
                 title={'Memory'}
                 color={getBackgroundColor(stats.memory / 1024, limits.memory * 1024)}
+                className={'col-span-6 md:col-span-4 xl:col-span-2'}
             >
                 {status === 'offline' ? (
                     <span className={'text-gray-400'}>Offline</span>
@@ -124,14 +149,27 @@ const ServerDetailsBlock = ({ className }: { className?: string }) => {
                     <Limit limit={textLimits.memory}>{bytesToString(stats.memory)}</Limit>
                 )}
             </StatBlock>
-            <StatBlock icon={faHdd} title={'Disk'} color={getBackgroundColor(stats.disk / 1024, limits.disk * 1024)}>
+            <StatBlock
+                icon={<HardDrive className={statIcon} />}
+                title={'Disk'}
+                color={getBackgroundColor(stats.disk / 1024, limits.disk * 1024)}
+                className={'col-span-6 md:col-span-4 xl:col-span-2'}
+            >
                 <Limit limit={textLimits.disk}>{bytesToString(stats.disk)}</Limit>
             </StatBlock>
-            <StatBlock icon={faCloudDownloadAlt} title={'Network (Inbound)'}>
-                {status === 'offline' ? <span className={'text-gray-400'}>Offline</span> : bytesToString(stats.rx)}
-            </StatBlock>
-            <StatBlock icon={faCloudUploadAlt} title={'Network (Outbound)'}>
+            <StatBlock
+                icon={<Upload className={statIcon} />}
+                title={'Network (Outbound)'}
+                className={'col-span-6 md:col-span-6 xl:col-span-3'}
+            >
                 {status === 'offline' ? <span className={'text-gray-400'}>Offline</span> : bytesToString(stats.tx)}
+            </StatBlock>
+            <StatBlock
+                icon={<DownloadIcon className={statIcon} />}
+                title={'Network (Inbound)'}
+                className={'col-span-6 md:col-span-6 xl:col-span-3'}
+            >
+                {status === 'offline' ? <span className={'text-gray-400'}>Offline</span> : bytesToString(stats.rx)}
             </StatBlock>
         </div>
     );

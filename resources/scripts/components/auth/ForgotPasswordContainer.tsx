@@ -12,6 +12,7 @@ import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import { Mail } from 'lucide-react';
 
 interface Values {
     email: string;
@@ -73,15 +74,19 @@ export default () => {
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
                 <LoginFormContainer title={'Request Password Reset'} css={tw`w-full flex`}>
-                    <Field
-                        light
-                        label={'Email'}
-                        description={
-                            'Enter your account email address to receive instructions on resetting your password.'
-                        }
-                        name={'email'}
-                        type={'email'}
-                    />
+                    <div css={tw`relative`}>
+                        <Mail css={tw`absolute left-3 top-11 z-10 h-4 w-4 text-neutral-500`} />
+                        <Field
+                            light
+                            label={'Email'}
+                            description={
+                                'Enter your account email address to receive instructions on resetting your password.'
+                            }
+                            name={'email'}
+                            type={'email'}
+                            className={'pl-10'}
+                        />
+                    </div>
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>
                             Send Email

@@ -70,12 +70,31 @@
             url: '{{ route('admin.nodes.view.configuration.token', $node->id) }}',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         }).done(function (data) {
+            const command = 'cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}';
+
             swal({
                 type: 'success',
                 title: 'Token created.',
-                text: '<p>To auto-configure your node run the following command:<br /><small><pre>cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}</pre></small></p>',
+                text:
+                    '<p>To auto-configure your node run the following command:</p>' +
+                    '<textarea id="nodeDeployCommand" class="form-control" rows="4" readonly style="resize:none; margin-top: 10px; font-family: monospace;">' + command + '</textarea>' +
+                    '<button id="copyNodeDeployCommand" class="btn btn-sm btn-primary" style="margin-top: 10px;">Copy Command</button>',
                 html: true
-            })
+            });
+
+            setTimeout(function () {
+                $('#copyNodeDeployCommand').on('click', function () {
+                    const textarea = document.getElementById('nodeDeployCommand');
+                    textarea.select();
+                    document.execCommand('copy');
+
+                    swal({
+                        type: 'success',
+                        title: 'Copied',
+                        text: 'Deployment command copied to clipboard.'
+                    });
+                });
+            }, 100);
         }).fail(function () {
             swal({
                 title: 'Error',

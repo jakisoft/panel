@@ -12,6 +12,7 @@ import Field from '@/components/elements/Field';
 import Input from '@/components/elements/Input';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
 interface Values {
     password: string;
@@ -20,6 +21,8 @@ interface Values {
 
 export default ({ match, location }: RouteComponentProps<{ token: string }>) => {
     const [email, setEmail] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
 
     const { clearFlashes, addFlash } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
@@ -62,21 +65,49 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
         >
             {({ isSubmitting }) => (
                 <LoginFormContainer title={'Reset Password'} css={tw`w-full flex`}>
-                    <div>
+                    <div css={tw`relative`}>
                         <label>Email</label>
-                        <Input value={email} isLight disabled />
+                        <Mail css={tw`absolute left-3 top-10 z-10 h-4 w-4 text-neutral-500`} />
+                        <Input value={email} isLight disabled className={'pl-10'} />
                     </div>
                     <div css={tw`mt-6`}>
-                        <Field
-                            light
-                            label={'New Password'}
-                            name={'password'}
-                            type={'password'}
-                            description={'Passwords must be at least 8 characters in length.'}
-                        />
+                        <div css={tw`relative`}>
+                            <Lock css={tw`absolute left-3 top-11 z-10 h-4 w-4 text-neutral-500`} />
+                            <button
+                                type={'button'}
+                                onClick={() => setShowPassword((s) => !s)}
+                                css={tw`absolute right-3 top-10 z-10 text-neutral-500 hover:text-neutral-300`}
+                            >
+                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                            <Field
+                                light
+                                label={'New Password'}
+                                name={'password'}
+                                type={showPassword ? 'text' : 'password'}
+                                description={'Passwords must be at least 8 characters in length.'}
+                                className={'pl-10 pr-10'}
+                            />
+                        </div>
                     </div>
                     <div css={tw`mt-6`}>
-                        <Field light label={'Confirm New Password'} name={'passwordConfirmation'} type={'password'} />
+                        <div css={tw`relative`}>
+                            <Lock css={tw`absolute left-3 top-11 z-10 h-4 w-4 text-neutral-500`} />
+                            <button
+                                type={'button'}
+                                onClick={() => setShowPasswordConfirmation((s) => !s)}
+                                css={tw`absolute right-3 top-10 z-10 text-neutral-500 hover:text-neutral-300`}
+                            >
+                                {showPasswordConfirmation ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                            <Field
+                                light
+                                label={'Confirm New Password'}
+                                name={'passwordConfirmation'}
+                                type={showPasswordConfirmation ? 'text' : 'password'}
+                                className={'pl-10 pr-10'}
+                            />
+                        </div>
                     </div>
                     <div css={tw`mt-6`}>
                         <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>

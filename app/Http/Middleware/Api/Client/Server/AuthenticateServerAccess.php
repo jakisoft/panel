@@ -5,6 +5,7 @@ namespace Pterodactyl\Http\Middleware\Api\Client\Server;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Server;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
 
 class AuthenticateServerAccess
@@ -39,9 +40,14 @@ class AuthenticateServerAccess
         // At the very least, ensure that the user trying to make this request is the
         // server owner, a subuser, or a root admin. We'll leave it up to the controllers
         // to authenticate more detailed permissions if needed.
-        if ($user->id !== $server->owner_id && !$user->root_admin) {
-            // Check for subuser status.
-            if (!$server->subusers->contains('user_id', $user->id)) {
+        if ($user->id !== $server->owner_id) {
+            $isSubuser = $server->subusers->contains('user_id', $user->id);
+
+            if (!$isSubuser) {
+                if ($user->root_admin) {
+                    throw new AccessDeniedHttpException('You can only access your own servers unless you are added as a subuser.');
+                }
+
                 throw new NotFoundHttpException(trans('exceptions.api.resource_not_found'));
             }
         }
