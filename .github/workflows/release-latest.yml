@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - codex/update-auth-component-styles-and-add-register
+      - codex/update-pterodactyl-login-and-playground-ui
   workflow_dispatch:
 
 permissions:
