@@ -27,7 +27,7 @@ jobs:
           cache: yarn
 
       - name: Install frontend dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Build frontend assets
         run: yarn build:production
