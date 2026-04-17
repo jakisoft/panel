@@ -122,6 +122,12 @@
                                 <i class="fa fa-th-large"></i> <span>Nests</span>
                             </a>
                         </li>
+                        <li class="header">ELYSIUM MANAGEMENT</li>
+                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.elysium') ?: 'active' }}">
+                            <a href="{{ route('admin.elysium') }}">
+                                <i class="fa fa-edit"></i> <span>Elysium Theme</span>
+                            </a>
+                        </li>
                     </ul>
                 </section>
             </aside>
@@ -145,7 +151,7 @@
                             @foreach (Alert::getMessages() as $type => $messages)
                                 @foreach ($messages as $message)
                                     <div class="alert alert-{{ $type }} alert-dismissable" role="alert">
-                                        {{ $message }}
+                                        {!! $message !!}
                                     </div>
                                 @endforeach
                             @endforeach

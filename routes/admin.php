@@ -93,7 +93,7 @@ Route::group(['prefix' => 'users'], function () {
     Route::post('/new', [Admin\UserController::class, 'store']);
 
     Route::patch('/view/{user:id}', [Admin\UserController::class, 'update']);
-    Route::delete('/view/{user:id}', [Admin\UserController::class, 'delete'])->name('admin.users.delete');
+    Route::delete('/view/{user:id}', [Admin\UserController::class, 'delete']);
 });
 
 /*
@@ -225,4 +225,26 @@ Route::group(['prefix' => 'nests'], function () {
     Route::delete('/view/{nest:id}', [Admin\Nests\NestController::class, 'destroy']);
     Route::delete('/egg/{egg:id}', [Admin\Nests\EggController::class, 'destroy']);
     Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Elysium Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/elysium
+|
+*/
+Route::group(['prefix' => 'elysium'], function () {
+    Route::get('/', [Admin\Elysium\GeneralController::class, 'index'])->name('admin.elysium');
+    Route::post('/update', [Admin\Elysium\GeneralController::class, 'update'])->name('admin.elysium.update');
+
+    Route::get('/meta', [Admin\Elysium\MetaController::class, 'index'])->name('admin.elysium.meta');
+    Route::post('/meta/update', [Admin\Elysium\MetaController::class, 'update'])->name('admin.elysium.meta.update');
+
+    Route::get('/color', [Admin\Elysium\ColorController::class, 'index'])->name('admin.elysium.color');
+    Route::post('/color/update', [Admin\Elysium\ColorController::class, 'update'])->name('admin.elysium.color.update');
+
+    Route::get('/announcement', [Admin\Elysium\AnnouncementController::class, 'index'])->name('admin.elysium.announcement');
+    Route::post('/announcement/update', [Admin\Elysium\AnnouncementController::class, 'update'])->name('admin.elysium.announcement.update');
 });
