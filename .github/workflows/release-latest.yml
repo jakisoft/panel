@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - codex/fix-expired-notice-and-expiry-badge-styling
+      - codex/update-pterodactyl-panel-layout-and-styling
   workflow_dispatch:
 
 permissions:
