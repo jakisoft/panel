@@ -29,6 +29,10 @@ class CommandController extends ClientApiController
      */
     public function index(SendCommandRequest $request, Server $server): Response
     {
+        if ($server->isExpired()) {
+            throw new HttpException(Response::HTTP_FORBIDDEN, "Server has expired. Console commands are unavailable.");
+        }
+
         try {
             $this->repository->setServer($server)->send($request->input('command'));
         } catch (DaemonConnectionException $exception) {
