@@ -25,30 +25,11 @@ import tw from "twin.macro";
 import CopyOnClick from "@/components/elements/CopyOnClick";
 import { capitalize } from "@/lib/strings";
 import TitledGreyBox from "@/components/elements/TitledGreyBox";
+import { getExpirationInfo } from "@/lib/serverExpiry";
 
 type Stats = Record<"memory" | "cpu" | "disk" | "uptime" | "rx" | "tx", number>;
 
 const iconSize = 15;
-
-const formatExpDate = (expDate: string | null) => {
-  if (!expDate) {
-    return { label: "Unlimited", expired: false };
-  }
-
-  const parsed = new Date(expDate);
-  if (Number.isNaN(parsed.getTime())) {
-    return { label: expDate, expired: false };
-  }
-
-  return {
-    label: parsed.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }),
-    expired: parsed.getTime() < Date.now(),
-  };
-};
 
 const ServerDetailsBlock = () => {
   const [stats, setStats] = useState<Stats>({
@@ -74,14 +55,17 @@ const ServerDetailsBlock = () => {
     return !match ? "n/a" : `${match.alias || ip(match.ip)}:${match.port}`;
   }, [serverData.allocations]);
 
+  const expInfo = getExpirationInfo(serverData.expDate);
+
   const resolvedStatus = useMemo(() => {
+    if (expInfo.expired) return "expired";
     if (serverData.status === "suspended") return "suspended";
     if (serverData.status === "installing") return "installing";
     if (serverData.status === "restoring_backup") return "restoring_backup";
     if (serverData.status === "install_failed" || serverData.status === "reinstall_failed") return "install_failed";
 
     return powerStatus ?? "offline";
-  }, [powerStatus, serverData.status]);
+  }, [expInfo.expired, powerStatus, serverData.status]);
 
   const statusLabel = useMemo(() => {
     switch (resolvedStatus) {
@@ -93,6 +77,8 @@ const ServerDetailsBlock = () => {
         return "Stopping";
       case "suspended":
         return "Suspended";
+      case "expired":
+        return "Expired";
       case "installing":
         return "Installing";
       case "restoring_backup":
@@ -104,7 +90,6 @@ const ServerDetailsBlock = () => {
     }
   }, [resolvedStatus]);
 
-  const expInfo = formatExpDate(serverData.expDate);
 
   useEffect(() => {
     if (!connected || !instance) return;
@@ -197,7 +182,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>UPTIME</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "offline"
+              {resolvedStatus === "offline" || resolvedStatus === "expired"
                 ? "Offline"
                 : stats.uptime > 0
                 ? <UptimeDuration uptime={stats.uptime / 1000} />
@@ -210,7 +195,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>CPU</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "offline" ? "Offline" : `${stats.cpu.toFixed(2)}% / ${cpuLimit}`}
+              {resolvedStatus === "offline" || resolvedStatus === "expired" ? "Offline" : `${stats.cpu.toFixed(2)}% / ${cpuLimit}`}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -219,7 +204,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>MEMORY</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "offline" ? "Offline" : `${bytesToString(stats.memory)} / ${memoryLimit}`}
+              {resolvedStatus === "offline" || resolvedStatus === "expired" ? "Offline" : `${bytesToString(stats.memory)} / ${memoryLimit}`}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -228,7 +213,7 @@ const ServerDetailsBlock = () => {
               <span css={tw`ml-2 uppercase font-semibold`}>DISK</span>
             </div>
             <p css={tw`mb-4`}>
-              {resolvedStatus === "offline" ? "Offline" : `${bytesToString(stats.disk)} / ${diskLimit}`}
+              {resolvedStatus === "offline" || resolvedStatus === "expired" ? "Offline" : `${bytesToString(stats.disk)} / ${diskLimit}`}
             </p>
           </div>
           <div css={tw`overflow-hidden whitespace-nowrap`}>
@@ -236,7 +221,7 @@ const ServerDetailsBlock = () => {
               <Globe size={iconSize} />
               <span css={tw`ml-2 uppercase font-semibold`}>NETWORK</span>
             </div>
-            {resolvedStatus === "offline" ? (
+            {resolvedStatus === "offline" || resolvedStatus === "expired" ? (
               <div css={tw`flex items-center mb-4`}>
                 {resolvedStatus === "install_failed" ? <TriangleAlert size={14} /> : <CircleOff size={14} />}
                 <p css={tw`ml-1`}>{statusLabel}</p>
