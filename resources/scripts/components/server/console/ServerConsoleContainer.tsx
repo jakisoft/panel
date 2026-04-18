@@ -45,19 +45,19 @@ const ServerConsoleContainer = () => {
       <div css={tw`mb-5`}>
         <ContentBox>
           <div css={tw`w-full h-[600px] flex mb-5 relative`}>
-            <div css={expInfo.expired ? tw`w-full pointer-events-none opacity-40` : tw`w-full`}>
+            {expInfo.expired && (
+              <div css={tw`absolute top-3 left-3 right-3 z-20 rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-4 py-2 text-xs text-yellow-200 backdrop-blur-sm`}>
+                Notice: server ini sudah expired. Aksi Start, Restart, dan Stop dinonaktifkan. Silakan perpanjang masa aktif atau hubungi admin.
+              </div>
+            )}
+            <div css={expInfo.expired ? tw`w-full h-full pointer-events-none opacity-40` : tw`w-full h-full`}>
               <Spinner.Suspense>
                 <Console />
               </Spinner.Suspense>
             </div>
 
             {expInfo.expired && (
-              <div css={tw`absolute inset-0 flex items-center justify-center bg-black/60 rounded-md backdrop-blur-sm`}>
-                <div css={tw`text-center max-w-xl px-6`}>
-                  <p css={tw`text-yellow-300 text-lg font-bold mb-2`}>Server Expired</p>
-                  <p css={tw`text-neutral-100 text-sm`}>Console tidak dapat digunakan. Silakan perpanjang masa aktif server atau hubungi admin.</p>
-                </div>
-              </div>
+              <div css={tw`absolute inset-0 z-10 rounded-md bg-black/60 backdrop-blur-sm`} />
             )}
           </div>
           <div css={tw`w-full justify-between items-center`}>

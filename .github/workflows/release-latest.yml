@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - codex/update-elysiumtheme-navigation-and-ui/ux
+      - codex/update-pterodactyl-panel-layout-and-styling
   workflow_dispatch:
 
 permissions:
