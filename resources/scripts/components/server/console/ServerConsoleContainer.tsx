@@ -50,7 +50,7 @@ const ServerConsoleContainer = () => {
                 Notice: server ini sudah expired. Aksi Start, Restart, dan Stop dinonaktifkan. Silakan perpanjang masa aktif atau hubungi admin.
               </div>
             )}
-            <div css={expInfo.expired ? tw`w-full pointer-events-none opacity-40` : tw`w-full`}>
+            <div css={expInfo.expired ? tw`w-full h-full pointer-events-none opacity-40` : tw`w-full h-full`}>
               <Spinner.Suspense>
                 <Console />
               </Spinner.Suspense>
