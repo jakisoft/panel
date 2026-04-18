@@ -6,7 +6,7 @@ import { PowerAction } from "@/components/server/console/ServerConsoleContainer"
 import { Dialog } from "@/components/elements/dialog";
 import { getExpirationInfo } from "@/lib/serverExpiry";
 import http from "@/api/http";
-import { useFlash } from "@/plugins/useFlash";
+import useFlash from "@/plugins/useFlash";
 
 interface PowerButtonProps {
   className?: string;

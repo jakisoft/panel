@@ -118,12 +118,15 @@ export default memo(({ server }: { server: Server }) => {
 
       <BackgroundDiv>
         {expInfo.expired && (
-          <span css={tw`absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-yellow-500/90 text-black shadow-lg`}>
-            Expired
+          <span
+            css={tw`absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold tracking-wide bg-yellow-500/90 text-black shadow-lg max-w-[calc(100%-1.5rem)] truncate`}
+            title={`Expired on ${expInfo.label}`}
+          >
+            Expired on {expInfo.label}
           </span>
         )}
 
-        <div css={tw`absolute left-4 bottom-4 right-36 sm:right-44`}>
+        <div css={tw`absolute left-4 bottom-4 right-4 pr-24 sm:pr-28 min-w-0`}>
           <p css={tw`font-bold text-left w-full truncate`} title={server.name}>
             {server.name}
           </p>
