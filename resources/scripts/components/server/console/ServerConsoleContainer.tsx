@@ -57,12 +57,7 @@ const ServerConsoleContainer = () => {
             </div>
 
             {expInfo.expired && (
-              <div css={tw`absolute inset-0 z-10 flex items-center justify-center bg-black/60 rounded-md backdrop-blur-sm`}>
-                <div css={tw`text-center max-w-xl px-6`}>
-                  <p css={tw`text-yellow-300 text-lg font-bold mb-2`}>Server Expired</p>
-                  <p css={tw`text-neutral-100 text-sm`}>Console tidak dapat digunakan. Silakan perpanjang masa aktif server atau hubungi admin.</p>
-                </div>
-              </div>
+              <div css={tw`absolute inset-0 z-10 rounded-md bg-black/60 backdrop-blur-sm`} />
             )}
           </div>
           <div css={tw`w-full justify-between items-center`}>
