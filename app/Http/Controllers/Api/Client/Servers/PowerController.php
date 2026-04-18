@@ -3,6 +3,7 @@
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 
 use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
@@ -24,6 +25,10 @@ class PowerController extends ClientApiController
      */
     public function index(SendPowerRequest $request, Server $server): Response
     {
+        if ($server->isExpired() && in_array($request->input('signal'), ['start', 'restart'], true)) {
+            throw new HttpException(Response::HTTP_FORBIDDEN, 'Server has expired. Please renew service or contact an administrator.');
+        }
+
         $this->repository->setServer($server)->send(
             $request->input('signal')
         );

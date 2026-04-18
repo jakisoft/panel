@@ -5,6 +5,8 @@ import { ServerContext } from "@/state/server";
 import { PowerAction } from "@/components/server/console/ServerConsoleContainer";
 import { Dialog } from "@/components/elements/dialog";
 import { getExpirationInfo } from "@/lib/serverExpiry";
+import http from "@/api/http";
+import { useFlash } from "@/plugins/useFlash";
 
 interface PowerButtonProps {
   className?: string;
@@ -13,13 +15,26 @@ interface PowerButtonProps {
 export default ({ className }: PowerButtonProps) => {
   const [open, setOpen] = useState(false);
   const status = ServerContext.useStoreState((state) => state.status.value);
+  const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid ?? "");
   const expDate = ServerContext.useStoreState((state) => state.server.data?.expDate ?? null);
-  const instance = ServerContext.useStoreState((state) => state.socket.instance);
+
+  const { clearFlashes, clearAndAddHttpError } = useFlash();
 
   const expInfo = useMemo(() => getExpirationInfo(expDate), [expDate]);
   const isExpired = expInfo.expired;
 
   const killable = status === "stopping";
+
+  const sendPowerSignal = (signal: PowerAction) => {
+    if (!uuid) return;
+
+    clearFlashes("server:power");
+
+    http.post(`/api/client/servers/${uuid}/power`, { signal }).catch((error) => {
+      clearAndAddHttpError({ key: "server:power", error });
+    });
+  };
+
   const onButtonClick = (
     action: PowerAction | "kill-confirmed",
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -32,10 +47,8 @@ export default ({ className }: PowerButtonProps) => {
       return setOpen(true);
     }
 
-    if (instance) {
-      setOpen(false);
-      instance.send("set state", action === "kill-confirmed" ? "kill" : action);
-    }
+    setOpen(false);
+    sendPowerSignal(action === "kill-confirmed" ? "kill" : action);
   };
 
   useEffect(() => {
@@ -45,10 +58,10 @@ export default ({ className }: PowerButtonProps) => {
   }, [status]);
 
   useEffect(() => {
-    if (!isExpired || !instance || status !== "running") return;
+    if (!isExpired || status !== "running") return;
 
-    instance.send("set state", "stop");
-  }, [isExpired, instance, status]);
+    sendPowerSignal("stop");
+  }, [isExpired, status]);
 
   return (
     <div className={className}>

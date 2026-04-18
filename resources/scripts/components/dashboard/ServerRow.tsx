@@ -2,7 +2,7 @@ import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components/macro";
 import tw from "twin.macro";
-import { Box, CalendarClock, Cpu, HardDrive, MemoryStick } from "lucide-react";
+import { Box, Cpu, HardDrive, MemoryStick } from "lucide-react";
 import { Server } from "@/api/server/getServer";
 import getServerResourceUsage, { ServerStats } from "@/api/server/getServerResourceUsage";
 import { bytesToString, mbToBytes } from "@/lib/formatters";
@@ -92,42 +92,19 @@ export default memo(({ server }: { server: Server }) => {
     return tw`bg-red-500/90 text-white`;
   }, [lifecycle.tone]);
 
+  const statusAnimation = useMemo(() => {
+    if (lifecycle.tone === "warning") return tw`animate-pulse`;
+    if (lifecycle.tone === "danger") return tw`animate-pulse`;
+
+    return tw``;
+  }, [lifecycle.tone]);
+
   const BackgroundDiv = styled.div`
     ${tw`w-full min-h-[170px] py-4 rounded-xl relative overflow-hidden`}
     background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url(${serverBackground});
     background-size: cover;
     background-position: center;
 
-    .expired-chip {
-      ${tw`backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.35)] border border-white/20`}
-    }
-
-    @media (max-width: 640px) {
-      .expired-chip {
-        animation: marquee-expired 6.5s linear infinite;
-        will-change: transform, opacity;
-      }
-
-      @keyframes marquee-expired {
-        0% {
-          transform: translateX(110%);
-          opacity: 0;
-        }
-
-        10% {
-          opacity: 1;
-        }
-
-        85% {
-          opacity: 1;
-        }
-
-        100% {
-          transform: translateX(-120%);
-          opacity: 0;
-        }
-      }
-    }
   `;
 
   const defaultAllocation = server.allocations.find((alloc) => alloc.isDefault);
@@ -135,16 +112,16 @@ export default memo(({ server }: { server: Server }) => {
   return (
     <div css={tw`text-neutral-50 rounded-xl shadow-[0_20px_45px_rgba(15,23,42,0.35)] p-[1px] bg-gradient-to-br from-indigo-400/40 via-purple-400/30 to-cyan-400/40 relative`}>
       <div css={tw`bg-elysium-color3 rounded-xl p-3`}>
+        <span css={[tw`absolute top-2 right-2 z-20 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-lg`, statusStyle, statusAnimation]}>
+          {lifecycle.label}
+        </span>
+
       <BackgroundDiv>
         {expInfo.expired && (
           <span css={tw`absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-yellow-500/90 text-black shadow-lg`}>
             Expired
           </span>
         )}
-
-        {!expInfo.expired && <span css={[tw`absolute top-3 right-3 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide`, statusStyle]}>
-          {lifecycle.label}
-        </span>}
 
         <div css={tw`absolute left-4 bottom-4 right-36 sm:right-44`}>
           <p css={tw`font-bold text-left w-full truncate`} title={server.name}>
@@ -162,14 +139,6 @@ export default memo(({ server }: { server: Server }) => {
           </div>
         </div>
 
-        <div css={tw`absolute right-3 bottom-3 max-w-[55%] sm:max-w-[45%] overflow-hidden`}>
-          <span className="expired-chip" css={tw`text-[11px] bg-black/30 px-2.5 py-1 rounded-full inline-flex items-center gap-1 whitespace-nowrap`}>
-            <CalendarClock size={13} />
-            <span>Expired:</span>
-            <span css={tw`font-semibold truncate`}>{expInfo.label}</span>
-            {expInfo.expired && <span css={tw`text-red-300`}>(Expired)</span>}
-          </span>
-        </div>
       </BackgroundDiv>
 
       <div css={tw`grid grid-cols-1 md:grid-cols-2 gap-x-2 sm:gap-x-4 mt-3 mb-4 gap-y-2 mx-4 rounded-xl`}>

@@ -222,6 +222,11 @@ class Server extends Model implements Identifiable
         return $this->status === self::STATUS_SUSPENDED;
     }
 
+    public function isExpired(): bool
+    {
+        return !is_null($this->exp_date) && $this->exp_date->isPast();
+    }
+
     /**
      * Gets the user who owns the server.
      *

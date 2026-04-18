@@ -45,7 +45,7 @@ const ServerConsoleContainer = () => {
       <div css={tw`mb-5`}>
         <ContentBox>
           <div css={tw`w-full h-[600px] flex mb-5 relative`}>
-            <div css={expInfo.expired ? tw`w-full pointer-events-none opacity-45` : tw`w-full`}>
+            <div css={expInfo.expired ? tw`w-full pointer-events-none opacity-40` : tw`w-full`}>
               <Spinner.Suspense>
                 <Console />
               </Spinner.Suspense>
@@ -62,7 +62,7 @@ const ServerConsoleContainer = () => {
           </div>
           <div css={tw`w-full justify-between items-center`}>
             <Can action={["control.start", "control.stop", "control.restart"]} matchAny>
-              <PowerButtons className={"flex space-x-2"} />
+              <PowerButtons className={"flex flex-wrap gap-2"} />
             </Can>
           </div>
         </ContentBox>
