@@ -46,7 +46,7 @@ const ServerConsoleContainer = () => {
         <ContentBox>
           <div css={tw`w-full h-[600px] flex mb-5 relative`}>
             {expInfo.expired && (
-              <div css={tw`absolute top-3 left-3 right-3 z-20 rounded-lg border border-yellow-500/40 bg-yellow-500/15 px-4 py-2 text-xs text-yellow-200 backdrop-blur-sm`}>
+              <div css={tw`absolute top-3 left-3 right-3 z-20 rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-4 py-2 text-xs text-yellow-200 backdrop-blur-sm`}>
                 Notice: server ini sudah expired. Aksi Start, Restart, dan Stop dinonaktifkan. Silakan perpanjang masa aktif atau hubungi admin.
               </div>
             )}
