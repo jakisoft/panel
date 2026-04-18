@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - codex/update-elysiumtheme-navigation-and-ui/ux
+      - codex/fix-expired-notice-and-expiry-badge-styling
   workflow_dispatch:
 
 permissions:
