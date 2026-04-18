@@ -9,22 +9,14 @@ import { bytesToString, mbToBytes } from "@/lib/formatters";
 import { Button } from "@/components/elements/button/index";
 import CopyOnClick from "@/components/elements/CopyOnClick";
 import { getElysiumData } from "@/components/elements/elysium/getElysiumData";
+import { getExpirationInfo } from "@/lib/serverExpiry";
 
 type Timer = ReturnType<typeof setInterval>;
 
-const getExpInfo = (expDate: string | null) => {
-  if (!expDate) return { label: "Unlimited", expired: false };
-
-  const parsed = new Date(expDate);
-  if (Number.isNaN(parsed.getTime())) return { label: expDate, expired: false };
-
-  return {
-    label: parsed.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
-    expired: parsed.getTime() < Date.now(),
-  };
-};
-
-const getLifecycleLabel = (server: Server, stats: ServerStats | null) => {
+const getLifecycleLabel = (server: Server, stats: ServerStats | null, expired: boolean) => {
+  if (expired) {
+    return { label: "Expired", tone: "warning" as const };
+  }
   if (server.status === "suspended" || stats?.isSuspended) {
     return { label: "Suspended", tone: "suspended" as const };
   }
@@ -89,8 +81,8 @@ export default memo(({ server }: { server: Server }) => {
   const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : "Unlimited";
   const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : "Unlimited";
   const cpuLimit = server.limits.cpu !== 0 ? `${server.limits.cpu}%` : "Unlimited";
-  const expInfo = getExpInfo(server.expDate);
-  const lifecycle = getLifecycleLabel(server, stats);
+  const expInfo = getExpirationInfo(server.expDate);
+  const lifecycle = getLifecycleLabel(server, stats, expInfo.expired);
 
   const statusStyle = useMemo(() => {
     if (lifecycle.tone === "success") return tw`bg-green-500/90 text-white`;
@@ -141,11 +133,18 @@ export default memo(({ server }: { server: Server }) => {
   const defaultAllocation = server.allocations.find((alloc) => alloc.isDefault);
 
   return (
-    <div css={tw`text-neutral-50 bg-elysium-color3 rounded-xl shadow-lg p-3 relative`}>
+    <div css={tw`text-neutral-50 rounded-xl shadow-[0_20px_45px_rgba(15,23,42,0.35)] p-[1px] bg-gradient-to-br from-indigo-400/40 via-purple-400/30 to-cyan-400/40 relative`}>
+      <div css={tw`bg-elysium-color3 rounded-xl p-3`}>
       <BackgroundDiv>
-        <span css={[tw`absolute top-3 right-3 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide`, statusStyle]}>
+        {expInfo.expired && (
+          <span css={tw`absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-yellow-500/90 text-black shadow-lg`}>
+            Expired
+          </span>
+        )}
+
+        {!expInfo.expired && <span css={[tw`absolute top-3 right-3 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide`, statusStyle]}>
           {lifecycle.label}
-        </span>
+        </span>}
 
         <div css={tw`absolute left-4 bottom-4 right-36 sm:right-44`}>
           <p css={tw`font-bold text-left w-full truncate`} title={server.name}>
@@ -208,10 +207,11 @@ export default memo(({ server }: { server: Server }) => {
       </div>
 
       <Link to={`/server/${server.id}`}>
-        <Button css={tw`block w-full`} disabled={expInfo.expired}>
-          <span css={tw`overflow-hidden whitespace-nowrap`}>{expInfo.expired ? "Server Expired" : "Manage Server"}</span>
+        <Button css={tw`block w-full`}>
+          <span css={tw`overflow-hidden whitespace-nowrap`}>Manage Server</span>
         </Button>
       </Link>
+      </div>
     </div>
   );
 });
