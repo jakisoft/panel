@@ -13,17 +13,15 @@ import {
     formatDaysRemaining,
 } from '@/api/server/files/recycleBin';
 import { bytesToString } from '@/lib/formatters';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTrashAlt,
-    faUndo,
-    faFolder,
-    faFile,
-    faTrashRestore,
-    faExclamationTriangle,
-    faSearch,
-    faClock,
-} from '@fortawesome/free-solid-svg-icons';
+    Trash2,
+    RotateCcw,
+    Folder,
+    FileText,
+    Clock,
+    Search,
+    AlertTriangle,
+} from 'lucide-react';
 import { Button } from '@/components/elements/button/index';
 import Spinner from '@/components/elements/Spinner';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
@@ -161,21 +159,21 @@ export default ({ visible, onDismissed }: RequiredModalProps) => {
                 </SpinnerOverlay>
 
                 <div className={'p-6'}>
-                    <div className={'flex items-center justify-between pb-4 border-b border-neutral-700'}>
+                    <div className={'flex flex-wrap items-center justify-between pb-4 border-b border-neutral-800 gap-3'}>
                         <div className={'flex items-center space-x-3'}>
-                            <div className={'p-2.5 bg-red-600/20 text-red-500 rounded-lg'}>
-                                <FontAwesomeIcon icon={faTrashAlt} className={'w-5 h-5'} />
+                            <div className={'p-3 bg-rose-500/10 text-rose-400 rounded-xl border border-rose-500/20'}>
+                                <Trash2 size={22} />
                             </div>
                             <div>
-                                <h2 className={'text-xl font-header font-semibold text-neutral-100 flex items-center gap-2'}>
+                                <h2 className={'text-lg font-bold text-neutral-100 flex items-center gap-2'}>
                                     Recycle Bin (Tong Sampah)
-                                    <span className={'text-xs font-sans font-medium px-2 py-0.5 bg-red-600 text-white rounded-full'}>
+                                    <span className={'text-xs font-semibold px-2.5 py-0.5 bg-rose-600/30 text-rose-300 border border-rose-500/40 rounded-full'}>
                                         {items.length} item
                                     </span>
                                 </h2>
                                 <p className={'text-xs text-neutral-400 mt-0.5 flex items-center gap-1.5'}>
-                                    <FontAwesomeIcon icon={faClock} className={'text-neutral-500'} />
-                                    File yang ada di sini akan dihapus otomatis setelah 7 hari.
+                                    <Clock size={13} className={'text-neutral-500'} />
+                                    File akan dihapus permanen secara otomatis setelah 7 hari.
                                 </p>
                             </div>
                         </div>
@@ -187,45 +185,45 @@ export default ({ visible, onDismissed }: RequiredModalProps) => {
                                     onClick={handleRestoreAll}
                                     className={'!py-1.5 !px-3 text-xs flex items-center gap-1.5'}
                                 >
-                                    <FontAwesomeIcon icon={faTrashRestore} />
+                                    <RotateCcw size={14} />
                                     Pulihkan Semua
                                 </Button>
                                 <Button.Danger
                                     onClick={() => setShowEmptyConfirm(true)}
                                     className={'!py-1.5 !px-3 text-xs flex items-center gap-1.5'}
                                 >
-                                    <FontAwesomeIcon icon={faTrashAlt} />
+                                    <Trash2 size={14} />
                                     Kosongkan Sampah
                                 </Button.Danger>
                             </div>
                         )}
                     </div>
 
-                    {items.length > 5 && (
+                    {items.length > 3 && (
                         <div className={'mt-4 relative'}>
-                            <FontAwesomeIcon icon={faSearch} className={'absolute left-3 top-3 text-neutral-400 text-sm'} />
+                            <Search size={15} className={'absolute left-3 top-3 text-neutral-400'} />
                             <input
                                 type={'text'}
                                 placeholder={'Cari file di recycle bin...'}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className={'w-full pl-9 pr-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-sm text-neutral-200 focus:outline-none focus:border-red-500'}
+                                className={'w-full pl-9 pr-4 py-2 bg-neutral-800/80 border border-neutral-700 rounded-xl text-sm text-neutral-200 focus:outline-none focus:border-rose-500 transition-colors'}
                             />
                         </div>
                     )}
 
-                    <div className={'mt-4 max-h-[55vh] overflow-y-auto pr-1'}>
+                    <div className={'mt-4 max-h-[50vh] overflow-y-auto pr-1 space-y-2'}>
                         {loading && !items.length ? (
                             <div className={'py-12 flex justify-center'}>
                                 <Spinner size={'large'} />
                             </div>
                         ) : !items.length ? (
                             <div className={'py-16 text-center'}>
-                                <div className={'w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-3 text-neutral-500'}>
-                                    <FontAwesomeIcon icon={faTrashAlt} className={'w-8 h-8 text-neutral-600'} />
+                                <div className={'w-16 h-16 bg-neutral-800/60 rounded-2xl flex items-center justify-center mx-auto mb-3 text-neutral-500 border border-neutral-700/50'}>
+                                    <Trash2 size={28} className={'text-neutral-500'} />
                                 </div>
-                                <h3 className={'text-neutral-300 font-medium text-base'}>Recycle Bin Kosong</h3>
-                                <p className={'text-xs text-neutral-500 mt-1 max-w-sm mx-auto'}>
+                                <h3 className={'text-neutral-200 font-semibold text-base'}>Recycle Bin Kosong</h3>
+                                <p className={'text-xs text-neutral-400 mt-1 max-w-sm mx-auto'}>
                                     Belum ada file atau folder yang dihapus. Saat Anda menghapus file, file tersebut akan masuk ke sini sebelum dihapus permanen.
                                 </p>
                             </div>
@@ -234,53 +232,51 @@ export default ({ visible, onDismissed }: RequiredModalProps) => {
                                 Tidak ada file yang sesuai dengan pencarian "{searchQuery}".
                             </div>
                         ) : (
-                            <div className={'space-y-2'}>
-                                {filteredItems.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className={'flex items-center justify-between p-3 bg-neutral-800/80 hover:bg-neutral-800 border border-neutral-700/60 hover:border-neutral-600 rounded-lg transition-colors'}
-                                    >
-                                        <div className={'flex items-center space-x-3 min-w-0 pr-4'}>
-                                            <div className={`p-2 rounded-lg ${item.isFile ? 'bg-blue-500/10 text-blue-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
-                                                <FontAwesomeIcon icon={item.isFile ? faFile : faFolder} className={'w-4 h-4'} />
-                                            </div>
-                                            <div className={'min-w-0'}>
-                                                <p className={'text-sm font-medium text-neutral-200 truncate'}>
-                                                    {item.name}
-                                                </p>
-                                                <div className={'flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-400 mt-0.5'}>
-                                                    <span>Lokasi Asal: <span className={'text-neutral-300'}>{item.originalDirectory}</span></span>
-                                                    {item.isFile && <span>• {bytesToString(item.size)}</span>}
-                                                    <span>• Dihapus: {format(new Date(item.deletedAt), 'dd MMM yyyy HH:mm')}</span>
-                                                    <span className={'text-amber-400/90 font-medium'}>({formatDaysRemaining(item.deletedAt)})</span>
-                                                </div>
-                                            </div>
+                            filteredItems.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className={'flex items-center justify-between p-3.5 bg-neutral-800/60 hover:bg-neutral-800 border border-neutral-700/60 hover:border-neutral-600 rounded-xl transition-colors'}
+                                >
+                                    <div className={'flex items-center space-x-3 min-w-0 pr-4'}>
+                                        <div className={`p-2.5 rounded-xl ${item.isFile ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+                                            {item.isFile ? <FileText size={18} /> : <Folder size={18} />}
                                         </div>
-
-                                        <div className={'flex items-center space-x-2 shrink-0'}>
-                                            <Button
-                                                onClick={() => handleRestore(item)}
-                                                className={'!py-1.5 !px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1'}
-                                                title={'Pulihkan ke lokasi asal'}
-                                            >
-                                                <FontAwesomeIcon icon={faUndo} className={'text-xs'} />
-                                                Restore
-                                            </Button>
-                                            <Button.Danger
-                                                onClick={() => setItemToDelete(item)}
-                                                className={'!py-1.5 !px-2.5 text-xs'}
-                                                title={'Hapus permanen'}
-                                            >
-                                                <FontAwesomeIcon icon={faTrashAlt} className={'text-xs'} />
-                                            </Button.Danger>
+                                        <div className={'min-w-0'}>
+                                            <p className={'text-sm font-semibold text-neutral-100 truncate'}>
+                                                {item.name}
+                                            </p>
+                                            <div className={'flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-400 mt-0.5'}>
+                                                <span>Lokasi: <span className={'text-neutral-300 font-mono'}>{item.originalDirectory}</span></span>
+                                                {item.isFile && <span>• {bytesToString(item.size)}</span>}
+                                                <span>• {format(new Date(item.deletedAt), 'dd MMM yyyy HH:mm')}</span>
+                                                <span className={'text-amber-400 font-medium'}>({formatDaysRemaining(item.deletedAt)})</span>
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+
+                                    <div className={'flex items-center space-x-2 shrink-0'}>
+                                        <Button
+                                            onClick={() => handleRestore(item)}
+                                            className={'!py-1.5 !px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 font-medium'}
+                                            title={'Pulihkan ke lokasi asal'}
+                                        >
+                                            <RotateCcw size={14} />
+                                            Pulihkan
+                                        </Button>
+                                        <Button.Danger
+                                            onClick={() => setItemToDelete(item)}
+                                            className={'!py-1.5 !px-2.5 text-xs'}
+                                            title={'Hapus permanen'}
+                                        >
+                                            <Trash2 size={14} />
+                                        </Button.Danger>
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
 
-                    <div className={'mt-6 pt-4 border-t border-neutral-700 flex justify-end'}>
+                    <div className={'mt-6 pt-4 border-t border-neutral-800 flex justify-end'}>
                         <Button variant={Button.Variants.Secondary} onClick={onDismissed}>
                             Tutup
                         </Button>

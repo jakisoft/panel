@@ -77,14 +77,16 @@ export default () => {
                         }
                     />
                     <Can action={'file.create'}>
-                        <div className={style.manager_actions}>
+                        <div className={'flex flex-wrap sm:flex-nowrap items-center gap-2 justify-end'}>
                             <FileManagerStatus />
                             <NewDirectoryButton />
-                            <UploadButton />
-                            <RecycleBinButton />
-                            <NavLink to={`/server/${id}/files/new${window.location.hash}`}>
-                                <Button>New File</Button>
-                            </NavLink>
+                            <div className={'grid grid-cols-2 gap-2 shrink-0'}>
+                                <UploadButton className={'w-full !py-2 text-xs sm:text-sm'} />
+                                <NavLink to={`/server/${id}/files/new${window.location.hash}`} className={'w-full'}>
+                                    <Button className={'w-full !py-2 text-xs sm:text-sm'}>New File</Button>
+                                </NavLink>
+                                <RecycleBinButton className={'w-full !py-2 text-xs sm:text-sm'} />
+                            </div>
                         </div>
                     </Can>
                 </div>

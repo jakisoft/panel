@@ -3,7 +3,7 @@ import getFileUploadUrl from '@/api/server/files/getFileUploadUrl';
 import createDirectory from '@/api/server/files/createDirectory';
 import tw from 'twin.macro';
 import { Button } from '@/components/elements/button/index';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ModalMask } from '@/components/elements/Modal';
 import Fade from '@/components/elements/Fade';
 import useEventListener from '@/plugins/useEventListener';
@@ -13,6 +13,7 @@ import { ServerContext } from '@/state/server';
 import { WithClassname } from '@/components/types';
 import Portal from '@/components/elements/Portal';
 import { CloudUploadIcon, FolderAddIcon } from '@heroicons/react/outline';
+import { Upload } from 'lucide-react';
 import { useSignal } from '@preact/signals-react';
 import { join } from 'pathe';
 
@@ -61,7 +62,7 @@ async function scanFileSystemEntry(entry: any, path = ''): Promise<UploadItem[]>
     return [];
 }
 
-export default ({ className }: WithClassname) => {
+const UploadComponent = ({ className }: WithClassname) => {
     const fileUploadInput = useRef<HTMLInputElement>(null);
     const folderUploadInput = useRef<HTMLInputElement>(null);
 
@@ -69,7 +70,7 @@ export default ({ className }: WithClassname) => {
     const timeouts = useSignal<NodeJS.Timeout[]>([]);
 
     const { mutate } = useFileManagerSwr();
-    const { addError, clearAndAddHttpError } = useFlashKey('files');
+    const { clearAndAddHttpError } = useFlashKey('files');
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
@@ -265,23 +266,24 @@ export default ({ className }: WithClassname) => {
                 multiple
             />
 
-            <div className={'flex items-center space-x-2'}>
-                <Button
-                    className={className}
-                    onClick={() => fileUploadInput.current && fileUploadInput.current.click()}
-                >
-                    Upload File
-                </Button>
-                <Button
-                    variant={Button.Variants.Secondary}
-                    className={className}
-                    onClick={() => folderUploadInput.current && folderUploadInput.current.click()}
-                    title={'Upload Folder'}
-                >
-                    <FolderAddIcon className={'w-4 h-4 mr-1 inline-block'} />
-                    Upload Folder
-                </Button>
-            </div>
+            <Button
+                className={className}
+                onClick={() => fileUploadInput.current && fileUploadInput.current.click()}
+            >
+                <Upload className={'w-4 h-4 mr-1.5 inline-block'} />
+                Upload File
+            </Button>
+            <Button
+                variant={Button.Variants.Secondary}
+                className={className}
+                onClick={() => folderUploadInput.current && folderUploadInput.current.click()}
+                title={'Upload Folder'}
+            >
+                <FolderAddIcon className={'w-4 h-4 mr-1.5 inline-block'} />
+                Upload Folder
+            </Button>
         </>
     );
 };
+
+export default UploadComponent;

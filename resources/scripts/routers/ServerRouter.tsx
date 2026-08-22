@@ -1,28 +1,27 @@
 import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
-import { NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
 import TransitionRouter from '@/TransitionRouter';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
 import { ServerContext } from '@/state/server';
-import { CSSTransition } from 'react-transition-group';
-import Can from '@/components/elements/Can';
 import Spinner from '@/components/elements/Spinner';
 import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
 import { httpErrorToHuman } from '@/api/http';
 import { useStoreState } from 'easy-peasy';
-import SubNavigation from '@/components/elements/SubNavigation';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import { ExternalLink } from 'lucide-react';
 import { useLocation } from 'react-router';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
+import { SidebarProvider, useSidebar } from '@/components/SidebarContext';
+import ServerSidebar from '@/components/navigation/ServerSidebar';
 
-export default () => {
+const ServerLayout = () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
+    const { isOpen } = useSidebar();
 
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [error, setError] = useState('');
@@ -30,7 +29,6 @@ export default () => {
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const inConflictState = ServerContext.useStoreState((state) => state.server.inConflictState);
-    const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
 
@@ -62,69 +60,55 @@ export default () => {
     }, [match.params.id]);
 
     return (
-        <React.Fragment key={'server-router'}>
-            <NavigationBar />
+        <div className={'min-h-screen bg-neutral-950 text-neutral-100'}>
             {!uuid || !id ? (
-                error ? (
-                    <ServerError message={error} />
-                ) : (
-                    <Spinner size={'large'} centered />
-                )
-            ) : (
                 <>
-                    <CSSTransition timeout={150} classNames={'fade'} appear in>
-                        <SubNavigation>
-                            <div>
-                                {routes.server
-                                    .filter((route) => !!route.name)
-                                    .map((route) => {
-                                        const Icon = route.icon;
-                                        return route.permission ? (
-                                            <Can key={route.path} action={route.permission} matchAny>
-                                                <NavLink to={to(route.path, true)} exact={route.exact}>
-                                                    {Icon && <Icon size={16} className={'opacity-80'} />}
-                                                    <span>{route.name}</span>
-                                                </NavLink>
-                                            </Can>
-                                        ) : (
-                                            <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
-                                                {Icon && <Icon size={16} className={'opacity-80'} />}
-                                                <span>{route.name}</span>
-                                            </NavLink>
-                                        );
-                                    })}
-                                {rootAdmin && (
-                                    // eslint-disable-next-line react/jsx-no-target-blank
-                                    <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
-                                        <ExternalLink size={16} />
-                                    </a>
-                                )}
-                            </div>
-                        </SubNavigation>
-                    </CSSTransition>
-                    <InstallListener />
-                    <TransferListener />
-                    <WebsocketHandler />
-                    {inConflictState && (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
-                        <ConflictStateRenderer />
+                    <NavigationBar />
+                    {error ? (
+                        <ServerError message={error} />
                     ) : (
-                        <ErrorBoundary>
-                            <TransitionRouter>
-                                <Switch location={location}>
-                                    {routes.server.map(({ path, permission, component: Component }) => (
-                                        <PermissionRoute key={path} permission={permission} path={to(path)} exact>
-                                            <Spinner.Suspense>
-                                                <Component />
-                                            </Spinner.Suspense>
-                                        </PermissionRoute>
-                                    ))}
-                                    <Route path={'*'} component={NotFound} />
-                                </Switch>
-                            </TransitionRouter>
-                        </ErrorBoundary>
+                        <Spinner size={'large'} centered />
                     )}
                 </>
+            ) : (
+                <>
+                    <ServerSidebar />
+                    <div className={`flex flex-col min-h-screen transition-all duration-300 ${isOpen ? 'lg:pl-64' : 'lg:pl-0'}`}>
+                        <NavigationBar />
+                        <main className={'flex-1 w-full'}>
+                            <InstallListener />
+                            <TransferListener />
+                            <WebsocketHandler />
+                            {inConflictState && (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
+                                <ConflictStateRenderer />
+                            ) : (
+                                <ErrorBoundary>
+                                    <TransitionRouter>
+                                        <Switch location={location}>
+                                            {routes.server.map(({ path, permission, component: Component }) => (
+                                                <PermissionRoute key={path} permission={permission} path={to(path)} exact>
+                                                    <Spinner.Suspense>
+                                                        <Component />
+                                                    </Spinner.Suspense>
+                                                </PermissionRoute>
+                                            ))}
+                                            <Route path={'*'} component={NotFound} />
+                                        </Switch>
+                                    </TransitionRouter>
+                                </ErrorBoundary>
+                            )}
+                        </main>
+                    </div>
+                </>
             )}
-        </React.Fragment>
+        </div>
+    );
+};
+
+export default () => {
+    return (
+        <SidebarProvider>
+            <ServerLayout />
+        </SidebarProvider>
     );
 };

@@ -1,51 +1,52 @@
 import React from 'react';
-import { NavLink, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import TransitionRouter from '@/TransitionRouter';
-import SubNavigation from '@/components/elements/SubNavigation';
 import { useLocation } from 'react-router';
 import Spinner from '@/components/elements/Spinner';
 import routes from '@/routers/routes';
+import { SidebarProvider, useSidebar } from '@/components/SidebarContext';
+import DashboardSidebar from '@/components/navigation/DashboardSidebar';
 
-export default () => {
+const DashboardLayout = () => {
     const location = useLocation();
+    const { isOpen } = useSidebar();
 
     return (
-        <>
-            <NavigationBar />
-            {location.pathname.startsWith('/account') && (
-                <SubNavigation>
-                    <div>
-                        {routes.account
-                            .filter((route) => !!route.name)
-                            .map(({ path, name, icon: Icon, exact = false }) => (
-                                <NavLink key={path} to={`/account/${path}`.replace('//', '/')} exact={exact}>
-                                    {Icon && <Icon size={16} className={'opacity-80'} />}
-                                    <span>{name}</span>
-                                </NavLink>
-                            ))}
-                    </div>
-                </SubNavigation>
-            )}
-            <TransitionRouter>
-                <React.Suspense fallback={<Spinner centered />}>
-                    <Switch location={location}>
-                        <Route path={'/'} exact>
-                            <DashboardContainer />
-                        </Route>
-                        {routes.account.map(({ path, component: Component }) => (
-                            <Route key={path} path={`/account/${path}`.replace('//', '/')} exact>
-                                <Component />
-                            </Route>
-                        ))}
-                        <Route path={'*'}>
-                            <NotFound />
-                        </Route>
-                    </Switch>
-                </React.Suspense>
-            </TransitionRouter>
-        </>
+        <div className={'min-h-screen bg-neutral-950 text-neutral-100'}>
+            <DashboardSidebar />
+            <div className={`flex flex-col min-h-screen transition-all duration-300 ${isOpen ? 'lg:pl-64' : 'lg:pl-0'}`}>
+                <NavigationBar />
+                <main className={'flex-1 w-full'}>
+                    <TransitionRouter>
+                        <React.Suspense fallback={<Spinner centered />}>
+                            <Switch location={location}>
+                                <Route path={'/'} exact>
+                                    <DashboardContainer />
+                                </Route>
+                                {routes.account.map(({ path, component: Component }) => (
+                                    <Route key={path} path={`/account/${path}`.replace('//', '/')} exact>
+                                        <Component />
+                                    </Route>
+                                ))}
+                                <Route path={'*'}>
+                                    <NotFound />
+                                </Route>
+                            </Switch>
+                        </React.Suspense>
+                    </TransitionRouter>
+                </main>
+            </div>
+        </div>
+    );
+};
+
+export default () => {
+    return (
+        <SidebarProvider>
+            <DashboardLayout />
+        </SidebarProvider>
     );
 };
