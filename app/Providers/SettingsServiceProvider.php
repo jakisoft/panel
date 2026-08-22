@@ -44,6 +44,8 @@ class SettingsServiceProvider extends ServiceProvider
         'backup:gdrive:client_secret',
         'backup:gdrive:refresh_token',
         'backup:gdrive:folder_id',
+        'backup:panel_auto_enabled',
+        'backup:panel_auto_frequency',
     ];
 
     /**

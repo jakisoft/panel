@@ -10,7 +10,9 @@ use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
 use Illuminate\Contracts\Console\Kernel;
 use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Services\Panel\PanelBackupService;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BackupController extends Controller
 {
@@ -18,15 +20,21 @@ class BackupController extends Controller
         private AlertsMessageBag $alert,
         private Kernel $kernel,
         private SettingsRepositoryInterface $settings,
+        private PanelBackupService $backupService,
     ) {
     }
 
     /**
-     * Render the UI for Cloud Backup settings (Cloudflare R2 & Google Drive).
+     * Render the UI for Cloud Backup and Full Panel Backup Management.
      */
     public function index(): View
     {
         return view('admin.backup.index', [
+            'backups' => $this->backupService->listBackups(),
+            'auto_backup' => [
+                'enabled' => config('backups.panel_auto_enabled', false),
+                'frequency' => config('backups.panel_auto_frequency', 'daily'),
+            ],
             'r2' => [
                 'enabled' => config('backups.r2.enabled', false),
                 'account_id' => config('backups.r2.account_id', ''),
@@ -53,6 +61,8 @@ class BackupController extends Controller
     {
         $keys = [
             'backup:default_provider' => $request->input('default_provider', 'local'),
+            'backup:panel_auto_enabled' => $request->boolean('panel_auto_enabled') ? 'true' : 'false',
+            'backup:panel_auto_frequency' => $request->input('panel_auto_frequency', 'daily'),
             'backup:r2:enabled' => $request->boolean('r2_enabled') ? 'true' : 'false',
             'backup:r2:account_id' => $request->input('r2_account_id', ''),
             'backup:r2:bucket' => $request->input('r2_bucket', ''),
@@ -77,7 +87,71 @@ class BackupController extends Controller
         }
 
         $this->kernel->call('queue:restart');
-        $this->alert->success('Pengaturan Cloud Backup berhasil disimpan dan queue worker telah direstart.')->flash();
+        $this->alert->success('Pengaturan Backup Panel & Cloud Storage berhasil disimpan.')->flash();
+
+        return redirect()->route('admin.backup');
+    }
+
+    /**
+     * Trigger manual full panel backup creation.
+     */
+    public function create(Request $request): RedirectResponse
+    {
+        try {
+            $desc = $request->input('description', 'Manual Panel Backup');
+            $result = $this->backupService->createBackup($desc);
+            $this->alert->success("Backup panel berhasil dibuat: {$result['filename']} ({$result['size_human']})")->flash();
+        } catch (Exception $e) {
+            $this->alert->danger('Gagal membuat backup panel: ' . $e->getMessage())->flash();
+        }
+
+        return redirect()->route('admin.backup');
+    }
+
+    /**
+     * Download backup file.
+     */
+    public function download(string $filename): BinaryFileResponse
+    {
+        return $this->backupService->downloadBackup($filename);
+    }
+
+    /**
+     * Delete backup file.
+     */
+    public function delete(string $filename): RedirectResponse
+    {
+        if ($this->backupService->deleteBackup($filename)) {
+            $this->alert->success("File backup {$filename} berhasil dihapus.")->flash();
+        } else {
+            $this->alert->danger("Gagal menghapus file backup {$filename}.")->flash();
+        }
+
+        return redirect()->route('admin.backup');
+    }
+
+    /**
+     * Restore panel from an uploaded file or an existing backup.
+     */
+    public function restore(Request $request): RedirectResponse
+    {
+        try {
+            if ($request->hasFile('backup_file')) {
+                $file = $request->file('backup_file');
+                $tempPath = $file->getRealPath();
+                $this->backupService->restoreBackup($tempPath);
+                $this->alert->success('Panel berhasil dipulihkan dari file backup yang diunggah! Seluruh user, server, dan pengaturan telah dikembalikan.')->flash();
+            } elseif ($request->filled('filename')) {
+                $filename = basename($request->input('filename'));
+                $path = storage_path('app/panel_backups/' . $filename);
+                $this->backupService->restoreBackup($path);
+                $this->alert->success("Panel berhasil dipulihkan dari {$filename}!")->flash();
+            } else {
+                $this->alert->danger('Silakan pilih file backup yang ingin dipulihkan.')->flash();
+            }
+        } catch (Exception $e) {
+            $this->alert->danger('Gagal memulihkan panel: ' . $e->getMessage())->flash();
+        }
 
         return redirect()->route('admin.backup');
     }
@@ -118,7 +192,6 @@ class BackupController extends Controller
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            // 200, 403, 404 all indicate host is reachable and responds
             if ($httpCode > 0) {
                 return response()->json([
                     'success' => true,

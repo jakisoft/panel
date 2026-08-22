@@ -44,6 +44,21 @@ class Kernel extends ConsoleKernel
             $schedule->command(PruneCommand::class, ['--model' => [ActivityLog::class]])->daily();
         }
 
+        // Automatic Full Panel Data Backup Scheduler
+        if (config('backups.panel_auto_enabled')) {
+            $freq = config('backups.panel_auto_frequency', 'daily');
+            $backupCmd = $schedule->command('p:panel:backup --description="Auto Scheduled Backup"');
+            if ($freq === 'hourly') {
+                $backupCmd->hourly();
+            } elseif ($freq === 'weekly') {
+                $backupCmd->weekly();
+            } elseif ($freq === 'monthly') {
+                $backupCmd->monthly();
+            } else {
+                $backupCmd->daily();
+            }
+        }
+
         if (config('pterodactyl.telemetry.enabled')) {
             $this->registerTelemetry($schedule);
         }

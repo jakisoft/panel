@@ -87,6 +87,10 @@ Route::group(['prefix' => 'settings'], function () {
 Route::group(['prefix' => 'backup'], function () {
     Route::get('/', [Admin\BackupController::class, 'index'])->name('admin.backup');
     Route::post('/', [Admin\BackupController::class, 'update']);
+    Route::post('/create', [Admin\BackupController::class, 'create'])->name('admin.backup.create');
+    Route::get('/download/{filename}', [Admin\BackupController::class, 'download'])->name('admin.backup.download');
+    Route::delete('/delete/{filename}', [Admin\BackupController::class, 'delete'])->name('admin.backup.delete');
+    Route::post('/restore', [Admin\BackupController::class, 'restore'])->name('admin.backup.restore');
     Route::post('/test/r2', [Admin\BackupController::class, 'testR2'])->name('admin.backup.test.r2');
     Route::post('/test/gdrive', [Admin\BackupController::class, 'testGDrive'])->name('admin.backup.test.gdrive');
 });

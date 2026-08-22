@@ -5,6 +5,9 @@ return [
 
     'default_provider' => env('APP_BACKUP_PROVIDER', 'local'),
 
+    'panel_auto_enabled' => (bool) env('PANEL_AUTO_BACKUP_ENABLED', false),
+    'panel_auto_frequency' => env('PANEL_AUTO_BACKUP_FREQUENCY', 'daily'),
+
     'r2' => [
         'enabled' => (bool) env('CLOUDFLARE_R2_ENABLED', false),
         'account_id' => env('CLOUDFLARE_R2_ACCOUNT_ID', ''),

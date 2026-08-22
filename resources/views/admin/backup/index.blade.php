@@ -2,37 +2,126 @@
 @include('partials/admin.settings.nav', ['activeTab' => 'backup'])
 
 @section('title')
-    Cloud Backup
+    Panel & Cloud Backup
 @endsection
 
 @section('content-header')
-    <h1>Cloud Backup Settings<small>Konfigurasi integrasi backup eksternal ke Cloudflare R2 dan Google Drive.</small></h1>
+    <h1>Panel & Cloud Backup<small>Backup menyeluruh data panel (Database + Pengaturan) & integrasi Cloud Storage.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">Cloud Backup</li>
+        <li class="active">Backup</li>
     </ol>
 @endsection
 
 @section('content')
     @yield('settings::nav')
+
+    <!-- Section 1: Full Panel Backup Management -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-header with-border" style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 class="box-title"><i class="fa fa-database"></i> Backup & Restore Seluruh Data Panel</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#createBackupModal">
+                            <i class="fa fa-plus-circle"></i> Buat Backup Panel Sekarang
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#restoreUploadModal">
+                            <i class="fa fa-upload"></i> Upload & Pulihkan Data Panel
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nama File Backup</th>
+                                <th>Ukuran File</th>
+                                <th>Waktu Dibuat</th>
+                                <th class="text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($backups as $backup)
+                                <tr>
+                                    <td>
+                                        <i class="fa fa-file-archive-o text-primary"></i>
+                                        <code style="font-size: 13px; font-weight: 600; margin-left: 5px;">{{ $backup['filename'] }}</code>
+                                    </td>
+                                    <td>{{ $backup['size_human'] }}</td>
+                                    <td>{{ $backup['created_at'] }}</td>
+                                    <td class="text-right">
+                                        <a href="{{ route('admin.backup.download', ['filename' => $backup['filename']]) }}" class="btn btn-xs btn-primary" title="Download Langsung Backup">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
+                                        <form action="{{ route('admin.backup.restore') }}" method="POST" style="display: inline-block;" onsubmit="return confirm('PERINGATAN: Memulihkan backup ini akan menimpa seluruh database panel saat ini dengan data di dalam file backup. Lanjutkan?');">
+                                            {!! csrf_field() !!}
+                                            <input type="hidden" name="filename" value="{{ $backup['filename'] }}">
+                                            <button type="submit" class="btn btn-xs btn-warning" title="Pulihkan / Restore ke Panel">
+                                                <i class="fa fa-history"></i> Pulihkan Data
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.backup.delete', ['filename' => $backup['filename']]) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus file backup ini?');">
+                                            {!! csrf_field() !!}
+                                            {!! method_field('DELETE') !!}
+                                            <button type="submit" class="btn btn-xs btn-danger" title="Hapus Backup">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <em>Belum ada file backup panel yang dibuat. Klik tombol <strong>"Buat Backup Panel Sekarang"</strong> di atas.</em>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer">
+                    <p class="text-muted text-sm" style="margin-bottom: 0;">
+                        <i class="fa fa-info-circle"></i> File backup mencakup dump lengkap MySQL (User, Server, Node, Allocations, Nests, Eggs, Settings) dan konfigurasi <code>.env</code> (APP_KEY). File ini dapat langsung dipulihkan saat instalasi panel baru di server lain.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Auto Backup & Cloud Storage Configuration Form -->
     <form action="{{ route('admin.backup') }}" method="POST">
         <div class="row">
-            <!-- Global Backup Provider -->
+            <!-- Auto Panel Backup Scheduler -->
             <div class="col-xs-12">
-                <div class="box box-primary">
-                    <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-hdd-o"></i> Default Storage Provider</h3>
+                <div class="box box-info">
+                    <div class="box-header with-border" style="display: flex; align-items: center; justify-content: space-between;">
+                        <h3 class="box-title"><i class="fa fa-clock-o"></i> Auto-Backup Panel Otomatis (Penjadwalan)</h3>
+                        <div class="material-switch">
+                            <input id="panel_auto_enabled" name="panel_auto_enabled" type="checkbox" value="1" @if($auto_backup['enabled']) checked @endif />
+                            <label for="panel_auto_enabled" class="label-info"></label>
+                        </div>
                     </div>
                     <div class="box-body">
-                        <div class="form-group col-md-6">
-                            <label class="control-label">Penyimpanan Backup Utama</label>
-                            <div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label class="control-label">Frekuensi Auto-Backup Panel</label>
+                                <select name="panel_auto_frequency" class="form-control">
+                                    <option value="daily" @if($auto_backup['frequency'] === 'daily') selected @endif>Setiap Hari (Daily - Rekomendasi)</option>
+                                    <option value="weekly" @if($auto_backup['frequency'] === 'weekly') selected @endif>Setiap Minggu (Weekly)</option>
+                                    <option value="monthly" @if($auto_backup['frequency'] === 'monthly') selected @endif>Setiap Bulan (Monthly)</option>
+                                    <option value="hourly" @if($auto_backup['frequency'] === 'hourly') selected @endif>Setiap Jam (Hourly)</option>
+                                </select>
+                                <p class="text-muted"><small>Panel akan otomatis membuat dump database & backup konfigurasi sesuai jadwal dan mengunggahnya ke cloud jika diaktifkan.</small></p>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="control-label">Penyimpanan Utama</label>
                                 <select name="default_provider" class="form-control">
                                     <option value="local" @if($default_provider === 'local') selected @endif>Local Node Storage (Default)</option>
                                     <option value="r2" @if($default_provider === 'r2') selected @endif>Cloudflare R2 (S3-Compatible - Bebas Egress)</option>
                                     <option value="gdrive" @if($default_provider === 'gdrive') selected @endif>Google Drive</option>
                                 </select>
-                                <p class="text-muted"><small>Pilih tujuan penyimpanan utama saat user membuat backup server.</small></p>
+                                <p class="text-muted"><small>Pilih penyimpanan utama untuk hasil backup.</small></p>
                             </div>
                         </div>
                     </div>
@@ -52,7 +141,7 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        <p class="text-muted"><small>Cloudflare R2 adalah penyimpanan object S3-compatible yang cepat tanpa biaya transfer data keluar (egress).</small></p>
+                        <p class="text-muted"><small>Penyimpanan object S3-compatible berkecepatan tinggi tanpa biaya transfer data keluar (egress).</small></p>
                         
                         <div class="form-group">
                             <label class="control-label">Cloudflare Account ID</label>
@@ -61,7 +150,7 @@
 
                         <div class="form-group">
                             <label class="control-label">R2 Bucket Name</label>
-                            <input type="text" class="form-control" id="r2_bucket" name="r2_bucket" value="{{ old('r2_bucket', $r2['bucket']) }}" placeholder="Contoh: pterodactyl-backups" />
+                            <input type="text" class="form-control" id="r2_bucket" name="r2_bucket" value="{{ old('r2_bucket', $r2['bucket']) }}" placeholder="Contoh: panel-backups" />
                         </div>
 
                         <div class="form-group">
@@ -102,7 +191,7 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        <p class="text-muted"><small>Integrasi penyimpanan backup server langsung ke akun Google Drive Anda menggunakan OAuth2 Credentials.</small></p>
+                        <p class="text-muted"><small>Simpan hasil backup langsung ke akun Google Drive Anda menggunakan OAuth2.</small></p>
 
                         <div class="form-group">
                             <label class="control-label">Google Client ID</label>
@@ -139,13 +228,70 @@
                     <div class="box-footer">
                         {!! csrf_field() !!}
                         <button type="submit" class="btn btn-sm btn-primary pull-right">
-                            <i class="fa fa-save"></i> Simpan Pengaturan Backup
+                            <i class="fa fa-save"></i> Simpan Pengaturan
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+
+    <!-- Modal Buat Backup Manual -->
+    <div class="modal fade" id="createBackupModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form action="{{ route('admin.backup.create') }}" method="POST">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><i class="fa fa-database"></i> Buat Backup Seluruh Data Panel</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-sm text-neutral-600">
+                            Proses ini akan meng-export seluruh database MySQL panel (user, server, node, egg, dll) serta konfigurasi <code>.env</code> dan membungkusnya ke dalam file <code>.tar.gz</code>.
+                        </p>
+                        <div class="form-group">
+                            <label class="control-label">Deskripsi / Catatan Backup (Opsional)</label>
+                            <input type="text" class="form-control" name="description" placeholder="Contoh: Backup sebelum migrasi server" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {!! csrf_field() !!}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Mulai Backup Sekarang</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Upload & Pulihkan Data -->
+    <div class="modal fade" id="restoreUploadModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form action="{{ route('admin.backup.restore') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirm('PERINGATAN: Memulihkan backup akan menimpa seluruh database panel saat ini. Pastikan Anda telah membuat backup terbaru sebelum melanjutkan. Lanjutkan?');">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><i class="fa fa-history"></i> Upload & Pulihkan Data Panel</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fa fa-exclamation-triangle"></i> <strong>Perhatian:</strong> Memulihkan backup panel akan menimpa seluruh database panel saat ini dengan data di dalam file backup yang Anda upload.
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Pilih File Backup (.tar.gz atau .zip)</label>
+                            <input type="file" class="form-control" name="backup_file" accept=".tar.gz,.zip,.tar" required />
+                            <p class="text-muted"><small>Unggah file backup panel yang sebelumnya Anda download dari JKSoft Cloud Panel.</small></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {!! csrf_field() !!}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger">Upload & Restore Sekarang</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('footer-scripts')
