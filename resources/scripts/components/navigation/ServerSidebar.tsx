@@ -13,20 +13,20 @@ import { useSidebar } from '@/components/SidebarContext';
 import routes from '@/routers/routes';
 import Can from '@/components/elements/Can';
 import LogoutConfirmDialog from '@/components/navigation/LogoutConfirmDialog';
-import pterodactylLogo from '@/assets/images/pterodactyl.svg';
+import jksoftLogo from '@/assets/images/jksoft-logo.svg';
 
 export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
     const { isOpen, close } = useSidebar();
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo) || pterodactylLogo;
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo) || jksoftLogo;
     const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
 
     const showLogo = logoDisplay === 'both' || logoDisplay === 'logo_only';
-    const showText = logoDisplay === 'both' || logoDisplay === 'text_only';
+    const showText = logoDisplay === 'text_only';
 
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
@@ -66,7 +66,7 @@ export default () => {
                 <div className={'h-16 flex items-center justify-between px-4 border-b border-neutral-800 shrink-0'}>
                     <Link to={'/'} className={'flex items-center gap-2.5 no-underline text-neutral-100 min-w-0 pr-2'}>
                         {showLogo && (
-                            <img src={logo} alt={name} className={'h-7 max-w-[140px] object-contain shrink-0'} />
+                            <img src={logo} alt={name} className={'h-8 max-w-[170px] object-contain shrink-0'} />
                         )}
                         {showText && (
                             <span className={'font-bold text-sm text-neutral-100 tracking-tight truncate'}>{name}</span>

@@ -17,11 +17,8 @@ class BaseSettingsFormRequest extends AdminFormRequest
             'app:logo' => 'nullable|string|max:500',
             'app:logo_display' => 'nullable|string|in:both,logo_only,text_only',
             'app:favicon' => 'nullable|string|max:500',
-            'app:background_color' => 'nullable|string|max:50',
-            'app:background_image' => 'nullable|string|max:500',
             'app:logo_file' => 'nullable|image|max:5120',
             'app:favicon_file' => 'nullable|mimes:ico,png,svg,webp,jpg,jpeg|max:2048',
-            'app:background_file' => 'nullable|image|max:8192',
             'pterodactyl:auth:2fa_required' => 'required|integer|in:0,1,2',
             'app:locale' => ['required', 'string', Rule::in(array_keys($this->getAvailableLanguages()))],
         ];

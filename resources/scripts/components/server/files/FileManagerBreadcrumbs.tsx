@@ -10,11 +10,18 @@ interface Props {
     isNewFile?: boolean;
 }
 
+const getCleanTrashFileName = (name: string): string => {
+    const match = name.match(/^\d+_[a-z0-9]+_(.+)$/i);
+    return match ? match[1] : name;
+};
+
 export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
     const [file, setFile] = useState<string | null>(null);
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
     const { hash } = useLocation();
+
+    const isTrash = directory.startsWith('/.trash') || hash.includes('.trash');
 
     useEffect(() => {
         const path = hashToPath(hash);
@@ -28,14 +35,33 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
     const breadcrumbs = (): { name: string; path?: string }[] =>
         directory
             .split('/')
-            .filter((directory) => !!directory)
-            .map((directory, index, dirs) => {
+            .filter((dir) => !!dir)
+            .map((dir, index, dirs) => {
                 if (!withinFileEditor && index === dirs.length - 1) {
-                    return { name: directory };
+                    return { name: dir };
                 }
 
-                return { name: directory, path: `/${dirs.slice(0, index + 1).join('/')}` };
+                return { name: dir, path: `/${dirs.slice(0, index + 1).join('/')}` };
             });
+
+    if (isTrash) {
+        return (
+            <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>
+                {renderLeft || <div css={tw`w-12`} />}/<span css={tw`px-1 text-neutral-300`}>home</span>/
+                <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+                    container
+                </NavLink>
+                /
+                <NavLink to={`/server/${id}/files/recycle-bin`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+                    recycle-bin
+                </NavLink>
+                /
+                {file && (
+                    <span css={tw`px-1 text-neutral-300`}>{getCleanTrashFileName(file)}</span>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>

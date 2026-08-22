@@ -22,11 +22,9 @@ class AssetComposer
         $view->with('asset', $this->assetHashService);
         $view->with('siteConfiguration', [
             'name' => config('app.name') ?? 'JKSoft Cloud',
-            'logo' => config('app.logo') ?? '/assets/svgs/pterodactyl.svg',
+            'logo' => config('app.logo') ?? '/assets/svgs/jksoft-logo.svg',
             'logo_display' => config('app.logo_display') ?? 'both',
             'favicon' => config('app.favicon') ?? '/favicons/favicon.ico',
-            'background_color' => config('app.background_color'),
-            'background_image' => config('app.background_image'),
             'locale' => config('app.locale') ?? 'en',
             'recaptcha' => [
                 'enabled' => config('recaptcha.enabled', false),

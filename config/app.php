@@ -25,7 +25,7 @@ return [
 
     'name' => env('APP_NAME', 'JKSoft Cloud'),
 
-    'logo' => env('APP_LOGO', '/assets/svgs/pterodactyl.svg'),
+    'logo' => env('APP_LOGO', '/assets/svgs/jksoft-logo.svg'),
 
     'favicon' => env('APP_FAVICON', '/favicons/favicon.ico'),
 

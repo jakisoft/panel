@@ -36,8 +36,8 @@
 
         @include('layouts.scripts')
     </head>
-    <body class="{{ $css['body'] ?? 'bg-neutral-950' }}" style="@if(config('app.background_color')) background-color: {{ config('app.background_color') }} !important; @endif @if(config('app.background_image')) background-image: url('{{ config('app.background_image') }}') !important; background-size: cover !important; background-attachment: fixed !important; background-position: center !important; @endif">
-            @yield('above-container')
+    <body class="{{ $css['body'] ?? 'bg-neutral-950' }}">
+        @section('content')
             @yield('container')
             @yield('below-container')
         @show

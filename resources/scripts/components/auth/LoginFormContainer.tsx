@@ -6,7 +6,7 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import tw from 'twin.macro';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
-import pterodactylLogo from '@/assets/images/pterodactyl.svg';
+import jksoftLogo from '@/assets/images/jksoft-logo.svg';
 
 type Props = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> & {
     title?: string;
@@ -41,9 +41,9 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
                 <div css={tw`md:flex w-full bg-neutral-900 border border-neutral-700/80 shadow-2xl rounded-2xl p-6 md:p-8 md:pl-0 mx-auto items-center`}>
                     <div css={tw`flex-none select-none mb-6 md:mb-0 self-center px-6 md:px-10 text-center`}>
                         <img
-                            src={logo || pterodactylLogo}
+                            src={logo || jksoftLogo}
                             alt={name}
-                            css={tw`block w-28 md:w-36 mx-auto object-contain max-h-24`}
+                            css={tw`block w-36 md:w-44 mx-auto object-contain max-h-24`}
                         />
                         <p css={tw`text-center text-sm font-semibold text-neutral-300 font-header mt-3`}>{name}</p>
                     </div>

@@ -132,108 +132,92 @@ export default ({ server, className }: { server: Server; className?: string }) =
     const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Unlimited';
     const cpuLimit = server.limits.cpu !== 0 ? `${server.limits.cpu}%` : 'Unlimited';
 
-    const getStatusBorder = () => {
-        if (isSuspended) return 'border-l-rose-500';
-        if (server.isNodeUnderMaintenance) return 'border-l-amber-500';
-        if (server.isTransferring || server.status === 'installing' || server.status === 'restoring_backup') return 'border-l-blue-500';
-        if (!stats) return 'border-l-neutral-700';
-        if (stats.status === 'running') return 'border-l-emerald-500';
-        if (stats.status === 'starting') return 'border-l-amber-400';
-        if (stats.status === 'stopping') return 'border-l-amber-600';
-        return 'border-l-neutral-600';
-    };
-
     return (
         <Link
             to={`/server/${server.id}`}
-            className={`group block p-4 sm:p-5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 border-l-4 ${getStatusBorder()} rounded-2xl transition-all duration-150 no-underline text-neutral-200 shadow-sm ${
+            className={`group block p-4 sm:p-5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700/80 rounded-2xl transition-all duration-200 no-underline text-neutral-200 shadow-md hover:shadow-xl shadow-black/30 ${
                 className || ''
             }`}
         >
-            <div className={'grid grid-cols-1 lg:grid-cols-12 gap-4 items-center'}>
-                {/* Left: Icon, Server Name, Description & IP */}
-                <div className={'lg:col-span-5 flex items-center gap-3.5 min-w-0'}>
-                    <div className={'w-11 h-11 rounded-xl bg-neutral-800 border border-neutral-700/60 text-neutral-300 flex items-center justify-center shrink-0 group-hover:text-white transition-colors'}>
+            <div className={'flex flex-col lg:flex-row lg:items-center justify-between gap-4'}>
+                {/* Left Side: Server Icon, Name, Address & Description */}
+                <div className={'flex items-center gap-3.5 min-w-0 flex-1'}>
+                    <div className={'w-11 h-11 rounded-xl bg-neutral-800 border border-neutral-700/60 text-neutral-300 flex items-center justify-center shrink-0 group-hover:text-white group-hover:bg-neutral-750 transition-colors shadow-inner'}>
                         <ServerIcon size={20} />
                     </div>
                     <div className={'min-w-0 flex-1'}>
-                        <div className={'flex items-center gap-2'}>
+                        <div className={'flex items-center gap-2 flex-wrap'}>
                             <h3 className={'text-sm sm:text-base font-bold text-neutral-100 group-hover:text-white transition-colors truncate'}>
                                 {server.name}
                             </h3>
+                            {allocationString && (
+                                <span className={'inline-flex items-center gap-1 text-[11px] font-mono text-neutral-400 bg-neutral-800/80 border border-neutral-700/50 px-2 py-0.5 rounded-md'}>
+                                    <Globe size={11} className={'text-neutral-500'} />
+                                    {allocationString}
+                                </span>
+                            )}
                             <div className={'lg:hidden ml-auto'}>
                                 {getStatusBadge()}
                             </div>
                         </div>
-                        {server.description ? (
-                            <p className={'text-xs text-neutral-400 truncate mt-0.5'}>
+                        {server.description && (
+                            <p className={'text-xs text-neutral-400 truncate mt-1'}>
                                 {server.description}
                             </p>
-                        ) : allocationString ? (
-                            <div className={'flex items-center gap-1.5 text-xs text-neutral-400 font-mono mt-0.5'}>
-                                <Globe size={12} className={'text-neutral-500 shrink-0'} />
-                                <span>{allocationString}</span>
-                            </div>
-                        ) : null}
-                        {server.description && allocationString && (
-                            <div className={'flex items-center gap-1.5 text-[11px] text-neutral-500 font-mono mt-1'}>
-                                <Globe size={11} className={'text-neutral-500 shrink-0'} />
-                                <span>{allocationString}</span>
-                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Middle: Resource Usage Metrics (CPU, RAM, Disk) */}
-                <div className={'lg:col-span-5'}>
+                {/* Right Side: Resource Stats Capsules & Status Badge */}
+                <div className={'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 shrink-0'}>
                     {stats && !isSuspended && !server.isNodeUnderMaintenance ? (
-                        <div className={'grid grid-cols-3 gap-2 sm:gap-3'}>
+                        <div className={'grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto'}>
                             {/* CPU */}
-                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-2 text-center sm:text-left'}>
-                                <div className={'flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-neutral-400 font-medium'}>
-                                    <Cpu size={13} className={alarms.cpu ? 'text-rose-400' : 'text-neutral-400'} />
+                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-1.5 min-w-[90px] text-center sm:text-left'}>
+                                <div className={'flex items-center justify-center sm:justify-start gap-1 text-[10px] uppercase font-bold text-neutral-400'}>
+                                    <Cpu size={12} className={alarms.cpu ? 'text-rose-400' : 'text-neutral-400'} />
                                     <span>CPU</span>
                                 </div>
-                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.cpu ? 'text-rose-400' : 'text-neutral-200'}`}>
+                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.cpu ? 'text-rose-400' : 'text-neutral-100'}`}>
                                     {stats.cpuUsagePercent.toFixed(1)}%
                                 </p>
-                                <p className={'text-[10px] text-neutral-500 truncate'}>of {cpuLimit}</p>
+                                <p className={'text-[9px] text-neutral-500 truncate leading-none mt-0.5'}>/ {cpuLimit}</p>
                             </div>
 
                             {/* RAM */}
-                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-2 text-center sm:text-left'}>
-                                <div className={'flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-neutral-400 font-medium'}>
-                                    <Layers size={13} className={alarms.memory ? 'text-rose-400' : 'text-neutral-400'} />
+                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-1.5 min-w-[100px] text-center sm:text-left'}>
+                                <div className={'flex items-center justify-center sm:justify-start gap-1 text-[10px] uppercase font-bold text-neutral-400'}>
+                                    <Layers size={12} className={alarms.memory ? 'text-rose-400' : 'text-neutral-400'} />
                                     <span>RAM</span>
                                 </div>
-                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.memory ? 'text-rose-400' : 'text-neutral-200'}`}>
+                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.memory ? 'text-rose-400' : 'text-neutral-100'}`}>
                                     {bytesToString(stats.memoryUsageInBytes)}
                                 </p>
-                                <p className={'text-[10px] text-neutral-500 truncate'}>of {memoryLimit}</p>
+                                <p className={'text-[9px] text-neutral-500 truncate leading-none mt-0.5'}>/ {memoryLimit}</p>
                             </div>
 
                             {/* DISK */}
-                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-2 text-center sm:text-left'}>
-                                <div className={'flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-neutral-400 font-medium'}>
-                                    <HardDrive size={13} className={alarms.disk ? 'text-rose-400' : 'text-neutral-400'} />
+                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-1.5 min-w-[100px] text-center sm:text-left'}>
+                                <div className={'flex items-center justify-center sm:justify-start gap-1 text-[10px] uppercase font-bold text-neutral-400'}>
+                                    <HardDrive size={12} className={alarms.disk ? 'text-rose-400' : 'text-neutral-400'} />
                                     <span>DISK</span>
                                 </div>
-                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.disk ? 'text-rose-400' : 'text-neutral-200'}`}>
+                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.disk ? 'text-rose-400' : 'text-neutral-100'}`}>
                                     {bytesToString(stats.diskUsageInBytes)}
                                 </p>
-                                <p className={'text-[10px] text-neutral-500 truncate'}>of {diskLimit}</p>
+                                <p className={'text-[9px] text-neutral-500 truncate leading-none mt-0.5'}>/ {diskLimit}</p>
                             </div>
                         </div>
                     ) : (
-                        <div className={'text-xs text-neutral-500 italic text-center lg:text-left'}>
+                        <div className={'text-xs text-neutral-500 italic py-1'}>
                             {isSuspended ? 'Server ditangguhkan' : server.isNodeUnderMaintenance ? 'Node dalam pemeliharaan' : 'Menghubungkan ke node...'}
                         </div>
                     )}
-                </div>
 
-                {/* Right: Status Badge */}
-                <div className={'lg:col-span-2 hidden lg:flex justify-end'}>
-                    {getStatusBadge()}
+                    {/* Status Badge (Desktop) */}
+                    <div className={'hidden lg:flex items-center justify-end min-w-[100px]'}>
+                        {getStatusBadge()}
+                    </div>
                 </div>
             </div>
         </Link>

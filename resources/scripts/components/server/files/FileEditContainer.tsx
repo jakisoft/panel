@@ -115,6 +115,8 @@ export default () => {
         }
     };
 
+    const isTrashFile = filePath.startsWith('/.trash');
+
     if (error) {
         return <ServerError message={error} onBack={() => history.goBack()} />;
     }
@@ -127,6 +129,20 @@ export default () => {
                     <FileManagerBreadcrumbs withinFileEditor isNewFile={action !== 'edit'} />
                 </div>
             </ErrorBoundary>
+            {isTrashFile && (
+                <div css={tw`mb-4 p-3.5 bg-neutral-900 border border-amber-500/40 rounded-xl text-amber-300 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm`}>
+                    <div>
+                        <span css={tw`font-bold`}>Mode Baca Saja (Read-Only)</span>: File ini berada di Tempat Sampah (Recycle Bin).
+                    </div>
+                    <Button
+                        isSecondary
+                        css={tw`text-xs`}
+                        onClick={() => history.push(`/server/${id}/files/recycle-bin`)}
+                    >
+                        Kembali ke Recycle Bin
+                    </Button>
+                </div>
+            )}
             {hash.replace(/^#/, '').endsWith('.pteroignore') && (
                 <div css={tw`mb-4 p-4 border-l-4 bg-neutral-900 rounded border-cyan-400`}>
                     <p css={tw`text-neutral-300 text-sm`}>
@@ -157,6 +173,7 @@ export default () => {
                         fetchFileContent = value;
                     }}
                     onContentSaved={() => {
+                        if (isTrashFile) return;
                         if (action !== 'edit') {
                             setModalVisible(true);
                         } else {
@@ -176,7 +193,15 @@ export default () => {
                         ))}
                     </Select>
                 </div>
-                {action === 'edit' ? (
+                {isTrashFile ? (
+                    <Button
+                        isSecondary
+                        css={tw`flex-1 sm:flex-none`}
+                        onClick={() => history.push(`/server/${id}/files/recycle-bin`)}
+                    >
+                        Kembali ke Recycle Bin
+                    </Button>
+                ) : action === 'edit' ? (
                     <Can action={'file.update'}>
                         <Button css={tw`flex-1 sm:flex-none`} onClick={() => save()}>
                             Save Content

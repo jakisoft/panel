@@ -66,16 +66,7 @@ class IndexController extends Controller
             $data['app:favicon'] = '/assets/' . $filename . '?v=' . time();
         }
 
-        // Handle custom background image upload if file provided
-        if ($request->hasFile('app:background_file')) {
-            $file = $request->file('app:background_file');
-            $ext = $file->getClientOriginalExtension() ?: 'jpg';
-            $filename = 'custom_bg.' . $ext;
-            $file->move(public_path('assets'), $filename);
-            $data['app:background_image'] = '/assets/' . $filename . '?v=' . time();
-        }
-
-        unset($data['app:logo_file'], $data['app:favicon_file'], $data['app:background_file']);
+        unset($data['app:logo_file'], $data['app:favicon_file']);
 
         foreach ($data as $key => $value) {
             $this->settings->set('settings::' . $key, $value);

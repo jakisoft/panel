@@ -6,7 +6,7 @@ import FileObjectRow from '@/components/server/files/FileObjectRow';
 import FileManagerBreadcrumbs from '@/components/server/files/FileManagerBreadcrumbs';
 import { FileObject } from '@/api/server/files/loadDirectory';
 import NewDirectoryButton from '@/components/server/files/NewDirectoryButton';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useHistory } from 'react-router-dom';
 import Can from '@/components/elements/Can';
 import { ServerError } from '@/components/elements/ScreenBlock';
 import tw from 'twin.macro';
@@ -34,6 +34,7 @@ const sortFiles = (files: FileObject[]): FileObject[] => {
 
 export default () => {
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
+    const history = useHistory();
     const { hash } = useLocation();
     const { data: files, error, mutate } = useFileManagerSwr();
     const directory = ServerContext.useStoreState((state) => state.files.directory);
@@ -42,6 +43,12 @@ export default () => {
 
     const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
     const selectedFilesLength = ServerContext.useStoreState((state) => state.files.selectedFiles.length);
+
+    useEffect(() => {
+        if (directory.startsWith('/.trash')) {
+            history.replace(`/server/${id}/files/recycle-bin`);
+        }
+    }, [directory, id]);
 
     useEffect(() => {
         clearFlashes('files');
