@@ -10,10 +10,9 @@ import { ServerContext } from '@/state/server';
 import deleteFiles from '@/api/server/files/deleteFiles';
 import { moveToTrash } from '@/api/server/files/recycleBin';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
+import DeleteConfirmationModal from '@/components/server/files/DeleteConfirmationModal';
 import Portal from '@/components/elements/Portal';
-import { Dialog } from '@/components/elements/dialog';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { Trash2, Archive, FolderInput } from 'lucide-react';
 
 const MassActionsBar = () => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
@@ -48,7 +47,7 @@ const MassActionsBar = () => {
     const onClickMoveToTrash = () => {
         setLoading(true);
         clearFlashes('files');
-        setLoadingMessage('Memindahkan ke Recycle Bin...');
+        setLoadingMessage('Memindahkan ke Tong Sampah...');
 
         const filesToTrash = selectedFiles.map((name) => ({
             name,
@@ -70,9 +69,8 @@ const MassActionsBar = () => {
 
     const onClickConfirmDeletion = () => {
         setLoading(true);
-        setShowConfirm(false);
         clearFlashes('files');
-        setLoadingMessage('Deleting files permanently...');
+        setLoadingMessage('Menghapus file secara permanen...');
 
         deleteFiles(uuid, directory, selectedFiles)
             .then(() => {
@@ -92,25 +90,13 @@ const MassActionsBar = () => {
                 <SpinnerOverlay visible={loading} size={'large'} fixed>
                     {loadingMessage}
                 </SpinnerOverlay>
-                <Dialog.Confirm
-                    title={'Hapus File Permanen'}
-                    open={showConfirm}
-                    confirm={'Hapus Permanen'}
-                    onClose={() => setShowConfirm(false)}
-                    onConfirmed={onClickConfirmDeletion}
-                >
-                    <p className={'mb-2'}>
-                        Apakah Anda yakin ingin menghapus&nbsp;
-                        <span className={'font-semibold text-gray-50'}>{selectedFiles.length} file</span> secara permanen?
-                        Tindakan ini tidak dapat dibatalkan.
-                    </p>
-                    <ul className={'list-disc pl-5 text-sm text-neutral-300 max-h-40 overflow-y-auto'}>
-                        {selectedFiles.slice(0, 15).map((file) => (
-                            <li key={file}>{file}</li>
-                        ))}
-                        {selectedFiles.length > 15 && <li>dan {selectedFiles.length - 15} file lainnya</li>}
-                    </ul>
-                </Dialog.Confirm>
+                <DeleteConfirmationModal
+                    visible={showConfirm}
+                    onDismissed={() => setShowConfirm(false)}
+                    files={selectedFiles}
+                    onMoveToTrash={onClickMoveToTrash}
+                    onDeletePermanently={onClickConfirmDeletion}
+                />
                 {showMove && (
                     <RenameFileModal
                         files={selectedFiles}
@@ -123,19 +109,30 @@ const MassActionsBar = () => {
                 <Portal>
                     <div className={'pointer-events-none fixed bottom-0 mb-6 flex justify-center w-full z-50'}>
                         <Fade timeout={75} in={selectedFiles.length > 0} unmountOnExit>
-                            <div css={tw`flex items-center space-x-3 pointer-events-auto rounded-lg p-3 bg-neutral-900/95 border border-neutral-700 shadow-xl backdrop-blur-sm`}>
-                                <Button onClick={() => setShowMove(true)}>Move</Button>
-                                <Button onClick={onClickCompress}>Archive</Button>
+                            <div className={'flex items-center gap-2 pointer-events-auto rounded-xl p-2.5 bg-neutral-900/95 border border-neutral-700 shadow-2xl backdrop-blur-md'}>
+                                <div className={'px-3 py-1 bg-neutral-800 text-neutral-300 text-xs font-semibold rounded-lg'}>
+                                    {selectedFiles.length} dipilih
+                                </div>
                                 <Button
-                                    onClick={onClickMoveToTrash}
-                                    className={'bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-1.5'}
-                                    title={'Pindahkan ke Recycle Bin (Aman, dapat dipulihkan dalam 7 hari)'}
+                                    onClick={() => setShowMove(true)}
+                                    className={'!py-2 !px-3 text-xs flex items-center gap-1.5'}
                                 >
-                                    <FontAwesomeIcon icon={faTrashAlt} className={'text-xs'} />
-                                    Move to Trash
+                                    <FolderInput size={14} />
+                                    Move
                                 </Button>
-                                <Button.Danger variant={Button.Variants.Secondary} onClick={() => setShowConfirm(true)}>
-                                    Delete Permanently
+                                <Button
+                                    onClick={onClickCompress}
+                                    className={'!py-2 !px-3 text-xs flex items-center gap-1.5'}
+                                >
+                                    <Archive size={14} />
+                                    Archive
+                                </Button>
+                                <Button.Danger
+                                    onClick={() => setShowConfirm(true)}
+                                    className={'!py-2 !px-3 text-xs flex items-center gap-1.5'}
+                                >
+                                    <Trash2 size={14} />
+                                    Delete
                                 </Button.Danger>
                             </div>
                         </Fade>

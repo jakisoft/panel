@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { NavLink, useParams } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
-import RecycleBinModal from '@/components/server/files/RecycleBinModal';
 import { WithClassname } from '@/components/types';
 
 export default ({ className }: WithClassname) => {
-    const [visible, setVisible] = useState(false);
+    const { id } = useParams<{ id: string }>();
 
     return (
-        <>
-            <RecycleBinModal visible={visible} onDismissed={() => setVisible(false)} />
-            <button
-                type={'button'}
-                onClick={() => setVisible(true)}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-sm bg-rose-600 hover:bg-rose-500 text-white ${className || ''}`}
-                title={'Recycle Bin (Tong Sampah)'}
-            >
-                <Trash2 size={16} />
-                <span>Recycle Bin</span>
-            </button>
-        </>
+        <NavLink
+            to={`/server/${id}/files/recycle-bin`}
+            className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-sm bg-rose-600 hover:bg-rose-500 text-white ${className || ''}`}
+            title={'Buka Tong Sampah (Recycle Bin)'}
+        >
+            <Trash2 size={16} />
+            <span>Recycle Bin</span>
+        </NavLink>
     );
 };

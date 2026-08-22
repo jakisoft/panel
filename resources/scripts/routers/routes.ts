@@ -35,6 +35,7 @@ import ServerActivityLogContainer from '@/components/server/ServerActivityLogCon
 // for the server dashboard when they're only needed for specific instances.
 const FileEditContainer = lazy(() => import('@/components/server/files/FileEditContainer'));
 const ScheduleEditContainer = lazy(() => import('@/components/server/schedules/ScheduleEditContainer'));
+const RecycleBinContainer = lazy(() => import('@/components/server/files/RecycleBinContainer'));
 
 interface RouteDefinition {
     path: string;
@@ -100,6 +101,14 @@ export default {
             name: 'Files',
             icon: Folder,
             component: FileManagerContainer,
+            exact: true,
+        },
+        {
+            path: '/files/recycle-bin',
+            permission: 'file.*',
+            name: undefined,
+            component: RecycleBinContainer,
+            exact: true,
         },
         {
             path: '/files/:action(edit|new)',

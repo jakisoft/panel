@@ -10,11 +10,10 @@ import {
     faLevelUpAlt,
     faPencilAlt,
     faTrashAlt,
-    faEye,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
-import ArchivePreviewModal from '@/components/server/files/ArchivePreviewModal';
+import DeleteConfirmationModal from '@/components/server/files/DeleteConfirmationModal';
 import { ServerContext } from '@/state/server';
 import { join } from 'pathe';
 import deleteFiles from '@/api/server/files/deleteFiles';
@@ -34,8 +33,6 @@ import compressFiles from '@/api/server/files/compressFiles';
 import decompressFiles from '@/api/server/files/decompressFiles';
 import isEqual from 'react-fast-compare';
 import ChmodFileModal from '@/components/server/files/ChmodFileModal';
-import { Dialog } from '@/components/elements/dialog';
-import { Button } from '@/components/elements/button/index';
 
 type ModalType = 'rename' | 'move' | 'chmod';
 
@@ -63,7 +60,6 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [modal, setModal] = useState<ModalType | null>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
-    const [showArchivePreview, setShowArchivePreview] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
@@ -149,34 +145,13 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
 
     return (
         <>
-            <Dialog
-                open={showConfirmation}
-                onClose={() => setShowConfirmation(false)}
-                title={`Hapus ${file.isFile ? 'File' : 'Folder'}`}
-            >
-                <div className={'space-y-3'}>
-                    <p className={'text-neutral-200'}>
-                        Pilih tindakan untuk <span className={'font-semibold text-white'}>{file.name}</span>:
-                    </p>
-                    <p className={'text-xs text-neutral-400'}>
-                        • <strong>Pindahkan ke Recycle Bin:</strong> File tersimpan aman dan dapat dipulihkan dalam 7 hari sebelum dibersihkan otomatis.
-                        <br />
-                        • <strong>Hapus Permanen:</strong> File langsung dihapus seketika dan tidak dapat dipulihkan.
-                    </p>
-                </div>
-                <Dialog.Footer>
-                    <Button.Text onClick={() => setShowConfirmation(false)}>Batal</Button.Text>
-                    <Button
-                        onClick={doMoveToTrash}
-                        className={'bg-amber-600 hover:bg-amber-500 text-white'}
-                    >
-                        Pindahkan ke Recycle Bin
-                    </Button>
-                    <Button.Danger onClick={doDeletion}>
-                        Hapus Permanen
-                    </Button.Danger>
-                </Dialog.Footer>
-            </Dialog>
+            <DeleteConfirmationModal
+                visible={showConfirmation}
+                onDismissed={() => setShowConfirmation(false)}
+                files={[file.name]}
+                onMoveToTrash={doMoveToTrash}
+                onDeletePermanently={doDeletion}
+            />
 
             <DropdownMenu
                 ref={onClickRef}
@@ -215,9 +190,6 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         <Row onClick={doCopy} icon={faCopy} title={'Copy'} />
                     </Can>
                 )}
-                {file.isArchiveType() && (
-                    <Row onClick={() => setShowArchivePreview(true)} icon={faEye} title={'Lihat Isi Archive'} />
-                )}
                 {file.isArchiveType() ? (
                     <Can action={'file.create'}>
                         <Row onClick={doUnarchive} icon={faBoxOpen} title={'Unarchive'} />
@@ -232,13 +204,6 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                     <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={'Delete'} $danger />
                 </Can>
             </DropdownMenu>
-            {file.isArchiveType() && (
-                <ArchivePreviewModal
-                    visible={showArchivePreview}
-                    fileName={file.name}
-                    onDismissed={() => setShowArchivePreview(false)}
-                />
-            )}
         </>
     );
 };
