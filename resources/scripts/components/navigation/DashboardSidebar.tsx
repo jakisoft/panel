@@ -64,7 +64,7 @@ export default () => {
                 }`}
             >
                 {/* Sidebar Header */}
-                <div className={'h-14 flex items-center justify-between px-4 border-b border-neutral-800 shrink-0'}>
+                <div className={'h-16 flex items-center justify-between px-4 border-b border-neutral-800 shrink-0'}>
                     <Link to={'/'} className={'flex items-center gap-2.5 no-underline text-neutral-100 min-w-0 pr-2'}>
                         {showLogo && (
                             <img src={logo} alt={name} className={'h-7 max-w-[140px] object-contain shrink-0'} />
@@ -83,16 +83,14 @@ export default () => {
                     </button>
                 </div>
 
-
-
                 {/* Navigation Menu Links */}
                 <nav className={'flex-1 overflow-y-auto px-3 py-3 space-y-1'}>
                     {/* Dashboard */}
                     <NavLink
                         to={'/'}
                         exact
-                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
-                        activeClassName={'!bg-cyan-600/20 !text-cyan-400 !font-semibold border border-cyan-500/30'}
+                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                        activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold border border-neutral-700/60 shadow-sm'}
                     >
                         <LayoutDashboard size={18} />
                         <span>Dashboard</span>
@@ -103,9 +101,9 @@ export default () => {
                         <a
                             href={'/admin'}
                             rel={'noreferrer'}
-                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
+                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
                         >
-                            <Shield size={18} className={'text-cyan-400'} />
+                            <Shield size={18} className={'text-neutral-400'} />
                             <span>Menu Admin</span>
                         </a>
                     )}
@@ -118,8 +116,8 @@ export default () => {
                         <button
                             type={'button'}
                             onClick={() => setAccountOpen((prev) => !prev)}
-                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors ${
-                                isAccountActive ? 'text-white font-semibold' : ''
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors ${
+                                isAccountActive ? 'text-neutral-100 font-semibold' : ''
                             }`}
                         >
                             <div className={'flex items-center gap-3'}>
@@ -138,8 +136,8 @@ export default () => {
                                 <NavLink
                                     to={'/account'}
                                     exact
-                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800/80 transition-colors'}
-                                    activeClassName={'!bg-cyan-500/20 !text-cyan-400 !font-semibold'}
+                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                                    activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold'}
                                 >
                                     <User size={15} />
                                     <span>Profil & Akun</span>
@@ -147,8 +145,8 @@ export default () => {
                                 <NavLink
                                     to={'/account/api'}
                                     exact
-                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800/80 transition-colors'}
-                                    activeClassName={'!bg-cyan-500/20 !text-cyan-400 !font-semibold'}
+                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                                    activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold'}
                                 >
                                     <Key size={15} />
                                     <span>API Credentials</span>
@@ -156,8 +154,8 @@ export default () => {
                                 <NavLink
                                     to={'/account/ssh'}
                                     exact
-                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800/80 transition-colors'}
-                                    activeClassName={'!bg-cyan-500/20 !text-cyan-400 !font-semibold'}
+                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                                    activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold'}
                                 >
                                     <Terminal size={15} />
                                     <span>SSH Keys</span>
@@ -165,8 +163,8 @@ export default () => {
                                 <NavLink
                                     to={'/account/activity'}
                                     exact
-                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-white hover:bg-neutral-800/80 transition-colors'}
-                                    activeClassName={'!bg-cyan-500/20 !text-cyan-400 !font-semibold'}
+                                    className={'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                                    activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold'}
                                 >
                                     <Activity size={15} />
                                     <span>Log Aktivitas</span>

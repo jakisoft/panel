@@ -18,7 +18,7 @@ export default () => {
 
     return (
         <header className={'w-full bg-neutral-900/95 backdrop-blur border-b border-neutral-800 shadow-md sticky top-0 z-30'}>
-            <div className={'w-full flex items-center justify-between h-14 px-3 sm:px-6'}>
+            <div className={'w-full flex items-center justify-between h-16 px-4 sm:px-6'}>
                 {/* Left: Sidebar Toggle & Logo */}
                 <div className={'flex items-center gap-3'}>
                     <button

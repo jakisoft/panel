@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerStats } from '@/api/server/getServerResourceUsage';
-import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
+import { bytesToString, ip } from '@/lib/formatters';
 import Spinner from '@/components/elements/Spinner';
 import { Server as ServerIcon, Cpu, HardDrive, Globe, Layers } from 'lucide-react';
 
@@ -51,78 +51,78 @@ export default ({ server, className }: { server: Server; className?: string }) =
     const getStatusBadge = () => {
         if (isSuspended) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20'}>
-                    <span className={'w-2 h-2 rounded-full bg-rose-500'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-rose-950/40 text-rose-400 border border-rose-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-rose-400'} />
                     Suspended
                 </span>
             );
         }
         if (server.isNodeUnderMaintenance) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20'}>
-                    <span className={'w-2 h-2 rounded-full bg-amber-500'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-950/40 text-amber-400 border border-amber-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-amber-400'} />
                     Maintenance
                 </span>
             );
         }
         if (server.isTransferring) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20'}>
-                    <span className={'w-2 h-2 rounded-full bg-blue-500 animate-pulse'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-950/40 text-blue-400 border border-blue-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse'} />
                     Transferring
                 </span>
             );
         }
         if (server.status === 'installing') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20'}>
-                    <span className={'w-2 h-2 rounded-full bg-amber-500 animate-pulse'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-950/40 text-amber-400 border border-amber-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse'} />
                     Installing
                 </span>
             );
         }
         if (server.status === 'restoring_backup') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'}>
-                    <span className={'w-2 h-2 rounded-full bg-indigo-500 animate-pulse'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-950/40 text-indigo-400 border border-indigo-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse'} />
                     Restoring
                 </span>
             );
         }
         if (!stats) {
             return (
-                <div className={'flex items-center gap-1.5'}>
+                <div className={'flex items-center gap-1.5 py-1'}>
                     <Spinner size={'small'} />
                 </div>
             );
         }
         if (stats.status === 'running') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-sm'}>
-                    <span className={'w-2 h-2 rounded-full bg-emerald-400 animate-pulse'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-950/40 text-emerald-400 border border-emerald-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse'} />
                     Running
                 </span>
             );
         }
         if (stats.status === 'starting') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30'}>
-                    <span className={'w-2 h-2 rounded-full bg-amber-400 animate-pulse'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-950/40 text-amber-400 border border-amber-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse'} />
                     Starting
                 </span>
             );
         }
         if (stats.status === 'stopping') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30'}>
-                    <span className={'w-2 h-2 rounded-full bg-amber-400'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-950/40 text-amber-400 border border-amber-800/40'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-amber-400'} />
                     Stopping
                 </span>
             );
         }
         return (
-            <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20'}>
-                <span className={'w-2 h-2 rounded-full bg-rose-500'} />
+            <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-neutral-800 text-neutral-400 border border-neutral-700/60'}>
+                <span className={'w-1.5 h-1.5 rounded-full bg-neutral-500'} />
                 Offline
             </span>
         );
@@ -131,83 +131,91 @@ export default ({ server, className }: { server: Server; className?: string }) =
     return (
         <Link
             to={`/server/${server.id}`}
-            className={`group block p-4 sm:p-5 bg-neutral-900/90 hover:bg-neutral-850 border border-neutral-800 hover:border-cyan-500/40 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-cyan-950/20 no-underline text-neutral-200 ${
+            className={`group block p-4 sm:p-5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 rounded-2xl transition-all duration-150 no-underline text-neutral-200 shadow-sm ${
                 className || ''
             }`}
         >
-            <div className={'flex flex-col md:flex-row md:items-center justify-between gap-4'}>
-                {/* Left: Icon & Server details */}
-                <div className={'flex items-start sm:items-center gap-3.5 min-w-0 flex-1'}>
-                    <div className={'w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-cyan-500/20 transition-all'}>
-                        <ServerIcon size={22} />
+            <div className={'grid grid-cols-1 lg:grid-cols-12 gap-4 items-center'}>
+                {/* Left: Icon, Server Name, Description & IP */}
+                <div className={'lg:col-span-5 flex items-center gap-3.5 min-w-0'}>
+                    <div className={'w-11 h-11 rounded-xl bg-neutral-800 border border-neutral-700/60 text-neutral-300 flex items-center justify-center shrink-0 group-hover:text-white transition-colors'}>
+                        <ServerIcon size={20} />
                     </div>
                     <div className={'min-w-0 flex-1'}>
-                        <div className={'flex items-center gap-2 flex-wrap'}>
-                            <h3 className={'text-base sm:text-lg font-bold text-neutral-100 group-hover:text-cyan-400 transition-colors truncate'}>
+                        <div className={'flex items-center gap-2'}>
+                            <h3 className={'text-sm sm:text-base font-bold text-neutral-100 group-hover:text-white transition-colors truncate'}>
                                 {server.name}
                             </h3>
-                            <div className={'md:hidden'}>
+                            <div className={'lg:hidden ml-auto'}>
                                 {getStatusBadge()}
                             </div>
                         </div>
-                        {server.description && (
-                            <p className={'text-xs sm:text-sm text-neutral-400 truncate mt-0.5'}>
+                        {server.description ? (
+                            <p className={'text-xs text-neutral-400 truncate mt-0.5'}>
                                 {server.description}
                             </p>
-                        )}
-                        {allocationString && (
-                            <div className={'flex items-center gap-1.5 mt-1.5 text-xs text-neutral-400 font-mono'}>
-                                <Globe size={13} className={'text-cyan-400 shrink-0'} />
-                                <span className={'bg-neutral-800/80 px-2 py-0.5 rounded-md border border-neutral-700/60'}>
-                                    {allocationString}
-                                </span>
+                        ) : allocationString ? (
+                            <div className={'flex items-center gap-1.5 text-xs text-neutral-400 font-mono mt-0.5'}>
+                                <Globe size={12} className={'text-neutral-500 shrink-0'} />
+                                <span>{allocationString}</span>
+                            </div>
+                        ) : null}
+                        {server.description && allocationString && (
+                            <div className={'flex items-center gap-1.5 text-[11px] text-neutral-500 font-mono mt-1'}>
+                                <Globe size={11} className={'text-neutral-500 shrink-0'} />
+                                <span>{allocationString}</span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Right: Stats & Status */}
-                <div className={'flex items-center justify-between md:justify-end gap-3 sm:gap-4 shrink-0'}>
-                    {stats && !isSuspended && !server.isNodeUnderMaintenance && (
+                {/* Middle: Resource Usage Metrics (CPU, RAM, Disk) */}
+                <div className={'lg:col-span-5'}>
+                    {stats && !isSuspended && !server.isNodeUnderMaintenance ? (
                         <div className={'grid grid-cols-3 gap-2 sm:gap-3'}>
-                            {/* CPU Stat */}
-                            <div className={`p-2 sm:px-3 sm:py-2 rounded-xl border ${alarms.cpu ? 'bg-rose-500/10 border-rose-500/30' : 'bg-neutral-800/60 border-neutral-700/50'}`}>
-                                <div className={'flex items-center gap-1.5 text-xs text-neutral-400'}>
-                                    <Cpu size={14} className={alarms.cpu ? 'text-rose-400' : 'text-cyan-400'} />
-                                    <span className={'hidden sm:inline'}>CPU</span>
+                            {/* CPU */}
+                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-2 text-center sm:text-left'}>
+                                <div className={'flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-neutral-400 font-medium'}>
+                                    <Cpu size={13} className={alarms.cpu ? 'text-rose-400' : 'text-neutral-400'} />
+                                    <span>CPU</span>
                                 </div>
-                                <p className={`text-xs sm:text-sm font-bold mt-0.5 ${alarms.cpu ? 'text-rose-300' : 'text-neutral-100'}`}>
+                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.cpu ? 'text-rose-400' : 'text-neutral-200'}`}>
                                     {stats.cpuUsagePercent.toFixed(1)}%
                                 </p>
                             </div>
 
-                            {/* RAM Stat */}
-                            <div className={`p-2 sm:px-3 sm:py-2 rounded-xl border ${alarms.memory ? 'bg-rose-500/10 border-rose-500/30' : 'bg-neutral-800/60 border-neutral-700/50'}`}>
-                                <div className={'flex items-center gap-1.5 text-xs text-neutral-400'}>
-                                    <Layers size={14} className={alarms.memory ? 'text-rose-400' : 'text-cyan-400'} />
-                                    <span className={'hidden sm:inline'}>RAM</span>
+                            {/* RAM */}
+                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-2 text-center sm:text-left'}>
+                                <div className={'flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-neutral-400 font-medium'}>
+                                    <Layers size={13} className={alarms.memory ? 'text-rose-400' : 'text-neutral-400'} />
+                                    <span>RAM</span>
                                 </div>
-                                <p className={`text-xs sm:text-sm font-bold mt-0.5 ${alarms.memory ? 'text-rose-300' : 'text-neutral-100'}`}>
+                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.memory ? 'text-rose-400' : 'text-neutral-200'}`}>
                                     {bytesToString(stats.memoryUsageInBytes)}
                                 </p>
                             </div>
 
-                            {/* Disk Stat */}
-                            <div className={`p-2 sm:px-3 sm:py-2 rounded-xl border ${alarms.disk ? 'bg-rose-500/10 border-rose-500/30' : 'bg-neutral-800/60 border-neutral-700/50'}`}>
-                                <div className={'flex items-center gap-1.5 text-xs text-neutral-400'}>
-                                    <HardDrive size={14} className={alarms.disk ? 'text-rose-400' : 'text-cyan-400'} />
-                                    <span className={'hidden sm:inline'}>DISK</span>
+                            {/* DISK */}
+                            <div className={'bg-neutral-800/60 border border-neutral-700/50 rounded-xl px-3 py-2 text-center sm:text-left'}>
+                                <div className={'flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-neutral-400 font-medium'}>
+                                    <HardDrive size={13} className={alarms.disk ? 'text-rose-400' : 'text-neutral-400'} />
+                                    <span>DISK</span>
                                 </div>
-                                <p className={`text-xs sm:text-sm font-bold mt-0.5 ${alarms.disk ? 'text-rose-300' : 'text-neutral-100'}`}>
+                                <p className={`text-xs font-bold mt-0.5 truncate ${alarms.disk ? 'text-rose-400' : 'text-neutral-200'}`}>
                                     {bytesToString(stats.diskUsageInBytes)}
                                 </p>
                             </div>
                         </div>
+                    ) : (
+                        <div className={'text-xs text-neutral-500 italic text-center lg:text-left'}>
+                            {isSuspended ? 'Server ditangguhkan' : server.isNodeUnderMaintenance ? 'Node dalam pemeliharaan' : 'Menghubungkan ke node...'}
+                        </div>
                     )}
+                </div>
 
-                    <div className={'hidden md:block'}>
-                        {getStatusBadge()}
-                    </div>
+                {/* Right: Status Badge */}
+                <div className={'lg:col-span-2 hidden lg:flex justify-end'}>
+                    {getStatusBadge()}
                 </div>
             </div>
         </Link>

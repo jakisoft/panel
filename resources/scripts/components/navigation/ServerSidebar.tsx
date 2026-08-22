@@ -64,7 +64,7 @@ export default () => {
                 }`}
             >
                 {/* Fixed Top Header: Logo and App Name */}
-                <div className={'h-14 flex items-center justify-between px-4 border-b border-neutral-800 shrink-0'}>
+                <div className={'h-16 flex items-center justify-between px-4 border-b border-neutral-800 shrink-0'}>
                     <Link to={'/'} className={'flex items-center gap-2.5 no-underline text-neutral-100 min-w-0 pr-2'}>
                         {showLogo && (
                             <img src={logo} alt={name} className={'h-7 max-w-[140px] object-contain shrink-0'} />
@@ -91,16 +91,16 @@ export default () => {
                         </h2>
                         {serverNode && (
                             <p className={'text-[11px] text-neutral-400 truncate mt-0.5'}>
-                                Node: <span className={'text-cyan-400 font-medium'}>{serverNode}</span>
+                                Node: <span className={'text-neutral-300 font-medium'}>{serverNode}</span>
                             </p>
                         )}
                     </div>
 
                     <Link
                         to={'/'}
-                        className={'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
+                        className={'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-neutral-800/60 transition-colors'}
                     >
-                        <LayoutDashboard size={16} className={'text-cyan-400'} />
+                        <LayoutDashboard size={16} className={'text-neutral-400'} />
                         <span>Kembali ke Dashboard</span>
                     </Link>
                 </div>
@@ -120,8 +120,8 @@ export default () => {
                                     <NavLink
                                         to={to(route.path)}
                                         exact={route.exact}
-                                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
-                                        activeClassName={'!bg-cyan-600/20 !text-cyan-400 !font-semibold border border-cyan-500/30'}
+                                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                                        activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold border border-neutral-700/60 shadow-sm'}
                                     >
                                         {Icon && <Icon size={18} />}
                                         <span>{route.name}</span>
@@ -132,8 +132,8 @@ export default () => {
                                     key={route.path}
                                     to={to(route.path)}
                                     exact={route.exact}
-                                    className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
-                                    activeClassName={'!bg-cyan-600/20 !text-cyan-400 !font-semibold border border-cyan-500/30'}
+                                    className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                                    activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold border border-neutral-700/60 shadow-sm'}
                                 >
                                     {Icon && <Icon size={18} />}
                                     <span>{route.name}</span>
@@ -146,9 +146,9 @@ export default () => {
                             href={`/admin/servers/view/${serverId}`}
                             target={'_blank'}
                             rel={'noreferrer'}
-                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
+                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
                         >
-                            <Shield size={18} className={'text-cyan-400'} />
+                            <Shield size={18} className={'text-neutral-400'} />
                             <span>Lihat di Admin</span>
                         </a>
                     )}

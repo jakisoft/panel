@@ -21,6 +21,8 @@ import { format } from 'date-fns';
 import RecycleBinDropdownMenu from '@/components/server/files/RecycleBinDropdownMenu';
 import RecycleBinMassActionsBar from '@/components/server/files/RecycleBinMassActionsBar';
 import { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
+import { encodePathSegments } from '@/helpers';
+import { join } from 'pathe';
 import tw from 'twin.macro';
 import styles from './style.module.css';
 
@@ -158,19 +160,26 @@ export default () => {
                                 checked={selectedIds.includes(item.id)}
                                 onChange={() => toggleSelectItem(item.id)}
                             />
-                            <div className={styles.details}>
+                            <NavLink
+                                className={styles.details}
+                                to={
+                                    item.isFile
+                                        ? `/server/${match.params.id}/files/edit#${encodePathSegments(join(item.originalDirectory || '/', item.name))}`
+                                        : `/server/${match.params.id}/files#${encodePathSegments(item.originalDirectory || '/')}`
+                                }
+                            >
                                 <div css={tw`flex-none text-neutral-400 ml-2 mr-4 text-lg pl-3`}>
                                     <FontAwesomeIcon icon={item.isFile ? faFileAlt : faFolder} />
                                 </div>
                                 <div css={tw`flex-1 truncate`}>
-                                    <span className={'text-neutral-200 font-medium'}>{item.name}</span>
+                                    <span className={'text-neutral-200 font-medium hover:text-white'}>{item.name}</span>
                                     <span css={tw`text-xs text-neutral-500 ml-2 font-mono hidden sm:inline`}>({item.originalDirectory})</span>
                                 </div>
                                 {item.isFile && <div css={tw`w-1/6 text-right mr-4 hidden sm:block text-neutral-400 text-xs`}>{bytesToString(item.size)}</div>}
                                 <div css={tw`w-1/5 text-right mr-4 hidden md:block text-xs text-neutral-400`} title={format(new Date(item.deletedAt), 'dd MMM yyyy HH:mm')}>
                                     {formatDaysRemaining(item.deletedAt)}
                                 </div>
-                            </div>
+                            </NavLink>
                             <RecycleBinDropdownMenu item={item} onItemRemoved={onItemRemoved} />
                         </div>
                     ))}
