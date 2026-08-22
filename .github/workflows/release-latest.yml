@@ -1,0 +1,59 @@
+name: Release Latest Archive
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-latest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install frontend dependencies
+        run: yarn install
+
+      - name: Build frontend assets
+        run: yarn build:production
+
+      - name: Create release archive
+        run: |
+          rm -f panel.tar.gz
+          rm -rf release-src
+          mkdir -p release-src
+
+          rsync -a ./ release-src/ \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.github' \
+            --exclude='tests' \
+            --exclude='release-src' \
+            --exclude='panel.tar.gz'
+
+          tar -czf panel.tar.gz -C release-src .
+
+      - name: Publish latest release asset
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: latest
+          body: Automated latest source archive release with compiled frontend assets.
+          allowUpdates: true
+          replacesArtifacts: true
+          removeArtifacts: true
+          artifacts: panel.tar.gz
