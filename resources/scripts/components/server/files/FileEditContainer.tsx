@@ -130,13 +130,13 @@ export default () => {
                 </div>
             </ErrorBoundary>
             {isTrashFile && (
-                <div css={tw`mb-4 p-3.5 bg-neutral-900 border border-amber-500/40 rounded-xl text-amber-300 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm`}>
+                <div className={'mb-4 p-3.5 bg-neutral-900 border border-amber-500/40 rounded-xl text-amber-300 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm'}>
                     <div>
-                        <span css={tw`font-bold`}>Mode Baca Saja (Read-Only)</span>: File ini berada di Tempat Sampah (Recycle Bin).
+                        <span className={'font-bold'}>Mode Baca Saja (Read-Only)</span>: File ini berada di Tempat Sampah (Recycle Bin).
                     </div>
                     <Button
                         isSecondary
-                        css={tw`text-xs`}
+                        className={'text-xs'}
                         onClick={() => history.push(`/server/${id}/files/recycle-bin`)}
                     >
                         Kembali ke Recycle Bin
