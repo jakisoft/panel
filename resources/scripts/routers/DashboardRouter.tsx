@@ -20,9 +20,10 @@ export default () => {
                     <div>
                         {routes.account
                             .filter((route) => !!route.name)
-                            .map(({ path, name, exact = false }) => (
+                            .map(({ path, name, icon: Icon, exact = false }) => (
                                 <NavLink key={path} to={`/account/${path}`.replace('//', '/')} exact={exact}>
-                                    {name}
+                                    {Icon && <Icon size={16} className={'opacity-80'} />}
+                                    <span>{name}</span>
                                 </NavLink>
                             ))}
                     </div>

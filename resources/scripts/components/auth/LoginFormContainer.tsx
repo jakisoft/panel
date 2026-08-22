@@ -12,21 +12,19 @@ type Props = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, 
 };
 
 const Container = styled.div`
+    ${tw`w-full px-4 py-8 mx-auto`}
+
     ${breakpoint('sm')`
-        ${tw`w-4/5 mx-auto`}
+        ${tw`w-4/5`}
     `};
 
     ${breakpoint('md')`
-        ${tw`p-10`}
+        ${tw`w-3/5 py-12`}
     `};
 
     ${breakpoint('lg')`
-        ${tw`w-3/5`}
-    `};
-
-    ${breakpoint('xl')`
         ${tw`w-full`}
-        max-width: 700px;
+        max-width: 680px;
     `};
 `;
 
@@ -36,21 +34,40 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
 
     return (
         <Container>
-            {title && <h2 css={tw`text-3xl text-center text-neutral-100 font-medium py-4`}>{title}</h2>}
-            <FlashMessageRender css={tw`mb-2 px-1`} />
-            <Form {...props} ref={ref}>
-                <div css={tw`md:flex w-full bg-neutral-900 border border-neutral-700 shadow-2xl rounded-xl p-6 md:pl-0 mx-1`}>
-                    <div css={tw`flex-none select-none mb-6 md:mb-0 self-center px-6`}>
-                        <img src={logo} alt={name} css={tw`block w-40 md:w-56 mx-auto object-contain max-h-24`} />
-                        <p css={tw`text-center text-sm text-neutral-400 font-header font-medium mt-3`}>{name}</p>
+            <div className={'flex flex-col items-center mb-6'}>
+                <div className={'relative group mb-3'}>
+                    <div className={'absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 opacity-30 blur group-hover:opacity-50 transition duration-300'} />
+                    <div className={'relative bg-neutral-900 border border-neutral-800 rounded-xl p-3 flex items-center justify-center'}>
+                        {logo && logo !== '/assets/svgs/pterodactyl.svg' ? (
+                            <img src={logo} alt={name} className={'h-12 max-w-[200px] object-contain'} />
+                        ) : (
+                            <div className={'flex items-center gap-2.5 px-2'}>
+                                <div className={'w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25'}>
+                                    <span className={'text-white font-bold text-base'}>JK</span>
+                                </div>
+                                <span className={'text-xl font-bold text-white tracking-tight'}>{name}</span>
+                            </div>
+                        )}
                     </div>
-                    <div css={tw`flex-1 md:border-l md:border-neutral-700 md:pl-6`}>{props.children}</div>
+                </div>
+                {title && <h2 className={'text-2xl font-bold text-neutral-100 mt-2'}>{title}</h2>}
+                <p className={'text-sm text-neutral-400 mt-1'}>Selamat datang kembali di panel manajemen cloud.</p>
+            </div>
+
+            <FlashMessageRender css={tw`mb-4 px-1`} />
+
+            <Form {...props} ref={ref}>
+                <div className={'w-full bg-neutral-900/90 backdrop-blur border border-neutral-800 shadow-2xl rounded-2xl p-6 sm:p-8'}>
+                    {props.children}
                 </div>
             </Form>
-            <p css={tw`text-center text-neutral-500 text-xs mt-4`}>
-                &copy; 2015 - {new Date().getFullYear()}&nbsp;
-                <span css={tw`text-neutral-400 font-medium`}>{name}</span>
-            </p>
+
+            <div className={'text-center mt-6 text-neutral-500 text-xs flex flex-col items-center gap-1'}>
+                <p>
+                    &copy; {new Date().getFullYear()} <span className={'text-neutral-300 font-semibold'}>{name}</span>. All rights reserved.
+                </p>
+                <p className={'text-neutral-600 text-[11px]'}>Protected with enterprise security.</p>
+            </div>
         </Container>
     );
 });

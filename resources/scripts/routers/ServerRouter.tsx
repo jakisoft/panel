@@ -14,8 +14,7 @@ import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
 import InstallListener from '@/components/server/InstallListener';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { ExternalLink } from 'lucide-react';
 import { useLocation } from 'react-router';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
@@ -78,23 +77,26 @@ export default () => {
                             <div>
                                 {routes.server
                                     .filter((route) => !!route.name)
-                                    .map((route) =>
-                                        route.permission ? (
+                                    .map((route) => {
+                                        const Icon = route.icon;
+                                        return route.permission ? (
                                             <Can key={route.path} action={route.permission} matchAny>
                                                 <NavLink to={to(route.path, true)} exact={route.exact}>
-                                                    {route.name}
+                                                    {Icon && <Icon size={16} className={'opacity-80'} />}
+                                                    <span>{route.name}</span>
                                                 </NavLink>
                                             </Can>
                                         ) : (
                                             <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
-                                                {route.name}
+                                                {Icon && <Icon size={16} className={'opacity-80'} />}
+                                                <span>{route.name}</span>
                                             </NavLink>
-                                        )
-                                    )}
+                                        );
+                                    })}
                                 {rootAdmin && (
                                     // eslint-disable-next-line react/jsx-no-target-blank
                                     <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
-                                        <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                        <ExternalLink size={16} />
                                     </a>
                                 )}
                             </div>

@@ -1,4 +1,18 @@
 import React, { lazy } from 'react';
+import {
+    Terminal,
+    Folder,
+    Database,
+    Clock,
+    Users,
+    Archive,
+    Network,
+    Play,
+    Settings,
+    Activity,
+    User,
+    Key,
+} from 'lucide-react';
 import ServerConsole from '@/components/server/console/ServerConsoleContainer';
 import DatabasesContainer from '@/components/server/databases/DatabasesContainer';
 import ScheduleContainer from '@/components/server/schedules/ScheduleContainer';
@@ -27,6 +41,7 @@ interface RouteDefinition {
     // If undefined is passed this route is still rendered into the router itself
     // but no navigation link is displayed in the sub-navigation menu.
     name: string | undefined;
+    icon?: React.ComponentType<{ className?: string; size?: number }>;
     component: React.ComponentType;
     exact?: boolean;
 }
@@ -47,22 +62,26 @@ export default {
         {
             path: '/',
             name: 'Account',
+            icon: User,
             component: AccountOverviewContainer,
             exact: true,
         },
         {
             path: '/api',
             name: 'API Credentials',
+            icon: Key,
             component: AccountApiContainer,
         },
         {
             path: '/ssh',
             name: 'SSH Keys',
+            icon: Terminal,
             component: AccountSSHContainer,
         },
         {
             path: '/activity',
             name: 'Activity',
+            icon: Activity,
             component: ActivityLogContainer,
         },
     ],
@@ -71,6 +90,7 @@ export default {
             path: '/',
             permission: null,
             name: 'Console',
+            icon: Terminal,
             component: ServerConsole,
             exact: true,
         },
@@ -78,6 +98,7 @@ export default {
             path: '/files',
             permission: 'file.*',
             name: 'Files',
+            icon: Folder,
             component: FileManagerContainer,
         },
         {
@@ -90,12 +111,14 @@ export default {
             path: '/databases',
             permission: 'database.*',
             name: 'Databases',
+            icon: Database,
             component: DatabasesContainer,
         },
         {
             path: '/schedules',
             permission: 'schedule.*',
             name: 'Schedules',
+            icon: Clock,
             component: ScheduleContainer,
         },
         {
@@ -108,36 +131,42 @@ export default {
             path: '/users',
             permission: 'user.*',
             name: 'Users',
+            icon: Users,
             component: UsersContainer,
         },
         {
             path: '/backups',
             permission: 'backup.*',
             name: 'Backups',
+            icon: Archive,
             component: BackupContainer,
         },
         {
             path: '/network',
             permission: 'allocation.*',
             name: 'Network',
+            icon: Network,
             component: NetworkContainer,
         },
         {
             path: '/startup',
             permission: 'startup.*',
             name: 'Startup',
+            icon: Play,
             component: StartupContainer,
         },
         {
             path: '/settings',
             permission: ['settings.*', 'file.sftp'],
             name: 'Settings',
+            icon: Settings,
             component: SettingsContainer,
         },
         {
             path: '/activity',
             permission: 'activity.*',
             name: 'Activity',
+            icon: Activity,
             component: ServerActivityLogContainer,
         },
     ],
