@@ -121,6 +121,32 @@
                                         <i class="fa fa-trash"></i> Reset Default
                                     </button>
                                 </div>
+                            <!-- Brand Display Mode -->
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Mode Tampilan Brand (Navbar & Sidebar)</label>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="radio-inline" style="font-weight: 500;">
+                                            <input type="radio" name="app:logo_display" value="both" @if(config('app.logo_display', 'both') === 'both') checked @endif>
+                                            <strong>Kombinasi (Logo + Nama)</strong>
+                                            <p class="text-muted" style="margin: 3px 0 0 0; font-size: 11px;">Menampilkan logo gambar dan teks nama aplikasi berdampingan.</p>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="radio-inline" style="font-weight: 500;">
+                                            <input type="radio" name="app:logo_display" value="logo_only" @if(config('app.logo_display') === 'logo_only') checked @endif>
+                                            <strong>Hanya Logo (Logo Only)</strong>
+                                            <p class="text-muted" style="margin: 3px 0 0 0; font-size: 11px;">Hanya menampilkan gambar logo tanpa teks nama.</p>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="radio-inline" style="font-weight: 500;">
+                                            <input type="radio" name="app:logo_display" value="text_only" @if(config('app.logo_display') === 'text_only') checked @endif>
+                                            <strong>Hanya Teks Nama (Text Only)</strong>
+                                            <p class="text-muted" style="margin: 3px 0 0 0; font-size: 11px;">Hanya menampilkan teks nama aplikasi tanpa icon/gambar logo.</p>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

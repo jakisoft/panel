@@ -14,7 +14,7 @@ export default createGlobalStyle`
     }
 
     body {
-        ${tw`font-sans bg-neutral-800 text-neutral-200`};
+        ${tw`font-sans bg-neutral-950 text-neutral-200`};
         letter-spacing: 0.015em;
     }
 
@@ -47,8 +47,8 @@ export default createGlobalStyle`
     /* Scroll Bar Style */
     ::-webkit-scrollbar {
         background: none;
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
     }
 
     ::-webkit-scrollbar-thumb {
@@ -56,7 +56,7 @@ export default createGlobalStyle`
         border-right-width: 4px;
         border-left-width: 4px;
         -webkit-border-radius: 9px 4px;
-        -webkit-box-shadow: inset 0 0 0 1px hsl(211, 10%, 53%), inset 0 0 0 4px hsl(209deg 18% 30%);
+        -webkit-box-shadow: inset 0 0 0 1px #334155, inset 0 0 0 4px #0f172a;
     }
 
     ::-webkit-scrollbar-track-piece {

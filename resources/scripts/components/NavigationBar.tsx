@@ -9,8 +9,12 @@ import UserDropdown from '@/components/navigation/UserDropdown';
 
 export default () => {
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo);
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo || '/assets/svgs/pterodactyl.svg');
+    const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const { toggle } = useSidebar();
+
+    const showLogo = logoDisplay === 'both' || logoDisplay === 'logo_only';
+    const showText = logoDisplay === 'both' || logoDisplay === 'text_only';
 
     return (
         <header className={'w-full bg-neutral-900/95 backdrop-blur border-b border-neutral-800 shadow-md sticky top-0 z-30'}>
@@ -31,19 +35,17 @@ export default () => {
                         to={'/'}
                         className={'flex items-center gap-2.5 no-underline text-neutral-100 hover:text-white transition-colors'}
                     >
-                        {logo && logo !== '/assets/svgs/pterodactyl.svg' ? (
+                        {showLogo && (
                             <img src={logo} alt={name} className={'h-7 max-w-[150px] object-contain'} />
-                        ) : (
-                            <div className={'flex items-center gap-2'}>
-                                <img src={'/assets/svgs/pterodactyl.svg'} alt={name} className={'h-7 w-7'} />
-                                <span className={'font-bold text-sm sm:text-base text-neutral-100 tracking-tight'}>{name}</span>
-                            </div>
+                        )}
+                        {showText && (
+                            <span className={'font-bold text-sm sm:text-base text-neutral-100 tracking-tight'}>{name}</span>
                         )}
                     </Link>
                 </div>
 
                 {/* Right: Search & User Avatar Dropdown */}
-                <div className={'flex items-center gap-2 sm:gap-4'}>
+                <div className={'flex items-center gap-3'}>
                     <SearchContainer />
                     <UserDropdown />
                 </div>

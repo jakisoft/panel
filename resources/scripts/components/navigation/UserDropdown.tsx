@@ -59,18 +59,13 @@ export default () => {
                         <div className={'w-10 h-10 rounded-xl overflow-hidden ring-2 ring-cyan-500/50 shrink-0'}>
                             <Avatar.User />
                         </div>
-                        <div className={'min-w-0 flex-1'}>
-                            <p className={'text-sm font-bold text-neutral-100 truncate'}>
+                        <div className={'min-w-0 flex-1 flex flex-col justify-center'}>
+                            <p className={'text-sm font-bold text-neutral-100 truncate leading-snug'}>
                                 {displayName}
                             </p>
-                            <p className={'text-xs text-neutral-400 truncate mt-0.5'}>
+                            <p className={'text-xs text-neutral-400 truncate mt-0.5 leading-snug'}>
                                 {user.email}
                             </p>
-                            <span className={`inline-block mt-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
-                                user.rootAdmin ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-neutral-800 text-neutral-300'
-                            }`}>
-                                {user.rootAdmin ? 'Root Admin' : 'Member'}
-                            </span>
                         </div>
                     </div>
 

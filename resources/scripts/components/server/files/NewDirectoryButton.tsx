@@ -105,6 +105,8 @@ const NewDirectoryDialog = asDialog({
     );
 });
 
+import { FolderPlus } from 'lucide-react';
+
 export default ({ className }: WithClassname) => {
     const [open, setOpen] = useState(false);
 
@@ -112,6 +114,7 @@ export default ({ className }: WithClassname) => {
         <>
             <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
             <Button.Text onClick={setOpen.bind(this, true)} className={className}>
+                <FolderPlus className={'w-4 h-4 mr-1.5 inline-block'} />
                 Create Directory
             </Button.Text>
         </>

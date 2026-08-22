@@ -65,7 +65,7 @@ export default () => {
     return (
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
             <ErrorBoundary>
-                <div className={'flex flex-wrap-reverse md:flex-nowrap mb-4'}>
+                <div className={'flex flex-col-reverse md:flex-row md:items-center justify-between gap-3 mb-4'}>
                     <FileManagerBreadcrumbs
                         renderLeft={
                             <FileActionCheckbox
@@ -77,15 +77,15 @@ export default () => {
                         }
                     />
                     <Can action={'file.create'}>
-                        <div className={'flex flex-wrap sm:flex-nowrap items-center gap-2 justify-end'}>
+                        <div className={'w-full md:w-auto flex flex-col md:flex-row items-stretch md:items-center gap-2 md:flex-nowrap md:shrink-0'}>
                             <FileManagerStatus />
-                            <NewDirectoryButton />
-                            <div className={'grid grid-cols-2 gap-2 shrink-0'}>
-                                <UploadButton className={'w-full !py-2 text-xs sm:text-sm'} />
-                                <NavLink to={`/server/${id}/files/new${window.location.hash}`} className={'w-full'}>
-                                    <Button className={'w-full !py-2 text-xs sm:text-sm'}>New File</Button>
+                            <NewDirectoryButton className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0'} />
+                            <div className={'grid grid-cols-2 md:flex md:items-center md:flex-nowrap gap-2 w-full md:w-auto shrink-0'}>
+                                <UploadButton className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0'} />
+                                <NavLink to={`/server/${id}/files/new${window.location.hash}`} className={'w-full md:w-auto shrink-0'}>
+                                    <Button className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap'}>New File</Button>
                                 </NavLink>
-                                <RecycleBinButton className={'w-full !py-2 text-xs sm:text-sm'} />
+                                <RecycleBinButton className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0'} />
                             </div>
                         </div>
                     </Can>

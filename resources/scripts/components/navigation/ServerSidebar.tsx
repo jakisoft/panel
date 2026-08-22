@@ -4,8 +4,7 @@ import {
     LayoutDashboard,
     LogOut,
     X,
-    Search,
-    ExternalLink,
+    Shield,
 } from 'lucide-react';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
@@ -19,10 +18,16 @@ export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
     const { isOpen, close } = useSidebar();
+    const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo || '/assets/svgs/pterodactyl.svg');
+    const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin);
     const serverName = ServerContext.useStoreState((state) => state.server.data?.name);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
     const serverNode = ServerContext.useStoreState((state) => state.server.data?.node);
+
+    const showLogo = logoDisplay === 'both' || logoDisplay === 'logo_only';
+    const showText = logoDisplay === 'both' || logoDisplay === 'text_only';
 
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
@@ -38,13 +43,6 @@ export default () => {
             return match.url;
         }
         return `${match.url.replace(/\/*$/, '')}/${value.replace(/^\/+/, '')}`;
-    };
-
-    const handleSearchClick = () => {
-        const searchBtn = document.querySelector('button[aria-label="Search"]') as HTMLButtonElement | null;
-        if (searchBtn) {
-            searchBtn.click();
-        }
     };
 
     return (
@@ -65,18 +63,16 @@ export default () => {
                     isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                {/* Fixed Top Header (Non-scrolling) */}
+                {/* Fixed Top Header: Logo and App Name */}
                 <div className={'h-14 flex items-center justify-between px-4 border-b border-neutral-800 shrink-0'}>
-                    <div className={'min-w-0 flex-1 pr-2'}>
-                        <h2 className={'text-sm font-bold text-neutral-100 truncate'}>
-                            {serverName || 'Memuat Server...'}
-                        </h2>
-                        {serverNode && (
-                            <p className={'text-[11px] text-neutral-400 truncate'}>
-                                Node: <span className={'text-cyan-400'}>{serverNode}</span>
-                            </p>
+                    <Link to={'/'} className={'flex items-center gap-2.5 no-underline text-neutral-100 min-w-0 pr-2'}>
+                        {showLogo && (
+                            <img src={logo} alt={name} className={'h-7 max-w-[140px] object-contain shrink-0'} />
                         )}
-                    </div>
+                        {showText && (
+                            <span className={'font-bold text-sm text-neutral-100 tracking-tight truncate'}>{name}</span>
+                        )}
+                    </Link>
                     <button
                         type={'button'}
                         onClick={close}
@@ -87,15 +83,17 @@ export default () => {
                     </button>
                 </div>
 
-                {/* Fixed Search & Dashboard Link (Non-scrolling) */}
+                {/* Server Info Card & Dashboard Link (Non-scrolling) */}
                 <div className={'p-3 border-b border-neutral-800/80 shrink-0 space-y-2'}>
-                    <div
-                        onClick={handleSearchClick}
-                        className={'flex items-center gap-2 px-3 py-2 bg-neutral-800/60 hover:bg-neutral-800 border border-neutral-700/60 rounded-xl text-neutral-400 text-xs cursor-pointer transition-colors'}
-                    >
-                        <Search size={14} className={'text-neutral-400'} />
-                        <span>Cari server...</span>
-                        <kbd className={'ml-auto text-[10px] bg-neutral-700/60 text-neutral-400 px-1.5 py-0.5 rounded'}>Ctrl+K</kbd>
+                    <div className={'p-2.5 bg-neutral-800/60 border border-neutral-700/60 rounded-xl'}>
+                        <h2 className={'text-xs font-bold text-neutral-100 truncate'}>
+                            {serverName || 'Memuat Server...'}
+                        </h2>
+                        {serverNode && (
+                            <p className={'text-[11px] text-neutral-400 truncate mt-0.5'}>
+                                Node: <span className={'text-cyan-400 font-medium'}>{serverNode}</span>
+                            </p>
+                        )}
                     </div>
 
                     <Link
@@ -148,10 +146,10 @@ export default () => {
                             href={`/admin/servers/view/${serverId}`}
                             target={'_blank'}
                             rel={'noreferrer'}
-                            className={'flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-cyan-300 hover:bg-neutral-800 transition-colors mt-2 border border-dashed border-neutral-800'}
+                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors'}
                         >
+                            <Shield size={18} className={'text-cyan-400'} />
                             <span>Lihat di Admin</span>
-                            <ExternalLink size={14} />
                         </a>
                     )}
                 </nav>

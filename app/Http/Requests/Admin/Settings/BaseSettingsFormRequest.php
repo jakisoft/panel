@@ -15,6 +15,7 @@ class BaseSettingsFormRequest extends AdminFormRequest
         return [
             'app:name' => 'required|string|max:191',
             'app:logo' => 'nullable|string|max:500',
+            'app:logo_display' => 'nullable|string|in:both,logo_only,text_only',
             'app:favicon' => 'nullable|string|max:500',
             'app:logo_file' => 'nullable|image|max:5120',
             'app:favicon_file' => 'nullable|mimes:ico,png,svg,webp,jpg,jpeg|max:2048',

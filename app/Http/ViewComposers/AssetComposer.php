@@ -23,6 +23,7 @@ class AssetComposer
         $view->with('siteConfiguration', [
             'name' => config('app.name') ?? 'JKSoft Cloud',
             'logo' => config('app.logo') ?? '/assets/svgs/pterodactyl.svg',
+            'logo_display' => config('app.logo_display') ?? 'both',
             'favicon' => config('app.favicon') ?? '/favicons/favicon.ico',
             'locale' => config('app.locale') ?? 'en',
             'recaptcha' => [

@@ -109,10 +109,7 @@ const MassActionsBar = () => {
                 <Portal>
                     <div className={'pointer-events-none fixed bottom-0 mb-6 flex justify-center w-full z-50'}>
                         <Fade timeout={75} in={selectedFiles.length > 0} unmountOnExit>
-                            <div className={'flex items-center gap-2 pointer-events-auto rounded-xl p-2.5 bg-neutral-900/95 border border-neutral-700 shadow-2xl backdrop-blur-md'}>
-                                <div className={'px-3 py-1 bg-neutral-800 text-neutral-300 text-xs font-semibold rounded-lg'}>
-                                    {selectedFiles.length} dipilih
-                                </div>
+                            <div className={'flex items-center gap-2 pointer-events-auto rounded-xl p-2 bg-neutral-900/95 border border-neutral-700 shadow-2xl backdrop-blur-md'}>
                                 <Button
                                     onClick={() => setShowMove(true)}
                                     className={'!py-2 !px-3 text-xs flex items-center gap-1.5'}
