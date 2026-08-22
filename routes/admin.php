@@ -78,6 +78,21 @@ Route::group(['prefix' => 'settings'], function () {
 
 /*
 |--------------------------------------------------------------------------
+| Cloud Backup Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/backup
+|
+*/
+Route::group(['prefix' => 'backup'], function () {
+    Route::get('/', [Admin\BackupController::class, 'index'])->name('admin.backup');
+    Route::post('/', [Admin\BackupController::class, 'update']);
+    Route::post('/test/r2', [Admin\BackupController::class, 'testR2'])->name('admin.backup.test.r2');
+    Route::post('/test/gdrive', [Admin\BackupController::class, 'testGDrive'])->name('admin.backup.test.gdrive');
+});
+
+/*
+|--------------------------------------------------------------------------
 | User Controller Routes
 |--------------------------------------------------------------------------
 |

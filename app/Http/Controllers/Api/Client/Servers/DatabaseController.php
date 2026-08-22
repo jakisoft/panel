@@ -87,6 +87,60 @@ class DatabaseController extends ClientApiController
     }
 
     /**
+     * Import a SQL file into the database.
+     */
+    public function import(\Illuminate\Http\Request $request, Server $server, Database $database): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'file' => 'required_without:sql|file|max:51200',
+            'sql' => 'required_without:file|string',
+        ]);
+
+        $sqlContent = '';
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $ext = strtolower($file->getClientOriginalExtension());
+            if ($ext === 'gz') {
+                $sqlContent = gzdecode(file_get_contents($file->getRealPath()));
+            } else {
+                $sqlContent = file_get_contents($file->getRealPath());
+            }
+        } else {
+            $sqlContent = $request->input('sql', '');
+        }
+
+        if (empty(trim($sqlContent))) {
+            return new \Illuminate\Http\JsonResponse(['success' => false, 'error' => 'File SQL kosong atau tidak valid.'], 422);
+        }
+
+        try {
+            $host = $database->host;
+            $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $host->host, $host->port, $database->database);
+            $pdo = new \PDO($dsn, $database->username, $database->password, [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
+            ]);
+
+            $pdo->exec($sqlContent);
+
+            Activity::event('server:database.import')
+                ->subject($database)
+                ->property('name', $database->database)
+                ->log();
+
+            return new \Illuminate\Http\JsonResponse([
+                'success' => true,
+                'message' => 'Database SQL berhasil diimport ke ' . $database->database . '!',
+            ]);
+        } catch (\Exception $e) {
+            return new \Illuminate\Http\JsonResponse([
+                'success' => false,
+                'error' => 'Gagal mengimport SQL: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Removes a database from the server.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException

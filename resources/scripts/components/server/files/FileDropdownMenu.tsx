@@ -10,9 +10,11 @@ import {
     faLevelUpAlt,
     faPencilAlt,
     faTrashAlt,
+    faEye,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
+import ArchivePreviewModal from '@/components/server/files/ArchivePreviewModal';
 import { ServerContext } from '@/state/server';
 import { join } from 'pathe';
 import deleteFiles from '@/api/server/files/deleteFiles';
@@ -61,6 +63,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [modal, setModal] = useState<ModalType | null>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showArchivePreview, setShowArchivePreview] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
@@ -212,6 +215,9 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         <Row onClick={doCopy} icon={faCopy} title={'Copy'} />
                     </Can>
                 )}
+                {file.isArchiveType() && (
+                    <Row onClick={() => setShowArchivePreview(true)} icon={faEye} title={'Lihat Isi Archive'} />
+                )}
                 {file.isArchiveType() ? (
                     <Can action={'file.create'}>
                         <Row onClick={doUnarchive} icon={faBoxOpen} title={'Unarchive'} />
@@ -226,6 +232,13 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                     <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={'Delete'} $danger />
                 </Can>
             </DropdownMenu>
+            {file.isArchiveType() && (
+                <ArchivePreviewModal
+                    visible={showArchivePreview}
+                    fileName={file.name}
+                    onDismissed={() => setShowArchivePreview(false)}
+                />
+            )}
         </>
     );
 };

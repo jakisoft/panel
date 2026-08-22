@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDatabase, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faDatabase, faEye, faTrashAlt, faFileImport, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import Modal from '@/components/elements/Modal';
 import { Form, Formik, FormikHelpers } from 'formik';
 import Field from '@/components/elements/Field';
@@ -10,6 +10,7 @@ import { ServerContext } from '@/state/server';
 import deleteServerDatabase from '@/api/server/databases/deleteServerDatabase';
 import { httpErrorToHuman } from '@/api/http';
 import RotatePasswordButton from '@/components/server/databases/RotatePasswordButton';
+import ImportDatabaseModal from '@/components/server/databases/ImportDatabaseModal';
 import Can from '@/components/elements/Can';
 import { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import useFlash from '@/plugins/useFlash';
@@ -19,6 +20,7 @@ import Label from '@/components/elements/Label';
 import Input from '@/components/elements/Input';
 import GreyRowBox from '@/components/elements/GreyRowBox';
 import CopyOnClick from '@/components/elements/CopyOnClick';
+import Tooltip from '@/components/elements/tooltip/Tooltip';
 
 interface Props {
     database: ServerDatabase;
@@ -30,6 +32,7 @@ export default ({ database, className }: Props) => {
     const { addError, clearFlashes } = useFlash();
     const [visible, setVisible] = useState(false);
     const [connectionVisible, setConnectionVisible] = useState(false);
+    const [importVisible, setImportVisible] = useState(false);
 
     const appendDatabase = ServerContext.useStoreActions((actions) => actions.databases.appendDatabase);
     const removeDatabase = ServerContext.useStoreActions((actions) => actions.databases.removeDatabase);
@@ -164,17 +167,41 @@ export default ({ database, className }: Props) => {
                     </CopyOnClick>
                     <p css={tw`mt-1 text-2xs text-neutral-500 uppercase select-none`}>Username</p>
                 </div>
-                <div css={tw`ml-8`}>
-                    <Button isSecondary css={tw`mr-2`} onClick={() => setConnectionVisible(true)}>
-                        <FontAwesomeIcon icon={faEye} fixedWidth />
-                    </Button>
-                    <Can action={'database.delete'}>
-                        <Button color={'red'} isSecondary onClick={() => setVisible(true)}>
-                            <FontAwesomeIcon icon={faTrashAlt} fixedWidth />
+                <div css={tw`ml-8 flex items-center`}>
+                    <Tooltip placement={'top'} content={'Buka di phpMyAdmin'}>
+                        <a
+                            href={'/phpmyadmin'}
+                            target={'_blank'}
+                            rel={'noopener noreferrer'}
+                            css={tw`p-2.5 mr-2 rounded bg-neutral-600 hover:bg-neutral-500 text-neutral-100 transition-colors inline-flex items-center justify-center`}
+                        >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} fixedWidth />
+                        </a>
+                    </Tooltip>
+                    <Tooltip placement={'top'} content={'Import File SQL'}>
+                        <Button isSecondary css={tw`mr-2`} onClick={() => setImportVisible(true)}>
+                            <FontAwesomeIcon icon={faFileImport} fixedWidth />
                         </Button>
+                    </Tooltip>
+                    <Tooltip placement={'top'} content={'Detail Koneksi'}>
+                        <Button isSecondary css={tw`mr-2`} onClick={() => setConnectionVisible(true)}>
+                            <FontAwesomeIcon icon={faEye} fixedWidth />
+                        </Button>
+                    </Tooltip>
+                    <Can action={'database.delete'}>
+                        <Tooltip placement={'top'} content={'Hapus Database'}>
+                            <Button color={'red'} isSecondary onClick={() => setVisible(true)}>
+                                <FontAwesomeIcon icon={faTrashAlt} fixedWidth />
+                            </Button>
+                        </Tooltip>
                     </Can>
                 </div>
             </GreyRowBox>
+            <ImportDatabaseModal
+                visible={importVisible}
+                database={database}
+                onDismissed={() => setImportVisible(false)}
+            />
         </>
     );
 };

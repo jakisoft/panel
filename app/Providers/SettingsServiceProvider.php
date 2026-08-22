@@ -32,6 +32,18 @@ class SettingsServiceProvider extends ServiceProvider
         'pterodactyl:client_features:allocations:enabled',
         'pterodactyl:client_features:allocations:range_start',
         'pterodactyl:client_features:allocations:range_end',
+        'backup:default_provider',
+        'backup:r2:enabled',
+        'backup:r2:account_id',
+        'backup:r2:bucket',
+        'backup:r2:access_key_id',
+        'backup:r2:secret_access_key',
+        'backup:r2:endpoint',
+        'backup:gdrive:enabled',
+        'backup:gdrive:client_id',
+        'backup:gdrive:client_secret',
+        'backup:gdrive:refresh_token',
+        'backup:gdrive:folder_id',
     ];
 
     /**
