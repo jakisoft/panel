@@ -164,7 +164,7 @@ export default () => {
                                 className={styles.details}
                                 to={
                                     item.isFile
-                                        ? `/server/${match.params.id}/files/edit#${encodePathSegments(join(item.originalDirectory || '/', item.name))}`
+                                        ? `/server/${match.params.id}/files/edit#${encodePathSegments(join('/.trash', item.id))}`
                                         : `/server/${match.params.id}/files#${encodePathSegments(item.originalDirectory || '/')}`
                                 }
                             >

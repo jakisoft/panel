@@ -128,10 +128,25 @@ export default ({ server, className }: { server: Server; className?: string }) =
         );
     };
 
+    const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : 'Unlimited';
+    const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Unlimited';
+    const cpuLimit = server.limits.cpu !== 0 ? `${server.limits.cpu}%` : 'Unlimited';
+
+    const getStatusBorder = () => {
+        if (isSuspended) return 'border-l-rose-500';
+        if (server.isNodeUnderMaintenance) return 'border-l-amber-500';
+        if (server.isTransferring || server.status === 'installing' || server.status === 'restoring_backup') return 'border-l-blue-500';
+        if (!stats) return 'border-l-neutral-700';
+        if (stats.status === 'running') return 'border-l-emerald-500';
+        if (stats.status === 'starting') return 'border-l-amber-400';
+        if (stats.status === 'stopping') return 'border-l-amber-600';
+        return 'border-l-neutral-600';
+    };
+
     return (
         <Link
             to={`/server/${server.id}`}
-            className={`group block p-4 sm:p-5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 rounded-2xl transition-all duration-150 no-underline text-neutral-200 shadow-sm ${
+            className={`group block p-4 sm:p-5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 border-l-4 ${getStatusBorder()} rounded-2xl transition-all duration-150 no-underline text-neutral-200 shadow-sm ${
                 className || ''
             }`}
         >
@@ -182,6 +197,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                                 <p className={`text-xs font-bold mt-0.5 truncate ${alarms.cpu ? 'text-rose-400' : 'text-neutral-200'}`}>
                                     {stats.cpuUsagePercent.toFixed(1)}%
                                 </p>
+                                <p className={'text-[10px] text-neutral-500 truncate'}>of {cpuLimit}</p>
                             </div>
 
                             {/* RAM */}
@@ -193,6 +209,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                                 <p className={`text-xs font-bold mt-0.5 truncate ${alarms.memory ? 'text-rose-400' : 'text-neutral-200'}`}>
                                     {bytesToString(stats.memoryUsageInBytes)}
                                 </p>
+                                <p className={'text-[10px] text-neutral-500 truncate'}>of {memoryLimit}</p>
                             </div>
 
                             {/* DISK */}
@@ -204,6 +221,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                                 <p className={`text-xs font-bold mt-0.5 truncate ${alarms.disk ? 'text-rose-400' : 'text-neutral-200'}`}>
                                     {bytesToString(stats.diskUsageInBytes)}
                                 </p>
+                                <p className={'text-[10px] text-neutral-500 truncate'}>of {diskLimit}</p>
                             </div>
                         </div>
                     ) : (

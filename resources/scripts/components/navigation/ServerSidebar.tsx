@@ -13,18 +13,17 @@ import { useSidebar } from '@/components/SidebarContext';
 import routes from '@/routers/routes';
 import Can from '@/components/elements/Can';
 import LogoutConfirmDialog from '@/components/navigation/LogoutConfirmDialog';
+import pterodactylLogo from '@/assets/images/pterodactyl.svg';
 
 export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
     const { isOpen, close } = useSidebar();
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo || '/assets/svgs/pterodactyl.svg');
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo) || pterodactylLogo;
     const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin);
-    const serverName = ServerContext.useStoreState((state) => state.server.data?.name);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
-    const serverNode = ServerContext.useStoreState((state) => state.server.data?.node);
 
     const showLogo = logoDisplay === 'both' || logoDisplay === 'logo_only';
     const showText = logoDisplay === 'both' || logoDisplay === 'text_only';
@@ -83,31 +82,17 @@ export default () => {
                     </button>
                 </div>
 
-                {/* Server Info Card & Dashboard Link (Non-scrolling) */}
-                <div className={'p-3 border-b border-neutral-800/80 shrink-0 space-y-2'}>
-                    <div className={'p-2.5 bg-neutral-800/60 border border-neutral-700/60 rounded-xl'}>
-                        <h2 className={'text-xs font-bold text-neutral-100 truncate'}>
-                            {serverName || 'Memuat Server...'}
-                        </h2>
-                        {serverNode && (
-                            <p className={'text-[11px] text-neutral-400 truncate mt-0.5'}>
-                                Node: <span className={'text-neutral-300 font-medium'}>{serverNode}</span>
-                            </p>
-                        )}
-                    </div>
-
-                    <Link
-                        to={'/'}
-                        className={'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-neutral-800/60 transition-colors'}
-                    >
-                        <LayoutDashboard size={16} className={'text-neutral-400'} />
-                        <span>Kembali ke Dashboard</span>
-                    </Link>
-                </div>
-
                 {/* Scrollable Server Navigation Menu */}
                 <nav className={'flex-1 overflow-y-auto px-3 py-3 space-y-1'}>
-                    <div className={'px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-neutral-500'}>
+                    <Link
+                        to={'/'}
+                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors mb-2 border-b border-neutral-800/80 pb-2.5'}
+                    >
+                        <LayoutDashboard size={18} />
+                        <span>Dashboard Utama</span>
+                    </Link>
+
+                    <div className={'px-3 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-neutral-500'}>
                         Menu Server
                     </div>
 

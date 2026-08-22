@@ -21,6 +21,8 @@ class SettingsServiceProvider extends ServiceProvider
         'app:logo',
         'app:logo_display',
         'app:favicon',
+        'app:background_color',
+        'app:background_image',
         'app:locale',
         'recaptcha:enabled',
         'recaptcha:secret_key',

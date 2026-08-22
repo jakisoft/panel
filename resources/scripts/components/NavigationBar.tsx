@@ -6,10 +6,11 @@ import { ApplicationStore } from '@/state';
 import SearchContainer from '@/components/dashboard/search/SearchContainer';
 import { useSidebar } from '@/components/SidebarContext';
 import UserDropdown from '@/components/navigation/UserDropdown';
+import pterodactylLogo from '@/assets/images/pterodactyl.svg';
 
 export default () => {
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo || '/assets/svgs/pterodactyl.svg');
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo) || pterodactylLogo;
     const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const { toggle } = useSidebar();
 

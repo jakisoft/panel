@@ -148,6 +148,83 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <hr style="border-color: #333; margin: 25px 0;">
+
+                            <h4 style="font-weight: bold; color: #fff; margin-bottom: 15px;">
+                                <i class="fa fa-paint-brush"></i> Kustomisasi Background & Tema Panel
+                            </h4>
+
+                            <!-- Background Color -->
+                            <div class="form-group">
+                                <label class="control-label">Warna Background Panel (Background Color)</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="color" id="bgColorPicker" value="{{ old('app:background_color', config('app.background_color', '#090d16')) }}" style="width: 48px; height: 36px; padding: 2px; border-radius: 4px; border: 1px solid #444; background: #222; cursor: pointer;">
+                                    <input type="text" id="bgColorInput" name="app:background_color" class="form-control" value="{{ old('app:background_color', config('app.background_color', '')) }}" placeholder="e.g. #090d16, #0f172a, #121212" style="max-width: 250px;">
+                                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                        <button type="button" class="btn btn-default btn-xs bg-preset-btn" data-color="#090d16" style="background:#090d16; color:#fff; border-color:#333;">Default Dark</button>
+                                        <button type="button" class="btn btn-default btn-xs bg-preset-btn" data-color="#0f172a" style="background:#0f172a; color:#fff; border-color:#333;">Slate Blue</button>
+                                        <button type="button" class="btn btn-default btn-xs bg-preset-btn" data-color="#121212" style="background:#121212; color:#fff; border-color:#333;">Charcoal</button>
+                                        <button type="button" class="btn btn-default btn-xs bg-preset-btn" data-color="#000000" style="background:#000000; color:#fff; border-color:#333;">Pure Black</button>
+                                        <button type="button" class="btn btn-danger btn-xs" id="bgResetColorBtn">Reset</button>
+                                    </div>
+                                </div>
+                                <p class="text-muted"><small>Pilih warna background dasar untuk seluruh halaman panel pengguna.</small></p>
+                            </div>
+
+                            <!-- Background Image -->
+                            <div class="form-group">
+                                <label class="control-label">Background Image (URL atau Upload File)</label>
+                                <div class="input-group">
+                                    <input type="text" id="bgImgInput" name="app:background_image" class="form-control" value="{{ old('app:background_image', config('app.background_image', '')) }}" placeholder="https://domain.com/wallpaper.jpg atau kosongkan untuk warna solid">
+                                    <span class="input-group-btn">
+                                        <label class="btn btn-default btn-file" style="margin-bottom: 0;">
+                                            <i class="fa fa-upload"></i> Upload Image <input type="file" id="bgFileInput" name="app:background_file" accept="image/*" style="display: none;">
+                                        </label>
+                                    </span>
+                                </div>
+                                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                                    <span style="font-size: 12px; color: #888;">Preset:</span>
+                                    <button type="button" class="btn btn-default btn-xs bg-img-preset" data-url="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1920&q=80">Cyber Dark</button>
+                                    <button type="button" class="btn btn-default btn-xs bg-img-preset" data-url="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80">Abstract Dark</button>
+                                    <button type="button" class="btn btn-danger btn-xs" id="bgResetImgBtn">Hapus Background Image</button>
+                                </div>
+                            </div>
+
+                            <!-- Live Interactive Mockup Preview -->
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label class="control-label"><i class="fa fa-eye"></i> Live Preview Mockup</label>
+                                <div id="livePreviewContainer" style="border-radius: 12px; border: 1px solid #334155; padding: 15px; min-height: 220px; background-color: {{ config('app.background_color') ?: '#090d16' }}; background-image: url('{{ config('app.background_image') }}'); background-size: cover; background-position: center; transition: all 0.3s ease;">
+                                    <!-- Mini Navbar Mockup -->
+                                    <div style="background: rgba(23, 23, 23, 0.9); border: 1px solid #333; border-radius: 8px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 14px; height: 10px; border-top: 2px solid #aaa; border-bottom: 2px solid #aaa;"></div>
+                                            <img id="mockupLogo" src="{{ config('app.logo', '/assets/svgs/pterodactyl.svg') }}" style="height: 18px; max-width: 60px; object-fit: contain;">
+                                            <span id="mockupTitle" style="font-weight: bold; font-size: 12px; color: #fff;">{{ config('app.name', 'JKSoft Cloud') }}</span>
+                                        </div>
+                                        <div style="display: flex; gap: 6px; align-items: center;">
+                                            <div style="width: 16px; height: 16px; background: #333; border-radius: 50%;"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Mini Content Mockup -->
+                                    <div style="display: flex; gap: 12px;">
+                                        <!-- Mini Sidebar -->
+                                        <div style="width: 110px; background: rgba(23, 23, 23, 0.85); border: 1px solid #333; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+                                            <div style="background: #2a2a2a; color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">Dashboard</div>
+                                            <div style="color: #888; padding: 3px 6px; font-size: 10px;">Servers</div>
+                                            <div style="color: #888; padding: 3px 6px; font-size: 10px;">Account</div>
+                                        </div>
+                                        <!-- Mini Server Card -->
+                                        <div style="flex: 1; background: rgba(23, 23, 23, 0.85); border: 1px solid #333; border-left: 3px solid #10b981; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: bold; font-size: 12px; color: #fff;">Production Server</div>
+                                                <div style="font-size: 9px; color: #888; font-family: monospace;">192.168.1.1:25565</div>
+                                            </div>
+                                            <span style="font-size: 9px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 6px; border-radius: 4px;">Running</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="box-footer">
@@ -177,15 +254,89 @@
             var faviconPreview = $('#faviconPreviewImg');
             var faviconTrash = $('#faviconTrashBtn');
 
+            var bgColorPicker = $('#bgColorPicker');
+            var bgColorInput = $('#bgColorInput');
+            var bgImgInput = $('#bgImgInput');
+            var bgFileInput = $('#bgFileInput');
+            var livePreview = $('#livePreviewContainer');
+            var mockupLogo = $('#mockupLogo');
+            var mockupTitle = $('#mockupTitle');
+
+            function updateLivePreview() {
+                var color = bgColorInput.val().trim() || '#090d16';
+                var img = bgImgInput.val().trim();
+
+                livePreview.css('background-color', color);
+                if (img) {
+                    livePreview.css('background-image', "url('" + img + "')");
+                } else {
+                    livePreview.css('background-image', 'none');
+                }
+            }
+
+            bgColorPicker.on('input change', function () {
+                bgColorInput.val($(this).val());
+                updateLivePreview();
+            });
+
+            bgColorInput.on('input change', function () {
+                var val = $(this).val();
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    bgColorPicker.val(val);
+                }
+                updateLivePreview();
+            });
+
+            $('.bg-preset-btn').on('click', function () {
+                var c = $(this).data('color');
+                bgColorPicker.val(c);
+                bgColorInput.val(c);
+                updateLivePreview();
+            });
+
+            $('#bgResetColorBtn').on('click', function () {
+                bgColorInput.val('');
+                bgColorPicker.val('#090d16');
+                updateLivePreview();
+            });
+
+            bgImgInput.on('input change', updateLivePreview);
+
+            $('.bg-img-preset').on('click', function () {
+                var u = $(this).data('url');
+                bgImgInput.val(u);
+                updateLivePreview();
+            });
+
+            $('#bgResetImgBtn').on('click', function () {
+                bgImgInput.val('');
+                bgFileInput.val('');
+                updateLivePreview();
+            });
+
+            bgFileInput.on('change', function (e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (event) {
+                        bgImgInput.val(event.target.result);
+                        updateLivePreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
             function updateLogoState() {
                 var val = logoInput.val().trim();
                 var isCustom = val !== '' && val !== defaultLogo;
                 if (isCustom) {
                     logoTrash.show();
                     logoPreview.attr('src', val);
+                    mockupLogo.attr('src', val);
                 } else {
                     logoTrash.hide();
                     logoPreview.attr('src', defaultLogo);
+                    mockupLogo.attr('src', defaultLogo);
                 }
             }
 
@@ -210,6 +361,7 @@
                     var reader = new FileReader();
                     reader.onload = function (event) {
                         logoPreview.attr('src', event.target.result);
+                        mockupLogo.attr('src', event.target.result);
                         logoTrash.show();
                     };
                     reader.readAsDataURL(file);
@@ -243,6 +395,7 @@
             // Initial check
             updateLogoState();
             updateFaviconState();
+            updateLivePreview();
         });
     </script>
 @endsection

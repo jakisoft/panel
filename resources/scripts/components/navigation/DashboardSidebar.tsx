@@ -15,12 +15,13 @@ import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { useSidebar } from '@/components/SidebarContext';
 import LogoutConfirmDialog from '@/components/navigation/LogoutConfirmDialog';
+import pterodactylLogo from '@/assets/images/pterodactyl.svg';
 
 export default () => {
     const location = useLocation();
     const { isOpen, close } = useSidebar();
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo || '/assets/svgs/pterodactyl.svg');
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo) || pterodactylLogo;
     const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin);
 
