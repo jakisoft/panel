@@ -97,6 +97,21 @@ Route::group(['prefix' => 'backup'], function () {
 
 /*
 |--------------------------------------------------------------------------
+| Master Domain Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/domains
+|
+*/
+Route::group(['prefix' => 'domains'], function () {
+    Route::get('/', [Admin\DomainPoolController::class, 'index'])->name('admin.domains');
+    Route::post('/', [Admin\DomainPoolController::class, 'store'])->name('admin.domains.store');
+    Route::post('/global', [Admin\DomainPoolController::class, 'updateGlobalSettings'])->name('admin.domains.global');
+    Route::delete('/{pool}', [Admin\DomainPoolController::class, 'delete'])->name('admin.domains.delete');
+});
+
+/*
+|--------------------------------------------------------------------------
 | User Controller Routes
 |--------------------------------------------------------------------------
 |

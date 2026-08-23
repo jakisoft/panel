@@ -244,6 +244,16 @@ class Server extends Model implements Identifiable
     }
 
     /**
+     * Gets the domain / subdomain configuration for this server.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\ServerDomain, $this>
+     */
+    public function domain(): HasOne
+    {
+        return $this->hasOne(ServerDomain::class);
+    }
+
+    /**
      * Gets the subusers associated with a server.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Pterodactyl\Models\Subuser, $this>
