@@ -49,52 +49,52 @@ export default ({ server, className }: { server: Server; className?: string }) =
         : null;
 
     const getStatusTheme = () => {
-        if (isSuspended) return { bar: 'before:bg-rose-500/50', icon: 'text-rose-400/80 group-hover:text-rose-300' };
-        if (server.isNodeUnderMaintenance) return { bar: 'before:bg-purple-500/50', icon: 'text-purple-400/80 group-hover:text-purple-300' };
-        if (server.isTransferring) return { bar: 'before:bg-sky-500/50', icon: 'text-sky-400/80 group-hover:text-sky-300' };
-        if (server.status === 'installing' || server.status === 'restoring_backup') return { bar: 'before:bg-amber-500/50', icon: 'text-amber-400/80 group-hover:text-amber-300' };
-        if (stats?.status === 'running') return { bar: 'before:bg-emerald-500/50 group-hover:before:bg-emerald-400', icon: 'text-emerald-400/80 group-hover:text-emerald-300' };
-        if (stats?.status === 'starting' || stats?.status === 'stopping') return { bar: 'before:bg-amber-500/50', icon: 'text-amber-400/80 group-hover:text-amber-300' };
-        return { bar: 'before:bg-neutral-700/50', icon: 'text-neutral-400 group-hover:text-neutral-200' };
+        if (isSuspended) return { bar: 'before:bg-rose-500/60', icon: 'text-rose-400 group-hover:text-rose-300' };
+        if (server.isNodeUnderMaintenance) return { bar: 'before:bg-purple-500/60', icon: 'text-purple-400 group-hover:text-purple-300' };
+        if (server.isTransferring) return { bar: 'before:bg-sky-500/60', icon: 'text-sky-400 group-hover:text-sky-300' };
+        if (server.status === 'installing' || server.status === 'restoring_backup') return { bar: 'before:bg-amber-500/60', icon: 'text-amber-400 group-hover:text-amber-300' };
+        if (stats?.status === 'running' || stats?.status === 'starting') return { bar: 'before:bg-emerald-500/60 group-hover:before:bg-emerald-400', icon: 'text-emerald-400 group-hover:text-emerald-300' };
+        if (stats?.status === 'stopping') return { bar: 'before:bg-rose-500/60', icon: 'text-rose-400 group-hover:text-rose-300' };
+        return { bar: 'before:bg-rose-500/40', icon: 'text-rose-400/80 group-hover:text-rose-300' };
     };
 
     const getStatusBadge = () => {
         if (isSuspended) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300/90 border border-rose-500/20'}>
-                    <span className={'w-1.5 h-1.5 rounded-full bg-rose-400/80'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-rose-400'} />
                     Suspended
                 </span>
             );
         }
         if (server.isNodeUnderMaintenance) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-purple-500/10 text-purple-300/90 border border-purple-500/20'}>
-                    <span className={'w-1.5 h-1.5 rounded-full bg-purple-400/80'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20'}>
+                    <span className={'w-1.5 h-1.5 rounded-full bg-purple-400'} />
                     Maintenance
                 </span>
             );
         }
         if (server.isTransferring) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-sky-500/10 text-sky-300/90 border border-sky-500/20'}>
-                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-400/80'} /></span>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20'}>
+                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-400'} /></span>
                     Transferring
                 </span>
             );
         }
         if (server.status === 'installing') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300/90 border border-amber-500/20'}>
-                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400/80'} /></span>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
+                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400'} /></span>
                     Installing
                 </span>
             );
         }
         if (server.status === 'restoring_backup') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-indigo-500/10 text-indigo-300/90 border border-indigo-500/20'}>
-                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-400/80'} /></span>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
+                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400'} /></span>
                     Restoring
                 </span>
             );
@@ -108,31 +108,31 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (stats.status === 'running') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-emerald-500/10 text-emerald-300/90 border border-emerald-500/20'}>
-                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400/80'} /></span>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'}>
+                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400'} /></span>
                     Running
                 </span>
             );
         }
         if (stats.status === 'starting') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300/90 border border-amber-500/20'}>
-                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400/80'} /></span>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'}>
+                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400'} /></span>
                     Starting
                 </span>
             );
         }
         if (stats.status === 'stopping') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300/90 border border-amber-500/20'}>
-                    <span className={'w-1.5 h-1.5 rounded-full bg-amber-400/70'} />
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
+                    <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-400'} /></span>
                     Stopping
                 </span>
             );
         }
         return (
-            <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-neutral-800/60 text-neutral-400 border border-neutral-700/40'}>
-                <span className={'w-1.5 h-1.5 rounded-full bg-neutral-500/70'} />
+            <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
+                <span className={'w-1.5 h-1.5 rounded-full bg-rose-400'} />
                 Offline
             </span>
         );
@@ -156,31 +156,33 @@ export default ({ server, className }: { server: Server; className?: string }) =
             }`}
         >
             <div className={'flex flex-col lg:flex-row lg:items-center justify-between gap-4'}>
-                {/* Left Side: Server Icon, Name, Address & Description */}
-                <div className={'flex items-center gap-3.5 min-w-0 flex-1 pl-1.5'}>
-                    <div className={`w-11 h-11 rounded-xl bg-neutral-800/80 border border-neutral-700/40 flex items-center justify-center shrink-0 group-hover:bg-neutral-750 transition-all duration-200 shadow-inner ${theme.icon}`}>
-                        <ServerIcon size={20} />
+                {/* Left Side: Server Icon on left, Name on top, IP:Port on bottom */}
+                <div className={'flex items-center gap-3.5 min-w-0 flex-1 pl-1'}>
+                    <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-neutral-800/80 border border-neutral-700/40 flex items-center justify-center shrink-0 group-hover:bg-neutral-750 transition-all duration-200 shadow-inner ${theme.icon}`}>
+                        <ServerIcon size={22} />
                     </div>
-                    <div className={'min-w-0 flex-1'}>
-                        <div className={'flex items-center gap-2 flex-wrap'}>
+                    <div className={'min-w-0 flex-1 flex flex-col justify-center gap-1'}>
+                        <div className={'flex items-center justify-between gap-2'}>
                             <h3 className={'text-sm sm:text-base font-semibold text-neutral-100 group-hover:text-white tracking-tight transition-colors truncate'}>
                                 {server.name}
                             </h3>
+                            <div className={'lg:hidden shrink-0'}>
+                                {getStatusBadge()}
+                            </div>
+                        </div>
+                        <div className={'flex items-center gap-2 flex-wrap min-w-0'}>
                             {allocationString && (
-                                <span className={'inline-flex items-center gap-1 text-[11px] font-mono text-neutral-400 bg-neutral-800/60 border border-neutral-700/40 px-2 py-0.5 rounded-lg'}>
+                                <span className={'inline-flex items-center gap-1 text-[11px] font-mono text-neutral-400 bg-neutral-800/70 border border-neutral-700/40 px-2 py-0.5 rounded-md shrink-0'}>
                                     <Globe size={11} className={'text-neutral-500'} />
                                     {allocationString}
                                 </span>
                             )}
-                            <div className={'lg:hidden ml-auto'}>
-                                {getStatusBadge()}
-                            </div>
+                            {server.description && (
+                                <span className={'text-xs text-neutral-400 truncate max-w-xs'}>
+                                    {server.description}
+                                </span>
+                            )}
                         </div>
-                        {server.description && (
-                            <p className={'text-xs text-neutral-400 truncate mt-1'}>
-                                {server.description}
-                            </p>
-                        )}
                     </div>
                 </div>
 
