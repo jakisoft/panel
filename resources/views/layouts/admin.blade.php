@@ -37,12 +37,9 @@
     <body class="hold-transition skin-blue fixed sidebar-mini">
         <div class="wrapper">
             <header class="main-header">
-                <a href="{{ route('index') }}" class="logo" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    @if(config('app.logo') && config('app.logo') !== '/assets/svgs/pterodactyl.svg')
-                        <img src="{{ config('app.logo') }}" alt="Logo" style="max-height: 32px; max-width: 140px; object-fit: contain;">
-                    @else
-                        <span>{{ config('app.name', 'JKSoft Cloud') }}</span>
-                    @endif
+                <a href="{{ route('index') }}" class="logo" style="display: flex; align-items: center; justify-content: flex-start; padding: 0 15px; gap: 10px; text-decoration: none; overflow: hidden;">
+                    <img src="{{ config('app.favicon', '/assets/svgs/jksoft-icon.svg') }}" alt="Logo" style="height: 32px; width: 32px; object-fit: contain; border-radius: 8px; flex-shrink: 0;">
+                    <span style="font-weight: 800; font-size: 16px; color: #ffffff; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ config('app.name', 'JKSoft Cloud') }}</span>
                 </a>
                 <nav class="navbar navbar-static-top">
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">

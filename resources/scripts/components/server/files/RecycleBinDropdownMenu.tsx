@@ -99,29 +99,29 @@ const RecycleBinDropdownMenu = ({ item, onItemRemoved }: Props) => {
                 )}
             >
                 {/* Trash Item Metadata Info & Countdown */}
-                <div css={tw`p-3 border-b border-neutral-700/60 text-xs text-neutral-300 min-w-[230px]`}>
-                    <div css={tw`font-bold text-neutral-100 mb-2 truncate text-xs`} title={item.name}>
+                <div css={tw`p-2.5 mb-2 rounded-lg bg-neutral-100 border border-neutral-200 text-neutral-700`}>
+                    <div css={tw`font-bold text-neutral-900 mb-1.5 truncate text-xs`} title={item.name}>
                         {item.name}
                     </div>
-                    <div css={tw`space-y-1.5`}>
-                        <div css={tw`flex items-center gap-1.5 text-neutral-400 text-[11px]`}>
-                            <Calendar size={12} className={'shrink-0 text-neutral-400'} />
-                            <span>Dihapus: <span className={'text-neutral-200 font-medium'}>{format(new Date(item.deletedAt), 'dd MMM yyyy HH:mm')}</span></span>
+                    <div css={tw`space-y-1 text-[11px]`}>
+                        <div css={tw`flex items-center gap-1.5 text-neutral-600`}>
+                            <Calendar size={12} className={'shrink-0 text-neutral-500'} />
+                            <span className={'truncate'}>Dihapus: <strong className={'text-neutral-800 font-semibold'}>{format(new Date(item.deletedAt), 'dd/MM/yyyy HH:mm')}</strong></span>
                         </div>
-                        <div css={tw`flex items-center gap-1.5 text-neutral-400 text-[11px]`}>
-                            <Clock size={12} className={'shrink-0 text-amber-400'} />
-                            <span>Otomatis hapus: <span className={'text-amber-300 font-medium'}>{formatDaysRemaining(item.deletedAt)}</span></span>
+                        <div css={tw`flex items-center gap-1.5 text-neutral-600`}>
+                            <Clock size={12} className={'shrink-0 text-rose-500'} />
+                            <span className={'truncate'}>Sisa: <strong className={'text-rose-600 font-bold'}>{formatDaysRemaining(item.deletedAt)}</strong></span>
                         </div>
                         {item.originalDirectory && (
-                            <div css={tw`flex items-center gap-1.5 text-neutral-400 text-[11px] truncate`}>
-                                <Folder size={12} className={'shrink-0 text-neutral-400'} />
-                                <span className={'truncate'} title={item.originalDirectory}>Asal: <span className={'font-mono text-neutral-300'}>{item.originalDirectory}</span></span>
+                            <div css={tw`flex items-center gap-1.5 text-neutral-600 truncate`}>
+                                <Folder size={12} className={'shrink-0 text-neutral-500'} />
+                                <span className={'truncate'} title={item.originalDirectory}>Asal: <strong className={'font-mono text-neutral-800'}>{item.originalDirectory}</strong></span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div css={tw`pt-1`}>
+                <div>
                     <Row onClick={doRestore} icon={faUndo} title={'Pulihkan (Restore)'} />
                     <Row onClick={() => setShowDeleteConfirm(true)} icon={faTrashAlt} title={'Hapus Permanen'} $danger />
                 </div>

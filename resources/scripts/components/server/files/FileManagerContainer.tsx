@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { Filter, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { httpErrorToHuman } from '@/api/http';
 import { CSSTransition } from 'react-transition-group';
 import Spinner from '@/components/elements/Spinner';
@@ -44,6 +45,9 @@ export default () => {
     const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
     const selectedFilesLength = ServerContext.useStoreState((state) => state.files.selectedFiles.length);
 
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+
     useEffect(() => {
         if (directory.startsWith('/.trash')) {
             history.replace(`/server/${id}/files/trash`);
@@ -54,15 +58,21 @@ export default () => {
         clearFlashes('files');
         setSelectedFiles([]);
         setDirectory(hashToPath(hash));
+        setIsSearching(false);
+        setSearchQuery('');
     }, [hash]);
 
     useEffect(() => {
         mutate();
     }, [directory]);
 
+    const visibleFiles = files ? sortFiles(files) : [];
+    const displayedFiles = searchQuery.trim()
+        ? visibleFiles.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+        : visibleFiles;
+
     const onSelectAllClick = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const visibleFiles = files ? sortFiles(files) : [];
-        setSelectedFiles(e.currentTarget.checked ? visibleFiles.map((file) => file.name) : []);
+        setSelectedFiles(e.currentTarget.checked ? displayedFiles.map((file) => file.name) : []);
     };
 
     if (error) {
@@ -73,16 +83,48 @@ export default () => {
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
             <ErrorBoundary>
                 <div className={'flex flex-col-reverse md:flex-row md:items-center justify-between gap-3 mb-4'}>
-                    <FileManagerBreadcrumbs
-                        renderLeft={
-                            <FileActionCheckbox
-                                type={'checkbox'}
-                                css={tw`mx-4`}
-                                checked={selectedFilesLength === (files?.length === 0 ? -1 : files?.length)}
-                                onChange={onSelectAllClick}
-                            />
-                        }
-                    />
+                    <div className={'flex items-center flex-1 min-w-0 overflow-hidden'}>
+                        <FileActionCheckbox
+                            type={'checkbox'}
+                            css={tw`mx-4`}
+                            checked={selectedFilesLength === (displayedFiles.length === 0 ? -1 : displayedFiles.length)}
+                            onChange={onSelectAllClick}
+                        />
+                        <button
+                            type={'button'}
+                            onClick={() => {
+                                setIsSearching((prev) => !prev);
+                                setSearchQuery('');
+                            }}
+                            className={'p-1.5 mr-3 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors focus:outline-none shrink-0'}
+                            title={isSearching ? 'Tutup Filter' : 'Filter / Cari File & Folder'}
+                            aria-label={isSearching ? 'Tutup Filter' : 'Filter / Cari File & Folder'}
+                        >
+                            {isSearching ? <X size={16} /> : <Filter size={16} />}
+                        </button>
+
+                        {isSearching ? (
+                            <div className={'flex-1 min-w-0 mr-4'}>
+                                <input
+                                    type={'text'}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Escape') {
+                                            setIsSearching(false);
+                                            setSearchQuery('');
+                                        }
+                                    }}
+                                    placeholder={'Cari file atau folder di direktori ini...'}
+                                    autoFocus
+                                    className={'w-full max-w-sm px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-sm text-neutral-100 placeholder-neutral-500 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors shadow-inner'}
+                                />
+                            </div>
+                        ) : (
+                            <FileManagerBreadcrumbs />
+                        )}
+                    </div>
+
                     <Can action={'file.create'}>
                         <div className={'w-full md:w-auto flex flex-col md:flex-row items-stretch md:items-center gap-2 md:flex-nowrap md:shrink-0'}>
                             <FileManagerStatus />
@@ -102,12 +144,16 @@ export default () => {
                 <Spinner size={'large'} centered />
             ) : (
                 <>
-                    {!files.length ? (
-                        <p css={tw`text-sm text-neutral-400 text-center`}>This directory seems to be empty.</p>
+                    {!displayedFiles.length ? (
+                        <p css={tw`text-sm text-neutral-400 text-center py-8`}>
+                            {searchQuery.trim()
+                                ? `Tidak ada file atau folder yang cocok dengan "${searchQuery}".`
+                                : 'This directory seems to be empty.'}
+                        </p>
                     ) : (
                         <CSSTransition classNames={'fade'} timeout={150} appear in>
                             <div>
-                                {files.length > 250 && (
+                                {displayedFiles.length > 250 && (
                                     <div css={tw`rounded bg-yellow-400 mb-px p-3`}>
                                         <p css={tw`text-yellow-900 text-sm text-center`}>
                                             This directory is too large to display in the browser, limiting the output
@@ -115,7 +161,7 @@ export default () => {
                                         </p>
                                     </div>
                                 )}
-                                {sortFiles(files.slice(0, 250)).map((file) => (
+                                {displayedFiles.slice(0, 250).map((file) => (
                                     <FileObjectRow key={file.key} file={file} />
                                 ))}
                                 <MassActionsBar />

@@ -53,7 +53,7 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
                 </NavLink>
                 /
                 <NavLink to={`/server/${id}/files/trash`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
-                    trash
+                    .trash
                 </NavLink>
                 /
                 {file && (

@@ -19,7 +19,7 @@ export default () => {
 
     const renderBrand = () => {
         if (logoDisplay === 'text_only') {
-            return <span className={'font-bold text-base text-neutral-100 tracking-tight truncate'}>{name}</span>;
+            return <span className={'font-black text-lg sm:text-xl text-white tracking-tight truncate'}>{name}</span>;
         }
 
         if (logoDisplay === 'logo_only') {
@@ -27,20 +27,20 @@ export default () => {
                 <img
                     src={logo || (isDefaultLogo ? jksoftLogo : logo)}
                     alt={name}
-                    className={'h-8 sm:h-9 max-w-[190px] object-contain'}
+                    className={'h-9 max-w-[210px] object-contain'}
                 />
             );
         }
 
         // 'both' (default)
         return (
-            <div className={'flex items-center gap-2.5 min-w-0'}>
+            <div className={'flex items-center gap-3 min-w-0'}>
                 <img
                     src={isDefaultLogo ? jksoftIcon : (logo || jksoftIcon)}
                     alt={name}
-                    className={isDefaultLogo ? 'h-8 w-8 object-contain shrink-0 rounded-lg shadow-sm' : 'h-8 sm:h-9 max-w-[140px] object-contain shrink-0'}
+                    className={isDefaultLogo ? 'h-9 w-9 object-contain shrink-0 rounded-xl shadow-md' : 'h-9 max-w-[150px] object-contain shrink-0'}
                 />
-                <span className={'font-bold text-base text-neutral-100 tracking-tight truncate'}>{name}</span>
+                <span className={'font-black text-lg sm:text-xl text-white tracking-tight truncate'}>{name}</span>
             </div>
         );
     };

@@ -26,7 +26,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
     const renderBrand = () => {
         if (logoDisplay === 'text_only') {
             return (
-                <span className={'font-bold text-sm sm:text-base text-neutral-200 tracking-tight truncate max-w-[170px]'}>
+                <span className={'font-black text-base sm:text-lg text-white tracking-tight truncate max-w-[200px]'}>
                     {name}
                 </span>
             );
@@ -35,7 +35,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
             <img
                 src={logo || jksoftLogo}
                 alt={name}
-                className={'h-7 sm:h-8 max-w-[140px] object-contain shrink-0'}
+                className={'h-9 sm:h-10 max-w-[180px] object-contain shrink-0'}
             />
         );
     };
