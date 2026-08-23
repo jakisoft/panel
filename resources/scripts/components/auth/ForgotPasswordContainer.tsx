@@ -12,6 +12,7 @@ import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import { KeyRound, Mail } from 'lucide-react';
 
 interface Values {
     email: string;
@@ -72,16 +73,20 @@ export default () => {
             })}
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Forgot Password'} css={tw`w-full flex`}>
-                    <Field
-                        light
-                        label={'Email'}
-                        description={
-                            'Enter your account email address to receive instructions on resetting your password.'
-                        }
-                        name={'email'}
-                        type={'email'}
-                    />
+                <LoginFormContainer title={'Forgot Password'} icon={<KeyRound size={20} />} css={tw`w-full flex`}>
+                    <div>
+                        <div className={'flex items-center gap-1.5 mb-1.5'}>
+                            <Mail size={14} className={'text-neutral-400'} />
+                            <span className={'text-xs uppercase text-neutral-200 font-medium'}>Email</span>
+                        </div>
+                        <Field
+                            name={'email'}
+                            type={'email'}
+                            description={
+                                'Enter your account email address to receive instructions on resetting your password.'
+                            }
+                        />
+                    </div>
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>
                             Send Email
@@ -105,7 +110,9 @@ export default () => {
                     <div css={tw`mt-6 text-center`}>
                         <Link
                             to={'/auth/login'}
-                            css={tw`text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
+                            className={
+                                'text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-300 transition-colors'
+                            }
                         >
                             Return to Login
                         </Link>

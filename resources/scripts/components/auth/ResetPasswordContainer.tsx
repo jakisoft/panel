@@ -12,6 +12,7 @@ import Field from '@/components/elements/Field';
 import Input from '@/components/elements/Input';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
+import { RotateCcw, Mail, Lock } from 'lucide-react';
 
 interface Values {
     password: string;
@@ -61,22 +62,33 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
             })}
         >
             {({ isSubmitting }) => (
-                <LoginFormContainer title={'Reset Password'} css={tw`w-full flex`}>
+                <LoginFormContainer title={'Reset Password'} icon={<RotateCcw size={20} />} css={tw`w-full flex`}>
                     <div>
-                        <label>Email</label>
-                        <Input value={email} isLight disabled />
+                        <div className={'flex items-center gap-1.5 mb-1.5'}>
+                            <Mail size={14} className={'text-neutral-400'} />
+                            <span className={'text-xs uppercase text-neutral-200 font-medium'}>Email</span>
+                        </div>
+                        <Input value={email} disabled />
                     </div>
-                    <div css={tw`mt-6`}>
+                    <div css={tw`mt-5`}>
+                        <div className={'flex items-center gap-1.5 mb-1.5'}>
+                            <Lock size={14} className={'text-neutral-400'} />
+                            <span className={'text-xs uppercase text-neutral-200 font-medium'}>New Password</span>
+                        </div>
                         <Field
-                            light
-                            label={'New Password'}
                             name={'password'}
                             type={'password'}
                             description={'Passwords must be at least 8 characters in length.'}
                         />
                     </div>
-                    <div css={tw`mt-6`}>
-                        <Field light label={'Confirm New Password'} name={'passwordConfirmation'} type={'password'} />
+                    <div css={tw`mt-5`}>
+                        <div className={'flex items-center gap-1.5 mb-1.5'}>
+                            <Lock size={14} className={'text-neutral-400'} />
+                            <span className={'text-xs uppercase text-neutral-200 font-medium'}>
+                                Confirm New Password
+                            </span>
+                        </div>
+                        <Field name={'passwordConfirmation'} type={'password'} />
                     </div>
                     <div css={tw`mt-6`}>
                         <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>
@@ -86,7 +98,9 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                     <div css={tw`mt-6 text-center`}>
                         <Link
                             to={'/auth/login'}
-                            css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
+                            className={
+                                'text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-300 transition-colors'
+                            }
                         >
                             Return to Login
                         </Link>

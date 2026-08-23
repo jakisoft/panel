@@ -13,17 +13,19 @@ export default () => {
     const { path } = useRouteMatch();
 
     return (
-        <div className={'pt-8 xl:pt-32'}>
-            <Switch location={location}>
-                <Route path={`${path}/login`} component={LoginContainer} exact />
-                <Route path={`${path}/login/checkpoint`} component={LoginCheckpointContainer} />
-                <Route path={`${path}/password`} component={ForgotPasswordContainer} exact />
-                <Route path={`${path}/password/reset/:token`} component={ResetPasswordContainer} />
-                <Route path={`${path}/checkpoint`} />
-                <Route path={'*'}>
-                    <NotFound onBack={() => history.push('/auth/login')} />
-                </Route>
-            </Switch>
+        <div className={'flex items-start justify-center min-h-screen px-4 pt-12 xl:pt-28 pb-12'}>
+            <div className={'w-full'}>
+                <Switch location={location}>
+                    <Route path={`${path}/login`} component={LoginContainer} exact />
+                    <Route path={`${path}/login/checkpoint`} component={LoginCheckpointContainer} />
+                    <Route path={`${path}/password`} component={ForgotPasswordContainer} exact />
+                    <Route path={`${path}/password/reset/:token`} component={ResetPasswordContainer} />
+                    <Route path={`${path}/checkpoint`} />
+                    <Route path={'*'}>
+                        <NotFound onBack={() => history.push('/auth/login')} />
+                    </Route>
+                </Switch>
+            </div>
         </div>
     );
 };

@@ -10,6 +10,7 @@ import { FlashStore } from '@/state/flashes';
 import Field from '@/components/elements/Field';
 import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
+import { ShieldCheck, KeyRound, FileKey } from 'lucide-react';
 
 interface Values {
     code: string;
@@ -27,12 +28,20 @@ const LoginCheckpointContainer = () => {
     const [isMissingDevice, setIsMissingDevice] = useState(false);
 
     return (
-        <LoginFormContainer title={'Two-Factor Auth'} css={tw`w-full flex`}>
+        <LoginFormContainer title={'Two-Factor Auth'} icon={<ShieldCheck size={20} />} css={tw`w-full flex`}>
             <div>
+                <div className={'flex items-center gap-1.5 mb-1.5'}>
+                    {isMissingDevice ? (
+                        <FileKey size={14} className={'text-neutral-400'} />
+                    ) : (
+                        <KeyRound size={14} className={'text-neutral-400'} />
+                    )}
+                    <span className={'text-xs uppercase text-neutral-200 font-medium'}>
+                        {isMissingDevice ? 'Recovery Code' : 'Authentication Code'}
+                    </span>
+                </div>
                 <Field
-                    light
                     name={isMissingDevice ? 'recoveryCode' : 'code'}
-                    title={isMissingDevice ? 'Recovery Code' : 'Authentication Code'}
                     description={
                         isMissingDevice
                             ? 'Enter one of the recovery codes generated when you setup 2-Factor authentication on this account in order to continue.'
@@ -55,15 +64,19 @@ const LoginCheckpointContainer = () => {
                         setFieldValue('recoveryCode', '');
                         setIsMissingDevice((s) => !s);
                     }}
-                    css={tw`cursor-pointer text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
+                    className={
+                        'cursor-pointer text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-300 transition-colors'
+                    }
                 >
                     {!isMissingDevice ? "I've Lost My Device" : 'I Have My Device'}
                 </span>
             </div>
-            <div css={tw`mt-6 text-center`}>
+            <div css={tw`mt-4 text-center`}>
                 <Link
                     to={'/auth/login'}
-                    css={tw`text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
+                    className={
+                        'text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-300 transition-colors'
+                    }
                 >
                     Return to Login
                 </Link>
