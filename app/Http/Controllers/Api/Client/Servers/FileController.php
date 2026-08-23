@@ -141,14 +141,40 @@ class FileController extends ClientApiController
      */
     public function rename(RenameFileRequest $request, Server $server): JsonResponse
     {
+        $root = $request->input('root');
+        $files = $request->input('files');
+
         $this->fileRepository
             ->setServer($server)
-            ->renameFiles($request->input('root'), $request->input('files'));
+            ->renameFiles($root, $files);
 
-        Activity::event('server:file.rename')
-            ->property('directory', $request->input('root'))
-            ->property('files', $request->input('files'))
-            ->log();
+        $isTrash = false;
+        $isRestore = false;
+        foreach ($files as $file) {
+            if (isset($file['to']) && str_starts_with($file['to'], '/.trash/')) {
+                $isTrash = true;
+            }
+            if (isset($file['from']) && str_starts_with($file['from'], '/.trash/')) {
+                $isRestore = true;
+            }
+        }
+
+        if ($isTrash) {
+            Activity::event('server:file.trash')
+                ->property('directory', $root)
+                ->property('files', array_column($files, 'from'))
+                ->log();
+        } elseif ($isRestore) {
+            Activity::event('server:file.trash-restore')
+                ->property('directory', $root)
+                ->property('files', array_column($files, 'to'))
+                ->log();
+        } else {
+            Activity::event('server:file.rename')
+                ->property('directory', $root)
+                ->property('files', $files)
+                ->log();
+        }
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
@@ -216,15 +242,25 @@ class FileController extends ClientApiController
      */
     public function delete(DeleteFileRequest $request, Server $server): JsonResponse
     {
+        $root = $request->input('root');
+        $files = $request->input('files');
+
         $this->fileRepository->setServer($server)->deleteFiles(
-            $request->input('root'),
-            $request->input('files')
+            $root,
+            $files
         );
 
-        Activity::event('server:file.delete')
-            ->property('directory', $request->input('root'))
-            ->property('files', $request->input('files'))
-            ->log();
+        if ($root === '/.trash' || str_starts_with($root, '/.trash/')) {
+            Activity::event('server:file.trash-delete')
+                ->property('directory', $root)
+                ->property('files', $files)
+                ->log();
+        } else {
+            Activity::event('server:file.delete')
+                ->property('directory', $root)
+                ->property('files', $files)
+                ->log();
+        }
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }

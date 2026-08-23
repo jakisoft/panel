@@ -72,15 +72,14 @@ export default () => {
     const searchAbortRef = useRef(0);
 
     useEffect(() => {
-        if (directory.startsWith('/.trash')) {
+        const currentPath = hashToPath(hash);
+        if (currentPath.startsWith('/.trash')) {
             history.replace(`/server/${id}/files/trash`);
+            return;
         }
-    }, [directory, id]);
-
-    useEffect(() => {
         clearFlashes('files');
         setSelectedFiles([]);
-        setDirectory(hashToPath(hash));
+        setDirectory(currentPath);
         setIsSearching(false);
         setSearchQuery('');
         setDeepResults([]);
@@ -208,7 +207,7 @@ export default () => {
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
             <ErrorBoundary>
                 <div className={'flex flex-col-reverse md:flex-row md:items-center justify-between gap-3 mb-4'}>
-                    {/* Left: Checkbox + Filter Toggle + Breadcrumbs / Search Bar */}
+                    {/* Left: Checkbox + Breadcrumbs / Search Bar */}
                     <div className={'flex items-center flex-1 min-w-0 mr-3 overflow-hidden'}>
                         <FileActionCheckbox
                             type={'checkbox'}
@@ -216,19 +215,6 @@ export default () => {
                             checked={selectedFilesLength === (displayedCount === 0 ? -1 : displayedCount)}
                             onChange={onSelectAllClick}
                         />
-                        <button
-                            type={'button'}
-                            onClick={() => {
-                                setIsSearching((prev) => !prev);
-                                setSearchQuery('');
-                                setDeepResults([]);
-                            }}
-                            className={'p-1.5 mr-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors focus:outline-none shrink-0'}
-                            title={isSearching ? 'Close Search' : 'Filter / Search Files & Folders'}
-                            aria-label={isSearching ? 'Close Search' : 'Filter / Search Files & Folders'}
-                        >
-                            {isSearching ? <X size={16} /> : <Filter size={16} />}
-                        </button>
 
                         {isSearching ? (
                             <div className={'flex-1 min-w-0 mr-4 flex items-center gap-2'}>
@@ -254,7 +240,7 @@ export default () => {
                         )}
                     </div>
 
-                    {/* Right: Original Clean Action Buttons */}
+                    {/* Right: Action Buttons with Filter on the corner next to Trash */}
                     <Can action={'file.create'}>
                         <div className={'w-full md:w-auto flex flex-col md:flex-row items-stretch md:items-center gap-2 md:flex-nowrap md:shrink-0'}>
                             <FileManagerStatus />
@@ -264,6 +250,23 @@ export default () => {
                                 <NavLink to={`/server/${id}/files/new${window.location.hash}`} className={'w-full md:w-auto shrink-0'}>
                                     <Button className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap'}>New File</Button>
                                 </NavLink>
+                                <button
+                                    type={'button'}
+                                    onClick={() => {
+                                        setIsSearching((prev) => !prev);
+                                        setSearchQuery('');
+                                        setDeepResults([]);
+                                    }}
+                                    className={`p-2 rounded-xl transition-all focus:outline-none flex items-center justify-center shrink-0 ${
+                                        isSearching
+                                            ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                                            : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                                    }`}
+                                    title={isSearching ? 'Close Search' : 'Filter / Search Files & Folders'}
+                                    aria-label={isSearching ? 'Close Search' : 'Filter / Search Files & Folders'}
+                                >
+                                    {isSearching ? <X size={16} /> : <Filter size={16} />}
+                                </button>
                                 <RecycleBinButton className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0'} />
                             </div>
                         </div>

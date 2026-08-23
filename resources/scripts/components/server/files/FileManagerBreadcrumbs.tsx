@@ -38,7 +38,7 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
 
         return (
             <div
-                className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
+                className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1 scrollbar-none'}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {renderLeft || null}
@@ -49,11 +49,15 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
                     container
                 </NavLink>
                 <span className={'shrink-0'}>/</span>
-                <NavLink to={`/server/${id}/files/trash`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
-                    .trash
-                </NavLink>
+                {trashSubDirs.length === 0 && !file ? (
+                    <span className={'px-1 text-neutral-300 shrink-0'}>.trash</span>
+                ) : (
+                    <NavLink to={`/server/${id}/files/trash`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
+                        .trash
+                    </NavLink>
+                )}
                 {trashSubDirs.map((dir, index) => {
-                    const isLast = !withinFileEditor && index === trashSubDirs.length - 1;
+                    const isLast = !withinFileEditor && !file && index === trashSubDirs.length - 1;
                     const subPath = trashSubDirs.slice(0, index + 1).join('/');
 
                     return (
@@ -87,43 +91,46 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
             .split('/')
             .filter((dir) => !!dir)
             .map((dir, index, dirs) => {
-                if (!withinFileEditor && index === dirs.length - 1) {
+                if (!withinFileEditor && !file && index === dirs.length - 1) {
                     return { name: dir };
                 }
 
                 return { name: dir, path: `/${dirs.slice(0, index + 1).join('/')}` };
             });
 
+    const crumbs = breadcrumbs();
+
     return (
         <div
-            className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
+            className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1 scrollbar-none'}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
             {renderLeft || null}
             <span className={'shrink-0'}>/</span>
             <span className={'px-1 text-neutral-300 shrink-0'}>home</span>
             <span className={'shrink-0'}>/</span>
-            <NavLink to={`/server/${id}/files`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
-                container
-            </NavLink>
-            <span className={'shrink-0'}>/</span>
-            {breadcrumbs().map((crumb, index) =>
-                crumb.path ? (
-                    <React.Fragment key={index}>
+            {crumbs.length === 0 && !file ? (
+                <span className={'px-1 text-neutral-300 shrink-0'}>container</span>
+            ) : (
+                <NavLink to={`/server/${id}/files`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
+                    container
+                </NavLink>
+            )}
+            {crumbs.map((crumb, index) => (
+                <React.Fragment key={index}>
+                    <span className={'shrink-0'}>/</span>
+                    {crumb.path ? (
                         <NavLink
                             to={`/server/${id}/files#${encodePathSegments(crumb.path)}`}
                             className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}
                         >
                             {crumb.name}
                         </NavLink>
-                        <span className={'shrink-0'}>/</span>
-                    </React.Fragment>
-                ) : (
-                    <span key={index} className={'px-1 text-neutral-300 shrink-0'}>
-                        {crumb.name}
-                    </span>
-                )
-            )}
+                    ) : (
+                        <span className={'px-1 text-neutral-300 shrink-0'}>{crumb.name}</span>
+                    )}
+                </React.Fragment>
+            ))}
             {file && (
                 <React.Fragment>
                     <span className={'shrink-0'}>/</span>
