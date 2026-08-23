@@ -32,21 +32,47 @@
             <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
             <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
             <![endif]-->
+            <style>
+                .skin-blue .main-header .navbar {
+                    margin-left: 0 !important;
+                    width: 100% !important;
+                }
+                .main-header {
+                    max-height: 50px;
+                    z-index: 1030;
+                }
+                .admin-navbar-brand {
+                    float: left;
+                    display: flex;
+                    align-items: center;
+                    height: 50px;
+                    padding: 0 15px;
+                    gap: 10px;
+                    text-decoration: none;
+                    color: #ffffff;
+                    transition: opacity 0.2s ease;
+                }
+                .admin-navbar-brand:hover, .admin-navbar-brand:focus {
+                    opacity: 0.9;
+                    text-decoration: none;
+                    color: #ffffff;
+                }
+            </style>
         @show
     </head>
     <body class="hold-transition skin-blue fixed sidebar-mini">
         <div class="wrapper">
             <header class="main-header">
-                <a href="{{ route('index') }}" class="logo" style="display: flex; align-items: center; justify-content: flex-start; padding: 0 15px; gap: 10px; text-decoration: none; overflow: hidden;">
-                    <img src="{{ config('app.favicon', '/assets/svgs/jksoft-icon.svg') }}" alt="Logo" style="height: 32px; width: 32px; object-fit: contain; border-radius: 8px; flex-shrink: 0;">
-                    <span style="font-weight: 800; font-size: 16px; color: #ffffff; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ config('app.name', 'JKSoft Cloud') }}</span>
-                </a>
-                <nav class="navbar navbar-static-top">
+                <nav class="navbar navbar-static-top" role="navigation">
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
+                    </a>
+                    <a href="{{ route('index') }}" class="admin-navbar-brand">
+                        <img src="{{ config('app.favicon', '/assets/svgs/jksoft-icon.svg') }}" alt="Logo" style="height: 28px; width: 28px; object-fit: contain; border-radius: 6px; flex-shrink: 0;">
+                        <span style="font-weight: 800; font-size: 16px; color: #ffffff; letter-spacing: -0.02em; white-space: nowrap;">{{ config('app.name', 'JKSoft Cloud') }}</span>
                     </a>
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
