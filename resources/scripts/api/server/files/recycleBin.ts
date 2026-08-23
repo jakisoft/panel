@@ -3,6 +3,7 @@ import saveFileContents from '@/api/server/files/saveFileContents';
 import createDirectory from '@/api/server/files/createDirectory';
 import renameFiles from '@/api/server/files/renameFiles';
 import deleteFiles from '@/api/server/files/deleteFiles';
+import loadDirectory from '@/api/server/files/loadDirectory';
 import { cleanDirectoryPath } from '@/helpers';
 
 export interface TrashItem {
@@ -44,8 +45,7 @@ export const getTrashItems = async (uuid: string): Promise<TrashItem[]> => {
             }
         }
     } catch {
-        // File doesn't exist or failed to load
-        return [];
+        metadata = { items: [] };
     }
 
     // Auto-clear logic: Remove items older than 7 days
@@ -61,6 +61,32 @@ export const getTrashItems = async (uuid: string): Promise<TrashItem[]> => {
         } catch {
             // Ignore auto-clear failure
         }
+    }
+
+    // Also scan physical files in /.trash to discover any un-indexed items
+    try {
+        const diskItems = await loadDirectory(uuid, TRASH_DIR);
+        const existingIds = new Set(active.map((i) => i.id));
+
+        for (const diskItem of diskItems) {
+            if (diskItem.name === '.meta.json' || diskItem.name === '.trash' || diskItem.name === '.recycle_bin') continue;
+
+            if (!existingIds.has(diskItem.name)) {
+                const cleanName = diskItem.name.replace(/^\d+_[a-z0-9]+_/i, '');
+                active.push({
+                    id: diskItem.name,
+                    name: cleanName,
+                    originalDirectory: '/',
+                    trashPath: `/.trash/${diskItem.name}`,
+                    isFile: diskItem.isFile,
+                    size: diskItem.size,
+                    deletedAt: diskItem.modifiedAt ? new Date(diskItem.modifiedAt).getTime() : now,
+                });
+                existingIds.add(diskItem.name);
+            }
+        }
+    } catch {
+        // ignore disk scan error
     }
 
     return active.sort((a, b) => b.deletedAt - a.deletedAt);

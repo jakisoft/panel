@@ -50,6 +50,7 @@ export default () => {
         { key: string; name: string; path: string; isFile: boolean; size: number; deletedAt: number; isSubItem?: boolean }[]
     >([]);
     const [isScanningTrash, setIsScanningTrash] = useState(false);
+    const searchAbortRef = React.useRef(0);
 
     const currentSubPath = hashToPath(hash);
     const isRootTrash = currentSubPath === '/' || currentSubPath === '';
@@ -84,7 +85,7 @@ export default () => {
         setDeepTrashResults([]);
     }, [uuid, hash]);
 
-    // Recursive search across trash items and inside deleted folders
+    // Recursive search across trash items (files and folders) and inside deleted folders
     useEffect(() => {
         const query = searchQuery.trim().toLowerCase();
         if (!isSearching || !query) {
@@ -93,14 +94,19 @@ export default () => {
             return;
         }
 
+        const searchId = ++searchAbortRef.current;
         setIsScanningTrash(true);
 
         if (isRootTrash) {
             const directMatches: { key: string; name: string; path: string; isFile: boolean; size: number; deletedAt: number; isSubItem?: boolean }[] = [];
-            const folderScanQueue: TrashItem[] = [];
+            const folderScanQueue: { id: string; name: string; deletedAt: number; path: string }[] = [];
 
             for (const item of items) {
-                if (item.name.toLowerCase().includes(query)) {
+                const cleanName = getCleanTrashName(item.name).toLowerCase();
+                const rawName = item.name.toLowerCase();
+                const idName = item.id.toLowerCase();
+
+                if (cleanName.includes(query) || rawName.includes(query) || idName.includes(query)) {
                     directMatches.push({
                         key: item.id,
                         name: item.name,
@@ -111,54 +117,147 @@ export default () => {
                     });
                 }
                 if (!item.isFile) {
-                    folderScanQueue.push(item);
+                    folderScanQueue.push({
+                        id: item.id,
+                        name: getCleanTrashName(item.name),
+                        deletedAt: item.deletedAt,
+                        path: item.id,
+                    });
                 }
             }
 
             setDeepTrashResults(directMatches);
 
-            // Scan inside deleted folders
+            // Scan inside deleted folders (deep recursive BFS)
             (async () => {
                 const results = [...directMatches];
-                for (const folder of folderScanQueue) {
+                const maxDirs = 40;
+                let dirsScanned = 0;
+
+                while (folderScanQueue.length > 0 && dirsScanned < maxDirs) {
+                    if (searchAbortRef.current !== searchId) return;
+
+                    const currentFolder = folderScanQueue.shift()!;
+                    dirsScanned++;
+
                     try {
-                        const subFolderFiles = await loadDirectory(uuid, join('/.trash', folder.id));
+                        const subFolderFiles = await loadDirectory(uuid, join('/.trash', currentFolder.path));
                         for (const sub of subFolderFiles) {
                             if (sub.name === '.trash' || sub.name === '.recycle_bin') continue;
-                            const cleanFolder = getCleanTrashName(folder.name);
-                            const displayRel = `${cleanFolder}/${sub.name}`;
-                            if (sub.name.toLowerCase().includes(query) || displayRel.toLowerCase().includes(query)) {
+
+                            const subRelPath = `${currentFolder.name}/${sub.name}`;
+                            const subRealPath = join(currentFolder.path, sub.name);
+
+                            if (sub.name.toLowerCase().includes(query) || subRelPath.toLowerCase().includes(query)) {
                                 results.push({
-                                    key: `${folder.id}_${sub.name}`,
-                                    name: displayRel,
-                                    path: join(folder.id, sub.name),
+                                    key: subRealPath,
+                                    name: subRelPath,
+                                    path: subRealPath,
                                     isFile: sub.isFile,
                                     size: sub.size,
-                                    deletedAt: folder.deletedAt,
+                                    deletedAt: currentFolder.deletedAt,
                                     isSubItem: true,
+                                });
+                            }
+
+                            if (!sub.isFile && folderScanQueue.length < maxDirs) {
+                                folderScanQueue.push({
+                                    id: sub.name,
+                                    name: subRelPath,
+                                    deletedAt: currentFolder.deletedAt,
+                                    path: subRealPath,
                                 });
                             }
                         }
                     } catch {
                         // ignore folder read error
                     }
+
+                    if (searchAbortRef.current === searchId) {
+                        setDeepTrashResults([...results]);
+                    }
                 }
-                setDeepTrashResults(results);
-                setIsScanningTrash(false);
+
+                if (searchAbortRef.current === searchId) {
+                    setIsScanningTrash(false);
+                }
             })();
         } else {
-            const matches = subFiles
-                .filter((f) => f.name.toLowerCase().includes(query))
-                .map((f) => ({
-                    key: f.key,
-                    name: f.name,
-                    path: join(currentSubPath, f.name),
-                    isFile: f.isFile,
-                    size: f.size,
-                    deletedAt: Date.now(),
-                }));
-            setDeepTrashResults(matches);
-            setIsScanningTrash(false);
+            const directMatches: { key: string; name: string; path: string; isFile: boolean; size: number; deletedAt: number; isSubItem?: boolean }[] = [];
+            const folderScanQueue: { name: string; path: string }[] = [];
+
+            for (const file of subFiles) {
+                if (file.name.toLowerCase().includes(query)) {
+                    directMatches.push({
+                        key: join(currentSubPath, file.name),
+                        name: file.name,
+                        path: join(currentSubPath, file.name),
+                        isFile: file.isFile,
+                        size: file.size,
+                        deletedAt: Date.now(),
+                    });
+                }
+                if (!file.isFile) {
+                    folderScanQueue.push({
+                        name: file.name,
+                        path: join(currentSubPath, file.name),
+                    });
+                }
+            }
+
+            setDeepTrashResults(directMatches);
+
+            (async () => {
+                const results = [...directMatches];
+                const maxDirs = 40;
+                let dirsScanned = 0;
+
+                while (folderScanQueue.length > 0 && dirsScanned < maxDirs) {
+                    if (searchAbortRef.current !== searchId) return;
+
+                    const cur = folderScanQueue.shift()!;
+                    dirsScanned++;
+
+                    try {
+                        const itemsInDir = await loadDirectory(uuid, join('/.trash', cur.path));
+                        for (const sub of itemsInDir) {
+                            if (sub.name === '.trash' || sub.name === '.recycle_bin') continue;
+
+                            const subRel = `${cur.name}/${sub.name}`;
+                            const subReal = join(cur.path, sub.name);
+
+                            if (sub.name.toLowerCase().includes(query) || subRel.toLowerCase().includes(query)) {
+                                results.push({
+                                    key: subReal,
+                                    name: subRel,
+                                    path: subReal,
+                                    isFile: sub.isFile,
+                                    size: sub.size,
+                                    deletedAt: Date.now(),
+                                    isSubItem: true,
+                                });
+                            }
+
+                            if (!sub.isFile && folderScanQueue.length < maxDirs) {
+                                folderScanQueue.push({
+                                    name: subRel,
+                                    path: subReal,
+                                });
+                            }
+                        }
+                    } catch {
+                        // ignore folder read error
+                    }
+
+                    if (searchAbortRef.current === searchId) {
+                        setDeepTrashResults([...results]);
+                    }
+                }
+
+                if (searchAbortRef.current === searchId) {
+                    setIsScanningTrash(false);
+                }
+            })();
         }
     }, [searchQuery, isSearching, items, subFiles, isRootTrash, currentSubPath, uuid]);
 
