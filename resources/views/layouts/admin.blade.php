@@ -33,21 +33,38 @@
             <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
             <![endif]-->
             <style>
+                .skin-blue .main-header {
+                    height: 58px;
+                    max-height: 58px;
+                    z-index: 1030;
+                }
                 .skin-blue .main-header .navbar {
                     margin-left: 0 !important;
                     width: 100% !important;
+                    min-height: 58px;
+                    height: 58px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
                 }
-                .main-header {
-                    max-height: 50px;
-                    z-index: 1030;
+                .skin-blue .main-header .navbar .sidebar-toggle {
+                    height: 58px;
+                    width: 50px;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    float: left;
+                    font-size: 16px;
                 }
                 .admin-navbar-brand {
                     float: left;
                     display: flex;
                     align-items: center;
-                    height: 50px;
-                    padding: 0 15px;
-                    gap: 10px;
+                    height: 58px;
+                    padding: 0 16px;
+                    gap: 12px;
                     text-decoration: none;
                     color: #ffffff;
                     transition: opacity 0.2s ease;
@@ -57,6 +74,55 @@
                     text-decoration: none;
                     color: #ffffff;
                 }
+                .skin-blue .main-header .navbar .navbar-custom-menu {
+                    height: 58px;
+                }
+                .skin-blue .main-header .navbar .navbar-custom-menu .navbar-nav {
+                    display: flex;
+                    align-items: center;
+                    height: 58px;
+                }
+                .skin-blue .main-header .navbar .navbar-custom-menu .navbar-nav > li > a {
+                    height: 58px;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 16px;
+                    font-size: 14px;
+                }
+                .skin-blue .main-header .navbar .navbar-custom-menu .user-menu .user-image {
+                    width: 32px;
+                    height: 32px;
+                    margin-top: 0;
+                    margin-right: 10px;
+                    border-radius: 50%;
+                }
+                /* Snug, proportional and clean layout metrics */
+                .skin-blue.fixed .main-sidebar {
+                    padding-top: 58px !important;
+                }
+                .skin-blue.fixed .content-wrapper {
+                    padding-top: 58px !important;
+                }
+                .content-header {
+                    padding: 16px 20px 0 20px !important;
+                }
+                .content {
+                    padding: 16px 20px 24px 20px !important;
+                }
+                .sidebar-menu > li.header {
+                    padding: 12px 18px 6px 18px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.05em;
+                }
+                .sidebar-menu > li > a {
+                    padding: 11px 18px;
+                    font-size: 13.5px;
+                }
+                .sidebar-menu > li > a > .fa {
+                    width: 20px;
+                    font-size: 14px;
+                }
             </style>
         @show
     </head>
@@ -64,29 +130,31 @@
         <div class="wrapper">
             <header class="main-header">
                 <nav class="navbar navbar-static-top" role="navigation">
-                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </a>
-                    <a href="{{ route('index') }}" class="admin-navbar-brand">
-                        <img src="{{ config('app.favicon', '/assets/svgs/jksoft-icon.svg') }}" alt="Logo" style="height: 28px; width: 28px; object-fit: contain; border-radius: 6px; flex-shrink: 0;">
-                        <span style="font-weight: 800; font-size: 16px; color: #ffffff; letter-spacing: -0.02em; white-space: nowrap;">{{ config('app.name', 'JKSoft Cloud') }}</span>
-                    </a>
+                    <div style="display: flex; align-items: center; float: left; height: 58px;">
+                        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a href="{{ route('index') }}" class="admin-navbar-brand">
+                            <img src="{{ config('app.favicon', '/assets/svgs/jksoft-icon.svg') }}" alt="Logo" style="height: 32px; width: 32px; object-fit: contain; border-radius: 8px; flex-shrink: 0;">
+                            <span style="font-weight: 800; font-size: 17px; color: #ffffff; letter-spacing: -0.02em; white-space: nowrap;">{{ config('app.name', 'JKSoft Cloud') }}</span>
+                        </a>
+                    </div>
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
                             <li class="user-menu">
                                 <a href="{{ route('account') }}">
                                     <img src="https://www.gravatar.com/avatar/{{ md5(strtolower(Auth::user()->email)) }}?s=160" class="user-image" alt="User Image">
-                                    <span class="hidden-xs">{{ Auth::user()->name_first }} {{ Auth::user()->name_last }}</span>
+                                    <span class="hidden-xs" style="font-weight: 600;">{{ Auth::user()->name_first }} {{ Auth::user()->name_last }}</span>
                                 </a>
                             </li>
                             <li>
-                                <li><a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin Control"><i class="fa fa-server"></i></a></li>
+                                <a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin Control" style="font-size: 16px;"><i class="fa fa-server"></i></a>
                             </li>
                             <li>
-                                <li><a href="{{ route('auth.logout') }}" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="fa fa-sign-out"></i></a></li>
+                                <a href="{{ route('auth.logout') }}" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout" style="font-size: 16px;"><i class="fa fa-sign-out"></i></a>
                             </li>
                         </ul>
                     </div>
