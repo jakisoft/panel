@@ -82,12 +82,12 @@ const RecycleBinDropdownMenu = ({ item, onItemRemoved }: Props) => {
             <Dialog.Confirm
                 open={showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(false)}
-                title={'Hapus Permanen'}
-                confirm={'Hapus'}
+                title={'Delete Permanently'}
+                confirm={'Delete'}
                 onConfirmed={doPermanentDelete}
             >
-                Apakah Anda yakin ingin menghapus <span className={'font-bold text-white'}>{item.name}</span> secara permanen?
-                Tindakan ini tidak dapat dibatalkan.
+                Are you sure you want to permanently delete <span className={'font-bold text-white'}>{item.name}</span>?
+                This action cannot be undone.
             </Dialog.Confirm>
 
             <DropdownMenu
@@ -106,24 +106,24 @@ const RecycleBinDropdownMenu = ({ item, onItemRemoved }: Props) => {
                     <div css={tw`space-y-1 text-[11px]`}>
                         <div css={tw`flex items-center gap-1.5 text-neutral-600`}>
                             <Calendar size={12} className={'shrink-0 text-neutral-500'} />
-                            <span className={'truncate'}>Dihapus: <strong className={'text-neutral-800 font-semibold'}>{format(new Date(item.deletedAt), 'dd/MM/yyyy HH:mm')}</strong></span>
+                            <span className={'truncate'}>Deleted: <strong className={'text-neutral-800 font-semibold'}>{format(new Date(item.deletedAt), 'dd/MM/yyyy HH:mm')}</strong></span>
                         </div>
                         <div css={tw`flex items-center gap-1.5 text-neutral-600`}>
                             <Clock size={12} className={'shrink-0 text-rose-500'} />
-                            <span className={'truncate'}>Sisa: <strong className={'text-rose-600 font-bold'}>{formatDaysRemaining(item.deletedAt)}</strong></span>
+                            <span className={'truncate'}>Auto delete: <strong className={'text-rose-600 font-bold'}>{formatDaysRemaining(item.deletedAt)}</strong></span>
                         </div>
                         {item.originalDirectory && (
                             <div css={tw`flex items-center gap-1.5 text-neutral-600 truncate`}>
                                 <Folder size={12} className={'shrink-0 text-neutral-500'} />
-                                <span className={'truncate'} title={item.originalDirectory}>Asal: <strong className={'font-mono text-neutral-800'}>{item.originalDirectory}</strong></span>
+                                <span className={'truncate'} title={item.originalDirectory}>Origin: <strong className={'font-mono text-neutral-800'}>{item.originalDirectory}</strong></span>
                             </div>
                         )}
                     </div>
                 </div>
 
                 <div>
-                    <Row onClick={doRestore} icon={faUndo} title={'Pulihkan (Restore)'} />
-                    <Row onClick={() => setShowDeleteConfirm(true)} icon={faTrashAlt} title={'Hapus Permanen'} $danger />
+                    <Row onClick={doRestore} icon={faUndo} title={'Restore'} />
+                    <Row onClick={() => setShowDeleteConfirm(true)} icon={faTrashAlt} title={'Delete Permanently'} $danger />
                 </div>
             </DropdownMenu>
         </>

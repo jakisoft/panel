@@ -16,17 +16,17 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
         <Dialog
             open={visible}
             onClose={onDismissed}
-            title={'Konfirmasi Hapus'}
+            title={'Delete Files'}
         >
             <div className={'py-2'}>
                 <p className={'text-sm text-neutral-300'}>
                     {files.length === 1 ? (
                         <>
-                            Apakah Anda ingin memindahkan <span className={'font-mono text-neutral-100 font-semibold'}>{files[0]}</span> ke Tong Sampah atau menghapus secara permanen?
+                            Do you want to move <span className={'font-mono text-neutral-100 font-semibold'}>{files[0]}</span> to the Trash or permanently delete it?
                         </>
                     ) : (
                         <>
-                            Apakah Anda ingin memindahkan file terpilih ke Tong Sampah atau menghapus secara permanen?
+                            Do you want to move the selected files to the Trash or permanently delete them?
                         </>
                     )}
                 </p>
@@ -34,7 +34,7 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
             <Dialog.Footer>
                 <div className={'w-full flex items-center justify-between'}>
                     <Button.Text onClick={onDismissed} className={'!py-2 !px-3 text-xs sm:text-sm'}>
-                        Batal
+                        Cancel
                     </Button.Text>
                     <div className={'flex items-center gap-2'}>
                         <Button
@@ -44,10 +44,10 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
                                 onMoveToTrash();
                             }}
                             className={'!bg-amber-600/20 hover:!bg-amber-600/30 !text-amber-300 border border-amber-500/40 text-xs sm:text-sm !py-2 !px-3'}
-                            title={'Pindahkan ke Tong Sampah'}
+                            title={'Move to Trash'}
                         >
                             <Trash2 size={14} className={'mr-1.5 inline'} />
-                            Ke Sampah
+                            Move to Trash
                         </Button>
                         <Button.Danger
                             onClick={() => {
@@ -55,9 +55,9 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
                                 onDeletePermanently();
                             }}
                             className={'text-xs sm:text-sm !py-2 !px-3'}
-                            title={'Hapus Permanen'}
+                            title={'Delete Permanently'}
                         >
-                            Permanen
+                            Delete Permanently
                         </Button.Danger>
                     </div>
                 </div>

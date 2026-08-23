@@ -25,7 +25,7 @@ export default ({ selectedItems, onActionCompleted }: Props) => {
     const onRestoreSelected = async () => {
         if (!selectedItems.length) return;
         setLoading(true);
-        setLoadingMessage(`Memulihkan ${selectedItems.length} item...`);
+        setLoadingMessage(`Restoring ${selectedItems.length} items...`);
         clearFlashes('files');
 
         const successIds: string[] = [];
@@ -48,7 +48,7 @@ export default ({ selectedItems, onActionCompleted }: Props) => {
         if (!selectedItems.length) return;
         setLoading(true);
         setShowDeleteConfirm(false);
-        setLoadingMessage(`Menghapus permanen ${selectedItems.length} item...`);
+        setLoadingMessage(`Permanently deleting ${selectedItems.length} items...`);
         clearFlashes('files');
 
         const successIds: string[] = [];
@@ -74,20 +74,20 @@ export default ({ selectedItems, onActionCompleted }: Props) => {
             </SpinnerOverlay>
 
             <Dialog.Confirm
-                title={'Hapus Permanen'}
+                title={'Delete Permanently'}
                 open={showDeleteConfirm}
-                confirm={'Hapus Permanen'}
+                confirm={'Delete Permanently'}
                 onClose={() => setShowDeleteConfirm(false)}
                 onConfirmed={onDeleteSelectedPermanently}
             >
                 <p className={'mb-2'}>
-                    Apakah Anda yakin ingin menghapus file terpilih secara permanen dari Recycle Bin? Tindakan ini tidak dapat dibatalkan.
+                    Are you sure you want to permanently delete the selected items from the Trash? This action cannot be undone.
                 </p>
                 <ul className={'list-disc pl-5 text-sm text-neutral-300 max-h-40 overflow-y-auto'}>
                     {selectedItems.slice(0, 15).map((item) => (
                         <li key={item.id}>{item.name}</li>
                     ))}
-                    {selectedItems.length > 15 && <li>dan lainnya...</li>}
+                    {selectedItems.length > 15 && <li>and more...</li>}
                 </ul>
             </Dialog.Confirm>
 
@@ -100,14 +100,14 @@ export default ({ selectedItems, onActionCompleted }: Props) => {
                                 className={'!py-2 !px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 font-medium'}
                             >
                                 <RotateCcw size={14} />
-                                Pulihkan Terpilih
+                                Restore Selected
                             </Button>
                             <Button.Danger
                                 onClick={() => setShowDeleteConfirm(true)}
                                 className={'!py-2 !px-3 text-xs flex items-center gap-1.5'}
                             >
                                 <Trash2 size={14} />
-                                Hapus Permanen
+                                Delete Permanently
                             </Button.Danger>
                         </div>
                     </Fade>

@@ -27,10 +27,12 @@ import style from './style.module.css';
 
 const sortFiles = (files: FileObject[]): FileObject[] => {
     const filteredFiles = files.filter((file) => file.name !== '.trash' && file.name !== '.recycle_bin');
-    const sortedFiles: FileObject[] = filteredFiles
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
-    return sortedFiles.filter((file, index) => index === 0 || file.name !== sortedFiles[index - 1].name);
+    return filteredFiles.sort((a, b) => {
+        if (a.isFile === b.isFile) {
+            return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+        }
+        return a.isFile ? 1 : -1;
+    });
 };
 
 export default () => {
@@ -67,8 +69,9 @@ export default () => {
     }, [directory]);
 
     const visibleFiles = files ? sortFiles(files) : [];
-    const displayedFiles = searchQuery.trim()
-        ? visibleFiles.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const displayedFiles = normalizedQuery
+        ? visibleFiles.filter((f) => f.name.toLowerCase().includes(normalizedQuery))
         : visibleFiles;
 
     const onSelectAllClick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,22 +89,10 @@ export default () => {
                     <div className={'flex items-center flex-1 min-w-0 overflow-hidden'}>
                         <FileActionCheckbox
                             type={'checkbox'}
-                            css={tw`mx-4`}
+                            css={tw`mx-4 shrink-0`}
                             checked={selectedFilesLength === (displayedFiles.length === 0 ? -1 : displayedFiles.length)}
                             onChange={onSelectAllClick}
                         />
-                        <button
-                            type={'button'}
-                            onClick={() => {
-                                setIsSearching((prev) => !prev);
-                                setSearchQuery('');
-                            }}
-                            className={'p-1.5 mr-3 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors focus:outline-none shrink-0'}
-                            title={isSearching ? 'Tutup Filter' : 'Filter / Cari File & Folder'}
-                            aria-label={isSearching ? 'Tutup Filter' : 'Filter / Cari File & Folder'}
-                        >
-                            {isSearching ? <X size={16} /> : <Filter size={16} />}
-                        </button>
 
                         {isSearching ? (
                             <div className={'flex-1 min-w-0 mr-4'}>
@@ -115,9 +106,9 @@ export default () => {
                                             setSearchQuery('');
                                         }
                                     }}
-                                    placeholder={'Cari file atau folder di direktori ini...'}
+                                    placeholder={'Search files and folders in this directory...'}
                                     autoFocus
-                                    className={'w-full max-w-sm px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-sm text-neutral-100 placeholder-neutral-500 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors shadow-inner'}
+                                    className={'w-full max-w-md px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-sm text-neutral-100 placeholder-neutral-500 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors shadow-inner'}
                                 />
                             </div>
                         ) : (
@@ -134,6 +125,22 @@ export default () => {
                                 <NavLink to={`/server/${id}/files/new${window.location.hash}`} className={'w-full md:w-auto shrink-0'}>
                                     <Button className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap'}>New File</Button>
                                 </NavLink>
+                                <button
+                                    type={'button'}
+                                    onClick={() => {
+                                        setIsSearching((prev) => !prev);
+                                        setSearchQuery('');
+                                    }}
+                                    className={`p-2 rounded-lg transition-all focus:outline-none flex items-center justify-center shrink-0 ${
+                                        isSearching
+                                            ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                                            : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                                    }`}
+                                    title={isSearching ? 'Close Search' : 'Filter / Search Files'}
+                                    aria-label={isSearching ? 'Close Search' : 'Filter / Search Files'}
+                                >
+                                    {isSearching ? <X size={16} /> : <Filter size={16} />}
+                                </button>
                                 <RecycleBinButton className={'w-full md:w-auto !py-2 !px-3 text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0'} />
                             </div>
                         </div>
@@ -147,7 +154,7 @@ export default () => {
                     {!displayedFiles.length ? (
                         <p css={tw`text-sm text-neutral-400 text-center py-8`}>
                             {searchQuery.trim()
-                                ? `Tidak ada file atau folder yang cocok dengan "${searchQuery}".`
+                                ? `No files or folders matched "${searchQuery}".`
                                 : 'This directory seems to be empty.'}
                         </p>
                     ) : (

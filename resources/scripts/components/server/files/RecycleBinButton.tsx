@@ -10,10 +10,10 @@ export default ({ className }: WithClassname) => {
         <NavLink
             to={`/server/${id}/files/trash`}
             className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-sm bg-rose-600 hover:bg-rose-500 text-white ${className || ''}`}
-            title={'Buka Sampah (Trash)'}
+            title={'Trash'}
         >
             <Trash2 size={16} />
-            <span>Sampah</span>
+            <span>Trash</span>
         </NavLink>
     );
 };

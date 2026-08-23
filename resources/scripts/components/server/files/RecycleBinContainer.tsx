@@ -64,7 +64,7 @@ export default () => {
             loadDirectory(uuid, join('/.trash', currentSubPath))
                 .then((data) => {
                     const sorted = data
-                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
                         .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
                     setSubFiles(sorted);
                 })
@@ -82,7 +82,7 @@ export default () => {
     const handleEmptyTrash = () => {
         setLoading(true);
         setShowEmptyConfirm(false);
-        setSpinnerMessage('Mengosongkan Tong Sampah...');
+        setSpinnerMessage('Emptying Trash...');
         clearFlashes('files');
 
         emptyTrash(uuid, items)
@@ -108,16 +108,17 @@ export default () => {
         setSelectedIds((prev) => prev.filter((i) => !ids.includes(i)));
     };
 
-    // Filter displayed items based on search query
+    // Filter displayed items based on search query (both files and folders)
+    const normalizedQuery = searchQuery.trim().toLowerCase();
     const displayedRootItems = isRootTrash
-        ? searchQuery.trim()
-            ? items.filter((i) => i.name.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+        ? normalizedQuery
+            ? items.filter((i) => i.name.toLowerCase().includes(normalizedQuery))
             : items
         : [];
 
     const displayedSubFiles = !isRootTrash
-        ? searchQuery.trim()
-            ? subFiles.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+        ? normalizedQuery
+            ? subFiles.filter((f) => f.name.toLowerCase().includes(normalizedQuery))
             : subFiles
         : [];
 
@@ -145,7 +146,7 @@ export default () => {
         .filter((dir) => !!dir);
 
     return (
-        <ServerContentBlock title={'Sampah'} showFlashKey={'files'}>
+        <ServerContentBlock title={'Trash'} showFlashKey={'files'}>
             <SpinnerOverlay visible={loading && !items.length && !subFiles.length && !!spinnerMessage} size={'large'} fixed>
                 {spinnerMessage}
             </SpinnerOverlay>
@@ -153,34 +154,22 @@ export default () => {
             <Dialog.Confirm
                 open={showEmptyConfirm}
                 onClose={() => setShowEmptyConfirm(false)}
-                title={'Kosongkan Tong Sampah'}
-                confirm={'Hapus Semua'}
+                title={'Empty Trash'}
+                confirm={'Empty Trash'}
                 onConfirmed={handleEmptyTrash}
             >
-                Apakah Anda yakin ingin menghapus semua file di Tong Sampah secara permanen? Tindakan ini tidak dapat dibatalkan.
+                Are you sure you want to permanently delete all items in the Trash? This action cannot be undone.
             </Dialog.Confirm>
 
-            {/* Breadcrumb & Search Bar */}
+            {/* Breadcrumb & Action Bar */}
             <div className={'flex items-center justify-between gap-3 mb-4'}>
                 <div className={'flex items-center flex-1 min-w-0 overflow-hidden'}>
                     <FileActionCheckbox
                         type={'checkbox'}
-                        css={tw`mx-4`}
+                        css={tw`mx-4 shrink-0`}
                         checked={selectedIds.length === (currentTotalCount === 0 ? -1 : currentTotalCount)}
                         onChange={onSelectAllClick}
                     />
-                    <button
-                        type={'button'}
-                        onClick={() => {
-                            setIsSearching((prev) => !prev);
-                            setSearchQuery('');
-                        }}
-                        className={'p-1.5 mr-3 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors focus:outline-none shrink-0'}
-                        title={isSearching ? 'Tutup Filter' : 'Filter / Cari File & Folder'}
-                        aria-label={isSearching ? 'Tutup Filter' : 'Filter / Cari File & Folder'}
-                    >
-                        {isSearching ? <X size={16} /> : <Filter size={16} />}
-                    </button>
 
                     {isSearching ? (
                         <div className={'flex-1 min-w-0 mr-4'}>
@@ -194,19 +183,24 @@ export default () => {
                                         setSearchQuery('');
                                     }
                                 }}
-                                placeholder={'Cari file atau folder di sampah...'}
+                                placeholder={'Search files and folders in trash...'}
                                 autoFocus
-                                className={'w-full max-w-sm px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-sm text-neutral-100 placeholder-neutral-500 rounded-xl focus:outline-none focus:border-rose-500 transition-colors shadow-inner'}
+                                className={'w-full max-w-md px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-sm text-neutral-100 placeholder-neutral-500 rounded-xl focus:outline-none focus:border-rose-500 transition-colors shadow-inner'}
                             />
                         </div>
                     ) : (
-                        <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>
-                            /<span css={tw`px-1 text-neutral-300`}>home</span>/
-                            <NavLink to={`/server/${match.params.id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+                        <div
+                            className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            <span className={'shrink-0'}>/</span>
+                            <span className={'px-1 text-neutral-300 shrink-0'}>home</span>
+                            <span className={'shrink-0'}>/</span>
+                            <NavLink to={`/server/${match.params.id}/files`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
                                 container
                             </NavLink>
-                            /
-                            <NavLink to={`/server/${match.params.id}/files/trash`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+                            <span className={'shrink-0'}>/</span>
+                            <NavLink to={`/server/${match.params.id}/files/trash`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
                                 .trash
                             </NavLink>
                             {pathSegments.map((segment, idx) => {
@@ -214,13 +208,13 @@ export default () => {
                                 const isLast = idx === pathSegments.length - 1;
                                 return (
                                     <React.Fragment key={idx}>
-                                        /
+                                        <span className={'shrink-0'}>/</span>
                                         {isLast ? (
-                                            <span css={tw`px-1 text-neutral-300`}>{getCleanTrashName(segment)}</span>
+                                            <span className={'px-1 text-neutral-300 shrink-0'}>{getCleanTrashName(segment)}</span>
                                         ) : (
                                             <NavLink
                                                 to={`/server/${match.params.id}/files/trash#/${encodePathSegments(subLink)}`}
-                                                css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}
+                                                className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}
                                             >
                                                 {getCleanTrashName(segment)}
                                             </NavLink>
@@ -232,14 +226,31 @@ export default () => {
                     )}
                 </div>
 
-                <div className={'flex items-center gap-2 pr-2'}>
+                {/* Right Action Buttons: Filter toggle on the left of red Trash button */}
+                <div className={'flex items-center gap-2 pr-2 shrink-0'}>
+                    <button
+                        type={'button'}
+                        onClick={() => {
+                            setIsSearching((prev) => !prev);
+                            setSearchQuery('');
+                        }}
+                        className={`p-2 rounded-xl transition-all focus:outline-none flex items-center justify-center shrink-0 ${
+                            isSearching
+                                ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                        }`}
+                        title={isSearching ? 'Close Search' : 'Filter / Search Trash'}
+                        aria-label={isSearching ? 'Close Search' : 'Filter / Search Trash'}
+                    >
+                        {isSearching ? <X size={16} /> : <Filter size={16} />}
+                    </button>
                     {(items.length > 0 || subFiles.length > 0) && (
                         <button
                             type={'button'}
                             onClick={() => setShowEmptyConfirm(true)}
                             className={'p-2 rounded-xl text-white bg-rose-600 hover:bg-rose-500 transition-colors shadow-sm focus:outline-none flex items-center justify-center shrink-0'}
-                            title={'Kosongkan Tong Sampah'}
-                            aria-label={'Kosongkan Tong Sampah'}
+                            title={'Empty Trash'}
+                            aria-label={'Empty Trash'}
                         >
                             <Trash2 size={16} />
                         </button>
@@ -255,8 +266,8 @@ export default () => {
                 !displayedRootItems.length ? (
                     <p css={tw`text-sm text-neutral-400 text-center py-8`}>
                         {searchQuery.trim()
-                            ? `Tidak ada file atau folder yang cocok dengan "${searchQuery}".`
-                            : 'Sampah kosong.'}
+                            ? `No files or folders matched "${searchQuery}".`
+                            : 'Trash is empty.'}
                     </p>
                 ) : (
                     <div>
@@ -302,8 +313,8 @@ export default () => {
                 !displayedSubFiles.length ? (
                     <p css={tw`text-sm text-neutral-400 text-center py-8`}>
                         {searchQuery.trim()
-                            ? `Tidak ada file atau folder yang cocok dengan "${searchQuery}".`
-                            : 'Folder sampah ini kosong.'}
+                            ? `No files or folders matched "${searchQuery}".`
+                            : 'This trash folder is empty.'}
                     </p>
                 ) : (
                     <div>

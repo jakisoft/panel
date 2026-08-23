@@ -47,7 +47,7 @@ const MassActionsBar = () => {
     const onClickMoveToTrash = () => {
         setLoading(true);
         clearFlashes('files');
-        setLoadingMessage('Memindahkan ke Tong Sampah...');
+        setLoadingMessage('Moving to Trash...');
 
         const filesToTrash = selectedFiles.map((name) => ({
             name,
@@ -70,7 +70,7 @@ const MassActionsBar = () => {
     const onClickConfirmDeletion = () => {
         setLoading(true);
         clearFlashes('files');
-        setLoadingMessage('Menghapus file secara permanen...');
+        setLoadingMessage('Permanently deleting files...');
 
         deleteFiles(uuid, directory, selectedFiles)
             .then(() => {

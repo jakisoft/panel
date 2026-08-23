@@ -46,50 +46,62 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
 
     if (isTrash) {
         return (
-            <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>
-                {renderLeft || <div css={tw`w-12`} />}/<span css={tw`px-1 text-neutral-300`}>home</span>/
-                <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+            <div
+                className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+                {renderLeft || <div css={tw`w-12 shrink-0`} />}
+                <span css={tw`shrink-0`}>/</span>
+                <span css={tw`px-1 text-neutral-300 shrink-0`}>home</span>
+                <span css={tw`shrink-0`}>/</span>
+                <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}>
                     container
                 </NavLink>
-                /
-                <NavLink to={`/server/${id}/files/trash`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+                <span css={tw`shrink-0`}>/</span>
+                <NavLink to={`/server/${id}/files/trash`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}>
                     .trash
                 </NavLink>
-                /
+                <span css={tw`shrink-0`}>/</span>
                 {file && (
-                    <span css={tw`px-1 text-neutral-300`}>{getCleanTrashFileName(file)}</span>
+                    <span css={tw`px-1 text-neutral-300 shrink-0`}>{getCleanTrashFileName(file)}</span>
                 )}
             </div>
         );
     }
 
     return (
-        <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>
-            {renderLeft || <div css={tw`w-12`} />}/<span css={tw`px-1 text-neutral-300`}>home</span>/
-            <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}>
+        <div
+            className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+            {renderLeft || <div css={tw`w-12 shrink-0`} />}
+            <span css={tw`shrink-0`}>/</span>
+            <span css={tw`px-1 text-neutral-300 shrink-0`}>home</span>
+            <span css={tw`shrink-0`}>/</span>
+            <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}>
                 container
             </NavLink>
-            /
+            <span css={tw`shrink-0`}>/</span>
             {breadcrumbs().map((crumb, index) =>
                 crumb.path ? (
                     <React.Fragment key={index}>
                         <NavLink
                             to={`/server/${id}/files#${encodePathSegments(crumb.path)}`}
-                            css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100`}
+                            css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}
                         >
                             {crumb.name}
                         </NavLink>
-                        /
+                        <span css={tw`shrink-0`}>/</span>
                     </React.Fragment>
                 ) : (
-                    <span key={index} css={tw`px-1 text-neutral-300`}>
+                    <span key={index} css={tw`px-1 text-neutral-300 shrink-0`}>
                         {crumb.name}
                     </span>
                 )
             )}
             {file && (
                 <React.Fragment>
-                    <span css={tw`px-1 text-neutral-300`}>{file}</span>
+                    <span css={tw`px-1 text-neutral-300 shrink-0`}>{file}</span>
                 </React.Fragment>
             )}
         </div>

@@ -27,9 +27,9 @@ const AUTO_CLEAR_MS = AUTO_CLEAR_DAYS * 24 * 60 * 60 * 1000;
 export const formatDaysRemaining = (deletedAt: number): string => {
     const elapsed = Date.now() - deletedAt;
     const remainingMs = AUTO_CLEAR_MS - elapsed;
-    if (remainingMs <= 0) return 'Kadaluarsa';
+    if (remainingMs <= 0) return 'Expired';
     const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
-    return `${remainingDays} hari tersisa`;
+    return `${remainingDays} ${remainingDays === 1 ? 'day' : 'days'} left`;
 };
 
 export const getTrashItems = async (uuid: string): Promise<TrashItem[]> => {

@@ -132,14 +132,14 @@ export default () => {
             {isTrashFile && (
                 <div className={'mb-4 p-3.5 bg-neutral-900 border border-amber-500/40 rounded-xl text-amber-300 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm'}>
                     <div>
-                        <span className={'font-bold'}>Mode Baca Saja (Read-Only)</span>: File ini berada di Sampah (Trash).
+                        <span className={'font-bold'}>Read-Only Mode</span>: This file is currently in the Trash.
                     </div>
                     <Button
                         isSecondary
                         className={'text-xs'}
                         onClick={() => history.push(`/server/${id}/files/trash`)}
                     >
-                        Kembali ke Sampah
+                        Back to Trash
                     </Button>
                 </div>
             )}
@@ -199,7 +199,7 @@ export default () => {
                         css={tw`flex-1 sm:flex-none`}
                         onClick={() => history.push(`/server/${id}/files/trash`)}
                     >
-                        Kembali ke Sampah
+                        Back to Trash
                     </Button>
                 ) : action === 'edit' ? (
                     <Can action={'file.update'}>
