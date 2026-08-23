@@ -31,7 +31,7 @@ return [
 
     'favicon' => env('APP_FAVICON', '/assets/svgs/jksoft-icon.svg'),
 
-    'og_image' => env('APP_OG_IMAGE', '/assets/svgs/og-image.svg'),
+    'og_image' => env('APP_OG_IMAGE', '/og-image.svg'),
 
     'footer_url' => env('APP_FOOTER_URL', 'https://github.com/jakisoft/panel'),
 

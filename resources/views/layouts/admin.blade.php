@@ -20,8 +20,8 @@
         <meta property="og:site_name" content="{{ config('app.name', 'JKSoft Cloud') }}">
         <meta property="og:title" content="{{ config('app.name', 'JKSoft Cloud') }} - Admin Control Panel">
         <meta property="og:description" content="{{ config('app.description', 'JKSoft Cloud Panel - Next-Gen Game Server & Cloud Management Platform with High-Performance Docker Isolation, Real-Time Console, and Automated Backups.') }}">
-        <meta property="og:image" content="{{ asset(config('app.og_image', '/assets/svgs/og-image.svg')) }}">
-        <meta property="og:image:secure_url" content="{{ asset(config('app.og_image', '/assets/svgs/og-image.svg')) }}">
+        <meta property="og:image" content="{{ url(config('app.og_image', '/og-image.svg')) }}">
+        <meta property="og:image:secure_url" content="{{ url(config('app.og_image', '/og-image.svg')) }}">
         <meta property="og:image:type" content="image/svg+xml">
         <meta property="og:image:width" content="1200">
         <meta property="og:image:height" content="500">
@@ -33,7 +33,7 @@
         <meta name="twitter:url" content="{{ url()->current() }}">
         <meta name="twitter:title" content="{{ config('app.name', 'JKSoft Cloud') }} - Admin Control Panel">
         <meta name="twitter:description" content="{{ config('app.description', 'JKSoft Cloud Panel - Next-Gen Game Server & Cloud Management Platform with High-Performance Docker Isolation, Real-Time Console, and Automated Backups.') }}">
-        <meta name="twitter:image" content="{{ asset(config('app.og_image', '/assets/svgs/og-image.svg')) }}">
+        <meta name="twitter:image" content="{{ url(config('app.og_image', '/og-image.svg')) }}">
         <meta name="twitter:image:alt" content="{{ config('app.name', 'JKSoft Cloud') }} Banner">
 
         <!-- Favicons & Icons -->
