@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import { NavLink, useLocation } from 'react-router-dom';
 import { encodePathSegments, hashToPath } from '@/helpers';
-import tw from 'twin.macro';
 
 interface Props {
     renderLeft?: JSX.Element;
@@ -32,19 +31,11 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
         }
     }, [withinFileEditor, isNewFile, hash]);
 
-    const breadcrumbs = (): { name: string; path?: string }[] =>
-        directory
-            .split('/')
-            .filter((dir) => !!dir)
-            .map((dir, index, dirs) => {
-                if (!withinFileEditor && index === dirs.length - 1) {
-                    return { name: dir };
-                }
-
-                return { name: dir, path: `/${dirs.slice(0, index + 1).join('/')}` };
-            });
-
     if (isTrash) {
+        const trashSubDirs = directory
+            .split('/')
+            .filter((dir) => !!dir && dir !== '.trash');
+
         return (
             <div
                 className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
@@ -61,13 +52,47 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
                 <NavLink to={`/server/${id}/files/trash`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
                     .trash
                 </NavLink>
-                <span className={'shrink-0'}>/</span>
+                {trashSubDirs.map((dir, index) => {
+                    const isLast = !withinFileEditor && index === trashSubDirs.length - 1;
+                    const subPath = trashSubDirs.slice(0, index + 1).join('/');
+
+                    return (
+                        <React.Fragment key={index}>
+                            <span className={'shrink-0'}>/</span>
+                            {isLast ? (
+                                <span className={'px-1 text-neutral-300 shrink-0'}>{getCleanTrashFileName(dir)}</span>
+                            ) : (
+                                <NavLink
+                                    to={`/server/${id}/files/trash#/${encodePathSegments(subPath)}`}
+                                    className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}
+                                >
+                                    {getCleanTrashFileName(dir)}
+                                </NavLink>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
                 {file && (
-                    <span className={'px-1 text-neutral-300 shrink-0'}>{getCleanTrashFileName(file)}</span>
+                    <React.Fragment>
+                        <span className={'shrink-0'}>/</span>
+                        <span className={'px-1 text-neutral-300 shrink-0'}>{getCleanTrashFileName(file)}</span>
+                    </React.Fragment>
                 )}
             </div>
         );
     }
+
+    const breadcrumbs = (): { name: string; path?: string }[] =>
+        directory
+            .split('/')
+            .filter((dir) => !!dir)
+            .map((dir, index, dirs) => {
+                if (!withinFileEditor && index === dirs.length - 1) {
+                    return { name: dir };
+                }
+
+                return { name: dir, path: `/${dirs.slice(0, index + 1).join('/')}` };
+            });
 
     return (
         <div
@@ -101,6 +126,7 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
             )}
             {file && (
                 <React.Fragment>
+                    <span className={'shrink-0'}>/</span>
                     <span className={'px-1 text-neutral-300 shrink-0'}>{file}</span>
                 </React.Fragment>
             )}

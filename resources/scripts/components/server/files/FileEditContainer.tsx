@@ -137,7 +137,14 @@ export default () => {
                     <Button
                         isSecondary
                         className={'text-xs'}
-                        onClick={() => history.push(`/server/${id}/files/trash`)}
+                        onClick={() => {
+                            const subTrash = directory.replace(/^\/\.trash\/?/, '');
+                            if (subTrash) {
+                                history.push(`/server/${id}/files/trash#/${encodePathSegments(subTrash)}`);
+                            } else {
+                                history.push(`/server/${id}/files/trash`);
+                            }
+                        }}
                     >
                         Back to Trash
                     </Button>

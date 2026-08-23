@@ -22,11 +22,11 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
                 <p className={'text-sm text-neutral-300'}>
                     {files.length === 1 ? (
                         <>
-                            Do you want to move <span className={'font-mono text-neutral-100 font-semibold'}>{files[0]}</span> to the Trash or permanently delete it?
+                            Do you want to move <span className={'font-mono text-neutral-100 font-semibold'}>{files[0]}</span> to Trash or permanently delete it?
                         </>
                     ) : (
                         <>
-                            Do you want to move the selected files to the Trash or permanently delete them?
+                            Do you want to move <span className={'text-neutral-100 font-semibold'}>{files.length}</span> selected file(s) to Trash or permanently delete them?
                         </>
                     )}
                 </p>
@@ -47,7 +47,7 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
                             title={'Move to Trash'}
                         >
                             <Trash2 size={14} className={'mr-1.5 inline'} />
-                            Move to Trash
+                            Trash
                         </Button>
                         <Button.Danger
                             onClick={() => {
@@ -57,7 +57,7 @@ export default ({ visible, onDismissed, files, onMoveToTrash, onDeletePermanentl
                             className={'text-xs sm:text-sm !py-2 !px-3'}
                             title={'Delete Permanently'}
                         >
-                            Delete Permanently
+                            Permanent
                         </Button.Danger>
                     </div>
                 </div>
