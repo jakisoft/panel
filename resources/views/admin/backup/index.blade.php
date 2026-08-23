@@ -408,9 +408,9 @@
                         <i class="fa fa-exclamation-triangle"></i> <strong>Perhatian:</strong> Data saat ini akan ditimpa dengan data dari file backup yang Anda unggah.
                     </div>
                     <div class="form-group">
-                        <label class="control-label">Pilih File Backup (.tar.gz atau .zip)</label>
-                        <input type="file" class="form-control" name="backup_file" accept=".tar.gz,.zip,.tar" required />
-                        <p class="text-muted"><small>Unggah arsip backup yang sebelumnya Anda download dari JKSoft Cloud Panel.</small></p>
+                        <label class="control-label">Pilih File Backup (.tar.gz, .zip, atau .sql)</label>
+                        <input type="file" class="form-control" name="backup_file" accept=".tar.gz,.zip,.tar,.sql" required />
+                        <p class="text-muted"><small>Unggah arsip backup (.tar.gz / .zip) atau file export database (.sql) yang ingin dipulihkan ke panel.</small></p>
                     </div>
                 </div>
                 <div class="modal-footer">

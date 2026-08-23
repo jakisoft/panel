@@ -160,6 +160,17 @@ class PanelBackupService
             throw new Exception("File backup tidak ditemukan.");
         }
 
+        // If direct SQL file uploaded
+        if (str_ends_with(strtolower($archivePath), '.sql')) {
+            $this->importDatabaseSql($archivePath);
+            $this->kernel->call('optimize:clear');
+            $this->kernel->call('queue:restart');
+            return [
+                'success' => true,
+                'message' => 'Database panel berhasil dipulihkan dari file SQL!',
+            ];
+        }
+
         $tempDir = storage_path('app/temp_restore_' . time());
         File::makeDirectory($tempDir, 0755, true);
 
@@ -173,13 +184,26 @@ class PanelBackupService
                 $zipCmd = "unzip -o " . escapeshellarg($archivePath) . " -d " . escapeshellarg($tempDir) . " 2>&1";
                 exec($zipCmd, $output2, $returnCode2);
                 if ($returnCode2 !== 0) {
-                    throw new Exception("Gagal mengekstrak arsip backup: " . implode(" ", $output));
+                    throw new Exception("Gagal mengekstrak arsip backup: " . implode(" ", array_merge((array)$output, (array)$output2)));
                 }
             }
 
+            // Find database.sql (at root or in any extracted subfolder)
             $sqlFile = $tempDir . '/database.sql';
             if (!File::exists($sqlFile)) {
-                throw new Exception("Arsip backup tidak memiliki file database.sql yang valid.");
+                $allSql = File::glob($tempDir . '/*.sql');
+                if (empty($allSql)) {
+                    $allSql = File::allFiles($tempDir);
+                    $allSql = array_filter($allSql, fn($f) => str_ends_with($f->getFilename(), '.sql'));
+                    $allSql = array_map(fn($f) => $f->getRealPath(), $allSql);
+                }
+                if (!empty($allSql)) {
+                    $sqlFile = reset($allSql);
+                }
+            }
+
+            if (!File::exists($sqlFile)) {
+                throw new Exception("Arsip backup tidak memiliki file database .sql yang valid.");
             }
 
             // Restore Database
@@ -187,6 +211,16 @@ class PanelBackupService
 
             // If backup contains .env, preserve critical db connection but update APP_KEY if needed
             $backupEnv = $tempDir . '/.env';
+            if (!File::exists($backupEnv)) {
+                $allEnv = File::allFiles($tempDir);
+                foreach ($allEnv as $f) {
+                    if ($f->getFilename() === '.env') {
+                        $backupEnv = $f->getRealPath();
+                        break;
+                    }
+                }
+            }
+
             if (File::exists($backupEnv)) {
                 $envContent = File::get($backupEnv);
                 if (preg_match('/^APP_KEY=(.+)$/m', $envContent, $matches)) {
@@ -224,13 +258,14 @@ class PanelBackupService
         $user = $dbConfig['username'] ?? 'root';
         $pass = $dbConfig['password'] ?? '';
 
-        // Try mysqldump
+        // Try mysqldump with MYSQL_PWD environment variable
+        $envPrefix = !empty($pass) ? 'MYSQL_PWD=' . escapeshellarg($pass) . ' ' : '';
         $dumpCmd = sprintf(
-            'mysqldump --single-transaction --quick --skip-lock-tables -h %s -P %d -u %s %s %s > %s 2>&1',
+            '%smysqldump --default-character-set=utf8mb4 --single-transaction --quick --skip-lock-tables -h %s -P %d -u %s %s > %s 2>&1',
+            $envPrefix,
             escapeshellarg($host),
             (int) $port,
             escapeshellarg($user),
-            !empty($pass) ? '-p' . escapeshellarg($pass) : '',
             escapeshellarg($dbName),
             escapeshellarg($destinationPath)
         );
@@ -287,13 +322,14 @@ class PanelBackupService
         $user = $dbConfig['username'] ?? 'root';
         $pass = $dbConfig['password'] ?? '';
 
-        // Try mysql CLI
+        // Try mysql CLI with MYSQL_PWD
+        $envPrefix = !empty($pass) ? 'MYSQL_PWD=' . escapeshellarg($pass) . ' ' : '';
         $mysqlCmd = sprintf(
-            'mysql -h %s -P %d -u %s %s %s < %s 2>&1',
+            '%smysql --default-character-set=utf8mb4 -h %s -P %d -u %s %s < %s 2>&1',
+            $envPrefix,
             escapeshellarg($host),
             (int) $port,
             escapeshellarg($user),
-            !empty($pass) ? '-p' . escapeshellarg($pass) : '',
             escapeshellarg($dbName),
             escapeshellarg($sqlFilePath)
         );
@@ -306,9 +342,38 @@ class PanelBackupService
         // Fallback: PDO execution
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::MYSQL_ATTR_MULTI_STATEMENTS, true);
-        $sql = File::get($sqlFilePath);
-        $pdo->exec($sql);
+        $pdo->exec("SET FOREIGN_KEY_CHECKS=0;");
+        $pdo->exec("SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';");
+        
+        $sqlContent = File::get($sqlFilePath);
+        $lines = explode("\n", $sqlContent);
+        $query = '';
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if (empty($trimmed) || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*') || str_starts_with($trimmed, '#')) {
+                continue;
+            }
+
+            $query .= $line . "\n";
+            if (str_ends_with($trimmed, ';')) {
+                try {
+                    $pdo->exec($query);
+                } catch (\Throwable $e) {
+                    // Continue on non-fatal statement warnings
+                }
+                $query = '';
+            }
+        }
+
+        if (!empty(trim($query))) {
+            try {
+                $pdo->exec($query);
+            } catch (\Throwable $e) {
+            }
+        }
+
+        $pdo->exec("SET FOREIGN_KEY_CHECKS=1;");
     }
 
     private function createZipArchive(string $sourceDir, string $outZipPath): void

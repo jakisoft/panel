@@ -24,6 +24,15 @@ class BackupController extends Controller
     ) {
     }
 
+    private function getSetting(string $key, mixed $default = null): mixed
+    {
+        $val = config('backups.' . $key);
+        if ($val !== null) return $val;
+        $val = config('backup.' . $key);
+        if ($val !== null) return $val;
+        return $this->settings->get('settings::backups:' . $key, $this->settings->get('settings::backup:' . $key, $default));
+    }
+
     /**
      * Render the UI for Cloud Backup and Full Panel Backup Management.
      */
@@ -32,25 +41,25 @@ class BackupController extends Controller
         return view('admin.backup.index', [
             'backups' => $this->backupService->listBackups(),
             'auto_backup' => [
-                'enabled' => config('backups.panel_auto_enabled', false),
-                'frequency' => config('backups.panel_auto_frequency', 'daily'),
+                'enabled' => filter_var($this->getSetting('panel_auto_enabled', false), FILTER_VALIDATE_BOOLEAN),
+                'frequency' => (string) $this->getSetting('panel_auto_frequency', 'daily'),
             ],
             'r2' => [
-                'enabled' => config('backups.r2.enabled', false),
-                'account_id' => config('backups.r2.account_id', ''),
-                'bucket' => config('backups.r2.bucket', ''),
-                'access_key_id' => config('backups.r2.access_key_id', ''),
-                'secret_access_key' => config('backups.r2.secret_access_key', ''),
-                'endpoint' => config('backups.r2.endpoint', ''),
+                'enabled' => filter_var($this->getSetting('r2.enabled', false), FILTER_VALIDATE_BOOLEAN),
+                'account_id' => (string) $this->getSetting('r2.account_id', ''),
+                'bucket' => (string) $this->getSetting('r2.bucket', ''),
+                'access_key_id' => (string) $this->getSetting('r2.access_key_id', ''),
+                'secret_access_key' => (string) $this->getSetting('r2.secret_access_key', ''),
+                'endpoint' => (string) $this->getSetting('r2.endpoint', ''),
             ],
             'gdrive' => [
-                'enabled' => config('backups.gdrive.enabled', false),
-                'client_id' => config('backups.gdrive.client_id', ''),
-                'client_secret' => config('backups.gdrive.client_secret', ''),
-                'refresh_token' => config('backups.gdrive.refresh_token', ''),
-                'folder_id' => config('backups.gdrive.folder_id', ''),
+                'enabled' => filter_var($this->getSetting('gdrive.enabled', false), FILTER_VALIDATE_BOOLEAN),
+                'client_id' => (string) $this->getSetting('gdrive.client_id', ''),
+                'client_secret' => (string) $this->getSetting('gdrive.client_secret', ''),
+                'refresh_token' => (string) $this->getSetting('gdrive.refresh_token', ''),
+                'folder_id' => (string) $this->getSetting('gdrive.folder_id', ''),
             ],
-            'default_provider' => config('backups.default_provider', 'local'),
+            'default_provider' => (string) $this->getSetting('default_provider', 'local'),
         ]);
     }
 
@@ -59,31 +68,67 @@ class BackupController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+        $r2Enabled = $request->boolean('r2_enabled');
+        $gdriveEnabled = $request->boolean('gdrive_enabled');
+
+        // Validation for Cloudflare R2 if enabled
+        if ($r2Enabled) {
+            $existingSecret = (string) $this->getSetting('r2.secret_access_key', '');
+            if (!$request->filled('r2_account_id') && !$request->filled('r2_endpoint')) {
+                $this->alert->danger('Cloudflare R2 diaktifkan: Account ID atau Endpoint wajib diisi.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+            if (!$request->filled('r2_bucket') || !$request->filled('r2_access_key_id')) {
+                $this->alert->danger('Cloudflare R2 diaktifkan: Bucket Name dan Access Key ID wajib diisi.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+            if (!$request->filled('r2_secret_access_key') && empty($existingSecret)) {
+                $this->alert->danger('Cloudflare R2 diaktifkan: Secret Access Key wajib diisi saat konfigurasi awal.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+        }
+
+        // Validation for Google Drive if enabled
+        if ($gdriveEnabled) {
+            $existingSecret = (string) $this->getSetting('gdrive.client_secret', '');
+            if (!$request->filled('gdrive_client_id') || !$request->filled('gdrive_refresh_token')) {
+                $this->alert->danger('Google Drive diaktifkan: Client ID dan OAuth Refresh Token wajib diisi.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+            if (!$request->filled('gdrive_client_secret') && empty($existingSecret)) {
+                $this->alert->danger('Google Drive diaktifkan: Client Secret wajib diisi saat konfigurasi awal.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+        }
+
         $keys = [
-            'backup:default_provider' => $request->input('default_provider', 'local'),
-            'backup:panel_auto_enabled' => $request->boolean('panel_auto_enabled') ? 'true' : 'false',
-            'backup:panel_auto_frequency' => $request->input('panel_auto_frequency', 'daily'),
-            'backup:r2:enabled' => $request->boolean('r2_enabled') ? 'true' : 'false',
-            'backup:r2:account_id' => $request->input('r2_account_id', ''),
-            'backup:r2:bucket' => $request->input('r2_bucket', ''),
-            'backup:r2:access_key_id' => $request->input('r2_access_key_id', ''),
-            'backup:r2:endpoint' => $request->input('r2_endpoint', ''),
-            'backup:gdrive:enabled' => $request->boolean('gdrive_enabled') ? 'true' : 'false',
-            'backup:gdrive:client_id' => $request->input('gdrive_client_id', ''),
-            'backup:gdrive:refresh_token' => $request->input('gdrive_refresh_token', ''),
-            'backup:gdrive:folder_id' => $request->input('gdrive_folder_id', ''),
+            'default_provider' => $request->input('default_provider', 'local'),
+            'panel_auto_enabled' => $request->boolean('panel_auto_enabled') ? 'true' : 'false',
+            'panel_auto_frequency' => $request->input('panel_auto_frequency', 'daily'),
+            'r2:enabled' => $r2Enabled ? 'true' : 'false',
+            'r2:account_id' => $request->input('r2_account_id', ''),
+            'r2:bucket' => $request->input('r2_bucket', ''),
+            'r2:access_key_id' => $request->input('r2_access_key_id', ''),
+            'r2:endpoint' => $request->input('r2_endpoint', ''),
+            'gdrive:enabled' => $gdriveEnabled ? 'true' : 'false',
+            'gdrive:client_id' => $request->input('gdrive_client_id', ''),
+            'gdrive:refresh_token' => $request->input('gdrive_refresh_token', ''),
+            'gdrive:folder_id' => $request->input('gdrive_folder_id', ''),
         ];
 
         if ($request->filled('r2_secret_access_key')) {
-            $keys['backup:r2:secret_access_key'] = $request->input('r2_secret_access_key');
+            $keys['r2:secret_access_key'] = $request->input('r2_secret_access_key');
         }
 
         if ($request->filled('gdrive_client_secret')) {
-            $keys['backup:gdrive:client_secret'] = $request->input('gdrive_client_secret');
+            $keys['gdrive:client_secret'] = $request->input('gdrive_client_secret');
         }
 
         foreach ($keys as $key => $value) {
-            $this->settings->set('settings::' . $key, $value);
+            $this->settings->set('settings::backups:' . $key, $value);
+            $this->settings->set('settings::backup:' . $key, $value);
+            config()->set('backups.' . str_replace(':', '.', $key), $value);
+            config()->set('backup.' . str_replace(':', '.', $key), $value);
         }
 
         $this->kernel->call('queue:restart');
@@ -139,13 +184,13 @@ class BackupController extends Controller
             if ($request->hasFile('backup_file')) {
                 $file = $request->file('backup_file');
                 $tempPath = $file->getRealPath();
-                $this->backupService->restoreBackup($tempPath);
-                $this->alert->success('Panel berhasil dipulihkan dari file backup yang diunggah! Seluruh user, server, dan pengaturan telah dikembalikan.')->flash();
+                $result = $this->backupService->restoreBackup($tempPath);
+                $this->alert->success($result['message'] ?? 'Panel berhasil dipulihkan dari file backup yang diunggah! Seluruh user, server, dan pengaturan telah dikembalikan.')->flash();
             } elseif ($request->filled('filename')) {
                 $filename = basename($request->input('filename'));
                 $path = storage_path('app/panel_backups/' . $filename);
-                $this->backupService->restoreBackup($path);
-                $this->alert->success("Panel berhasil dipulihkan dari {$filename}!")->flash();
+                $result = $this->backupService->restoreBackup($path);
+                $this->alert->success($result['message'] ?? "Panel berhasil dipulihkan dari {$filename}!")->flash();
             } else {
                 $this->alert->danger('Silakan pilih file backup yang ingin dipulihkan.')->flash();
             }

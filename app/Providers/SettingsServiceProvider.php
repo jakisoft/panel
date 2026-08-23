@@ -33,6 +33,20 @@ class SettingsServiceProvider extends ServiceProvider
         'pterodactyl:client_features:allocations:enabled',
         'pterodactyl:client_features:allocations:range_start',
         'pterodactyl:client_features:allocations:range_end',
+        'backups:default_provider',
+        'backups:r2:enabled',
+        'backups:r2:account_id',
+        'backups:r2:bucket',
+        'backups:r2:access_key_id',
+        'backups:r2:secret_access_key',
+        'backups:r2:endpoint',
+        'backups:gdrive:enabled',
+        'backups:gdrive:client_id',
+        'backups:gdrive:client_secret',
+        'backups:gdrive:refresh_token',
+        'backups:gdrive:folder_id',
+        'backups:panel_auto_enabled',
+        'backups:panel_auto_frequency',
         'backup:default_provider',
         'backup:r2:enabled',
         'backup:r2:account_id',
@@ -101,7 +115,11 @@ class SettingsServiceProvider extends ServiceProvider
         }
 
         foreach ($this->keys as $key) {
-            $value = array_get($values, 'settings::' . $key, $config->get(str_replace(':', '.', $key)));
+            $altKey = str_starts_with($key, 'backups:')
+                ? 'backup:' . substr($key, 8)
+                : (str_starts_with($key, 'backup:') ? 'backups:' . substr($key, 7) : $key);
+
+            $value = array_get($values, 'settings::' . $key, array_get($values, 'settings::' . $altKey, $config->get(str_replace(':', '.', $key))));
             if (in_array($key, self::$encrypted) && $encrypter) {
                 try {
                     $value = $encrypter->decrypt($value);
@@ -109,7 +127,7 @@ class SettingsServiceProvider extends ServiceProvider
                 }
             }
 
-            switch (strtolower($value)) {
+            switch (strtolower((string) $value)) {
                 case 'true':
                 case '(true)':
                     $value = true;
@@ -128,6 +146,11 @@ class SettingsServiceProvider extends ServiceProvider
             }
 
             $config->set(str_replace(':', '.', $key), $value);
+            if (str_starts_with($key, 'backups:')) {
+                $config->set('backup.' . substr(str_replace(':', '.', $key), 8), $value);
+            } elseif (str_starts_with($key, 'backup:')) {
+                $config->set('backups.' . substr(str_replace(':', '.', $key), 7), $value);
+            }
         }
     }
 
