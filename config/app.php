@@ -25,9 +25,13 @@ return [
 
     'name' => env('APP_NAME', 'JKSoft Cloud'),
 
+    'description' => env('APP_DESCRIPTION', 'JKSoft Cloud Panel - Next-Gen Game Server & Cloud Management Platform with High-Performance Docker Isolation, Real-Time Console, and Automated Backups.'),
+
     'logo' => env('APP_LOGO', '/assets/svgs/jksoft-logo.svg'),
 
     'favicon' => env('APP_FAVICON', '/assets/svgs/jksoft-icon.svg'),
+
+    'og_image' => env('APP_OG_IMAGE', '/assets/svgs/og-image.svg'),
 
     'footer_url' => env('APP_FOOTER_URL', 'https://github.com/jakisoft/panel'),
 
