@@ -50,20 +50,20 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
                 className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-                {renderLeft || <div css={tw`w-12 shrink-0`} />}
-                <span css={tw`shrink-0`}>/</span>
-                <span css={tw`px-1 text-neutral-300 shrink-0`}>home</span>
-                <span css={tw`shrink-0`}>/</span>
-                <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}>
+                {renderLeft || <div className={'w-12 shrink-0'} />}
+                <span className={'shrink-0'}>/</span>
+                <span className={'px-1 text-neutral-300 shrink-0'}>home</span>
+                <span className={'shrink-0'}>/</span>
+                <NavLink to={`/server/${id}/files`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
                     container
                 </NavLink>
-                <span css={tw`shrink-0`}>/</span>
-                <NavLink to={`/server/${id}/files/trash`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}>
+                <span className={'shrink-0'}>/</span>
+                <NavLink to={`/server/${id}/files/trash`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
                     .trash
                 </NavLink>
-                <span css={tw`shrink-0`}>/</span>
+                <span className={'shrink-0'}>/</span>
                 {file && (
-                    <span css={tw`px-1 text-neutral-300 shrink-0`}>{getCleanTrashFileName(file)}</span>
+                    <span className={'px-1 text-neutral-300 shrink-0'}>{getCleanTrashFileName(file)}</span>
                 )}
             </div>
         );
@@ -74,34 +74,34 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
             className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-            {renderLeft || <div css={tw`w-12 shrink-0`} />}
-            <span css={tw`shrink-0`}>/</span>
-            <span css={tw`px-1 text-neutral-300 shrink-0`}>home</span>
-            <span css={tw`shrink-0`}>/</span>
-            <NavLink to={`/server/${id}/files`} css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}>
+            {renderLeft || <div className={'w-12 shrink-0'} />}
+            <span className={'shrink-0'}>/</span>
+            <span className={'px-1 text-neutral-300 shrink-0'}>home</span>
+            <span className={'shrink-0'}>/</span>
+            <NavLink to={`/server/${id}/files`} className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}>
                 container
             </NavLink>
-            <span css={tw`shrink-0`}>/</span>
+            <span className={'shrink-0'}>/</span>
             {breadcrumbs().map((crumb, index) =>
                 crumb.path ? (
                     <React.Fragment key={index}>
                         <NavLink
                             to={`/server/${id}/files#${encodePathSegments(crumb.path)}`}
-                            css={tw`px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0`}
+                            className={'px-1 text-neutral-200 no-underline hover:text-neutral-100 shrink-0'}
                         >
                             {crumb.name}
                         </NavLink>
-                        <span css={tw`shrink-0`}>/</span>
+                        <span className={'shrink-0'}>/</span>
                     </React.Fragment>
                 ) : (
-                    <span key={index} css={tw`px-1 text-neutral-300 shrink-0`}>
+                    <span key={index} className={'px-1 text-neutral-300 shrink-0'}>
                         {crumb.name}
                     </span>
                 )
             )}
             {file && (
                 <React.Fragment>
-                    <span css={tw`px-1 text-neutral-300 shrink-0`}>{file}</span>
+                    <span className={'px-1 text-neutral-300 shrink-0'}>{file}</span>
                 </React.Fragment>
             )}
         </div>

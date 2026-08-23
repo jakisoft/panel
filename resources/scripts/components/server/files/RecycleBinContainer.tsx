@@ -166,7 +166,7 @@ export default () => {
                 <div className={'flex items-center flex-1 min-w-0 overflow-hidden'}>
                     <FileActionCheckbox
                         type={'checkbox'}
-                        css={tw`mx-4 shrink-0`}
+                        className={'mx-4 shrink-0'}
                         checked={selectedIds.length === (currentTotalCount === 0 ? -1 : currentTotalCount)}
                         onChange={onSelectAllClick}
                     />

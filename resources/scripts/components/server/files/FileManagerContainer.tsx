@@ -89,7 +89,7 @@ export default () => {
                     <div className={'flex items-center flex-1 min-w-0 overflow-hidden'}>
                         <FileActionCheckbox
                             type={'checkbox'}
-                            css={tw`mx-4 shrink-0`}
+                            className={'mx-4 shrink-0'}
                             checked={selectedFilesLength === (displayedFiles.length === 0 ? -1 : displayedFiles.length)}
                             onChange={onSelectAllClick}
                         />
