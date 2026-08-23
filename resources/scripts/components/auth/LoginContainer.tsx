@@ -10,7 +10,6 @@ import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
-import { LogIn, User, Lock } from 'lucide-react';
 
 interface Values {
     username: string;
@@ -75,22 +74,10 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
             })}
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Login'} icon={<LogIn size={20} />} css={tw`w-full flex`}>
-                    <div>
-                        <div className={'flex items-center gap-1.5 mb-1.5'}>
-                            <User size={14} className={'text-neutral-400'} />
-                            <span className={'text-xs uppercase text-neutral-200 font-medium'}>
-                                Username or Email
-                            </span>
-                        </div>
-                        <Field type={'text'} name={'username'} disabled={isSubmitting} />
-                    </div>
-                    <div css={tw`mt-5`}>
-                        <div className={'flex items-center gap-1.5 mb-1.5'}>
-                            <Lock size={14} className={'text-neutral-400'} />
-                            <span className={'text-xs uppercase text-neutral-200 font-medium'}>Password</span>
-                        </div>
-                        <Field type={'password'} name={'password'} disabled={isSubmitting} />
+                <LoginFormContainer title={'Login to Continue'} css={tw`w-full flex`}>
+                    <Field light type={'text'} label={'Username or Email'} name={'username'} disabled={isSubmitting} />
+                    <div css={tw`mt-6`}>
+                        <Field light type={'password'} label={'Password'} name={'password'} disabled={isSubmitting} />
                     </div>
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>
@@ -115,9 +102,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                     <div css={tw`mt-6 text-center`}>
                         <Link
                             to={'/auth/password'}
-                            className={
-                                'text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-300 transition-colors'
-                            }
+                            css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
                         >
                             Forgot password?
                         </Link>
