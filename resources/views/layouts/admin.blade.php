@@ -179,11 +179,6 @@
                                 <i class="fa fa-cloud-upload"></i> <span>Cloud Backup</span>
                             </a>
                         </li>
-                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.domains') ?: 'active' }}">
-                            <a href="{{ route('admin.domains')}}">
-                                <i class="fa fa-globe"></i> <span>Master Domains</span>
-                            </a>
-                        </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
                             <a href="{{ route('admin.api.index')}}">
                                 <i class="fa fa-gamepad"></i> <span>Application API</span>

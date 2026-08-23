@@ -25,7 +25,6 @@ export default () => {
     const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
-    const domainFeatureEnabled = ServerContext.useStoreState((state) => state.server.data?.featureLimits.domain_feature_enabled ?? true);
 
     const isDefaultLogo = !logo || logo.includes('jksoft-logo.svg') || logo.includes('jksoft-icon.svg');
 
@@ -121,7 +120,7 @@ export default () => {
                     </div>
 
                     {routes.server
-                        .filter((route) => !!route.name && (route.path !== '/domain' || domainFeatureEnabled))
+                        .filter((route) => !!route.name)
                         .map((route) => {
                             const Icon = route.icon;
                             return route.permission ? (

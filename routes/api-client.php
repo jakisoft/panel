@@ -152,12 +152,6 @@ Route::group([
         Route::put('/docker-image', [Client\Servers\SettingsController::class, 'dockerImage']);
     });
 
-    Route::group(['prefix' => '/domain'], function () {
-        Route::get('/', [Client\Servers\DomainController::class, 'index']);
-        Route::post('/subdomain', [Client\Servers\DomainController::class, 'setSubdomain']);
-        Route::post('/custom', [Client\Servers\DomainController::class, 'setCustomDomain']);
-        Route::post('/disable', [Client\Servers\DomainController::class, 'disable']);
-        Route::get('/health', [Client\Servers\DomainController::class, 'health']);
-        Route::get('/logs', [Client\Servers\DomainController::class, 'logs']);
     });
 });
+

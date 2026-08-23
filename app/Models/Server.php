@@ -173,7 +173,6 @@ class Server extends Model implements Identifiable
         'database_limit' => 'present|nullable|integer|min:0',
         'allocation_limit' => 'sometimes|nullable|integer|min:0',
         'backup_limit' => 'present|nullable|integer|min:0',
-        'domain_feature_enabled' => 'sometimes|boolean',
     ];
 
     /**
@@ -195,7 +194,6 @@ class Server extends Model implements Identifiable
         'database_limit' => 'integer',
         'allocation_limit' => 'integer',
         'backup_limit' => 'integer',
-        'domain_feature_enabled' => 'boolean',
         self::CREATED_AT => 'datetime',
         self::UPDATED_AT => 'datetime',
         'deleted_at' => 'datetime',
@@ -243,16 +241,6 @@ class Server extends Model implements Identifiable
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
-    }
-
-    /**
-     * Gets the domain / subdomain configuration for this server.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Pterodactyl\Models\ServerDomain, $this>
-     */
-    public function domain(): HasOne
-    {
-        return $this->hasOne(ServerDomain::class);
     }
 
     /**

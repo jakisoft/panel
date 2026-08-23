@@ -56,7 +56,6 @@ export interface Server {
         databases: number;
         allocations: number;
         backups: number;
-        domain_feature_enabled?: boolean;
     };
     isTransferring: boolean;
     skipScripts: boolean;

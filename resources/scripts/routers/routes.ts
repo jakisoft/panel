@@ -12,7 +12,6 @@ import {
     Activity,
     User,
     Key,
-    Globe,
 } from 'lucide-react';
 import ServerConsole from '@/components/server/console/ServerConsoleContainer';
 import DatabasesContainer from '@/components/server/databases/DatabasesContainer';
@@ -23,7 +22,6 @@ import NetworkContainer from '@/components/server/network/NetworkContainer';
 import StartupContainer from '@/components/server/startup/StartupContainer';
 import FileManagerContainer from '@/components/server/files/FileManagerContainer';
 import SettingsContainer from '@/components/server/settings/SettingsContainer';
-import DomainContainer from '@/components/server/domain/DomainContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
 import AccountApiContainer from '@/components/dashboard/AccountApiContainer';
 import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer';
@@ -186,14 +184,6 @@ export default {
             name: 'Activity',
             icon: Activity,
             component: ServerActivityLogContainer,
-        },
-        {
-            path: '/domain',
-            permission: null,
-            name: 'Domain',
-            icon: Globe,
-            component: DomainContainer,
-            exact: true,
         },
     ],
 } as Routes;
