@@ -17,6 +17,7 @@ class BaseSettingsFormRequest extends AdminFormRequest
             'app:logo' => 'nullable|string|max:500',
             'app:logo_display' => 'nullable|string|in:both,logo_only,text_only',
             'app:favicon' => 'nullable|string|max:500',
+            'app:footer_url' => 'nullable|string|max:500',
             'app:logo_file' => 'nullable|image|max:5120',
             'app:favicon_file' => 'nullable|mimes:ico,png,svg,webp,jpg,jpeg|max:2048',
             'pterodactyl:auth:2fa_required' => 'required|integer|in:0,1,2',

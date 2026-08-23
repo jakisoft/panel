@@ -27,7 +27,9 @@ return [
 
     'logo' => env('APP_LOGO', '/assets/svgs/jksoft-logo.svg'),
 
-    'favicon' => env('APP_FAVICON', '/favicons/favicon.ico'),
+    'favicon' => env('APP_FAVICON', '/assets/svgs/jksoft-icon.svg'),
+
+    'footer_url' => env('APP_FOOTER_URL', 'https://github.com/jakisoft/panel'),
 
     /*
     |--------------------------------------------------------------------------

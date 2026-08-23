@@ -1,7 +1,6 @@
 import React, { forwardRef } from 'react';
 import { Form } from 'formik';
 import styled from 'styled-components/macro';
-import { breakpoint } from '@/theme';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import tw from 'twin.macro';
 import { useStoreState } from 'easy-peasy';
@@ -13,46 +12,65 @@ type Props = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, 
 };
 
 const Container = styled.div`
-    ${tw`w-full px-4 mx-auto`}
-
-    ${breakpoint('sm')`
-        ${tw`w-4/5`}
-    `};
-
-    ${breakpoint('md')`
-        ${tw`w-3/5 p-10`}
-    `};
-
-    ${breakpoint('lg')`
-        ${tw`w-full`}
-        max-width: 720px;
-    `};
+    ${tw`w-full px-4 mx-auto`};
+    max-width: 480px;
 `;
 
 export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => {
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
     const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo);
+    const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
+    const footerUrl = useStoreState((state: ApplicationStore) => state.settings.data?.footer_url || 'https://github.com/jakisoft/panel');
+
+    // Display either logo image OR app name text, never both
+    const renderBrand = () => {
+        if (logoDisplay === 'text_only') {
+            return (
+                <span className={'font-bold text-sm sm:text-base text-neutral-200 tracking-tight truncate max-w-[170px]'}>
+                    {name}
+                </span>
+            );
+        }
+        return (
+            <img
+                src={logo || jksoftLogo}
+                alt={name}
+                className={'h-7 sm:h-8 max-w-[140px] object-contain shrink-0'}
+            />
+        );
+    };
 
     return (
         <Container>
-            {title && <h2 css={tw`text-3xl text-center text-neutral-100 font-medium py-4 tracking-tight`}>{title}</h2>}
-            <FlashMessageRender css={tw`mb-3 px-1`} />
             <Form {...props} ref={ref}>
-                <div css={tw`md:flex w-full bg-neutral-900 border border-neutral-700/80 shadow-2xl rounded-2xl p-6 md:p-8 md:pl-0 mx-auto items-center`}>
-                    <div css={tw`flex-none select-none mb-6 md:mb-0 self-center px-6 md:px-10 text-center`}>
-                        <img
-                            src={logo || jksoftLogo}
-                            alt={name}
-                            css={tw`block w-36 md:w-44 mx-auto object-contain max-h-24`}
-                        />
-                        <p css={tw`text-center text-sm font-semibold text-neutral-300 font-header mt-3`}>{name}</p>
+                <div css={tw`w-full bg-neutral-900 border border-neutral-800 shadow-2xl rounded-2xl p-6 sm:p-8 mx-auto`}>
+                    {/* Top Asymmetric Header: Title on Top-Left, Logo OR Name on Top-Right */}
+                    <div className={'flex items-center justify-between gap-4 pb-5 mb-5 border-b border-neutral-800/80'}>
+                        {title && (
+                            <h2 className={'text-xl sm:text-2xl font-bold text-neutral-100 tracking-tight'}>
+                                {title}
+                            </h2>
+                        )}
+                        <div className={'flex items-center justify-end shrink-0'}>
+                            {renderBrand()}
+                        </div>
                     </div>
-                    <div css={tw`flex-1 md:border-l md:border-neutral-800 md:pl-8`}>{props.children}</div>
+
+                    <FlashMessageRender css={tw`mb-4 px-1`} />
+                    {props.children}
                 </div>
             </Form>
-            <p css={tw`text-center text-neutral-500 text-xs mt-5`}>
+            <p css={tw`text-center text-neutral-500 text-xs mt-6`}>
                 &copy; 2015 - {new Date().getFullYear()}&nbsp;
-                <span css={tw`text-neutral-400 font-semibold`}>{name}</span>. All rights reserved.
+                <a
+                    href={footerUrl}
+                    rel={'noopener nofollow noreferrer'}
+                    target={'_blank'}
+                    css={tw`no-underline text-neutral-400 font-semibold hover:text-neutral-300 transition-colors`}
+                >
+                    {name}
+                </a>
+                . All rights reserved.
             </p>
         </Container>
     );

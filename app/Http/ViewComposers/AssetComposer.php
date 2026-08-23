@@ -24,7 +24,8 @@ class AssetComposer
             'name' => config('app.name') ?? 'JKSoft Cloud',
             'logo' => config('app.logo') ?? '/assets/svgs/jksoft-logo.svg',
             'logo_display' => config('app.logo_display') ?? 'both',
-            'favicon' => config('app.favicon') ?? '/favicons/favicon.ico',
+            'favicon' => config('app.favicon') ?? '/assets/svgs/jksoft-icon.svg',
+            'footer_url' => config('app.footer_url') ?? 'https://github.com/jakisoft/panel',
             'locale' => config('app.locale') ?? 'en',
             'recaptcha' => [
                 'enabled' => config('recaptcha.enabled', false),

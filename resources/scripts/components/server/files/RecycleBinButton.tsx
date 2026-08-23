@@ -8,12 +8,12 @@ export default ({ className }: WithClassname) => {
 
     return (
         <NavLink
-            to={`/server/${id}/files/recycle-bin`}
+            to={`/server/${id}/files/trash`}
             className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-sm bg-rose-600 hover:bg-rose-500 text-white ${className || ''}`}
-            title={'Buka Tong Sampah (Recycle Bin)'}
+            title={'Buka Sampah (Trash)'}
         >
             <Trash2 size={16} />
-            <span>Recycle Bin</span>
+            <span>Sampah</span>
         </NavLink>
     );
 };

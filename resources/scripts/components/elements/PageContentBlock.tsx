@@ -3,6 +3,8 @@ import ContentContainer from '@/components/elements/ContentContainer';
 import { CSSTransition } from 'react-transition-group';
 import tw from 'twin.macro';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import { useStoreState } from 'easy-peasy';
+import { ApplicationStore } from '@/state';
 
 export interface PageContentBlockProps {
     title?: string;
@@ -11,6 +13,9 @@ export interface PageContentBlockProps {
 }
 
 const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey, className, children }) => {
+    const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
+    const footerUrl = useStoreState((state: ApplicationStore) => state.settings.data?.footer_url || 'https://github.com/jakisoft/panel');
+
     useEffect(() => {
         if (title) {
             document.title = title;
@@ -26,15 +31,16 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
                 </ContentContainer>
                 <ContentContainer css={tw`mb-4`}>
                     <p css={tw`text-center text-neutral-500 text-xs`}>
+                        &copy; 2015 - {new Date().getFullYear()}&nbsp;
                         <a
                             rel={'noopener nofollow noreferrer'}
-                            href={'https://pterodactyl.io'}
+                            href={footerUrl}
                             target={'_blank'}
-                            css={tw`no-underline text-neutral-500 hover:text-neutral-300`}
+                            css={tw`no-underline text-neutral-400 font-semibold hover:text-neutral-300 transition-colors`}
                         >
-                            Pterodactyl&reg;
+                            {name}
                         </a>
-                        &nbsp;&copy; 2015 - {new Date().getFullYear()}
+                        . All rights reserved.
                     </p>
                 </ContentContainer>
             </>

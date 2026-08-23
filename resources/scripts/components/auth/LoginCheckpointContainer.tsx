@@ -27,8 +27,8 @@ const LoginCheckpointContainer = () => {
     const [isMissingDevice, setIsMissingDevice] = useState(false);
 
     return (
-        <LoginFormContainer title={'Device Checkpoint'} css={tw`w-full flex`}>
-            <div css={tw`mt-6`}>
+        <LoginFormContainer title={'Two-Factor Auth'} css={tw`w-full flex`}>
+            <div>
                 <Field
                     light
                     name={isMissingDevice ? 'recoveryCode' : 'code'}

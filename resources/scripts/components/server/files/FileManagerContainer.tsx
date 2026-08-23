@@ -46,7 +46,7 @@ export default () => {
 
     useEffect(() => {
         if (directory.startsWith('/.trash')) {
-            history.replace(`/server/${id}/files/recycle-bin`);
+            history.replace(`/server/${id}/files/trash`);
         }
     }, [directory, id]);
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerStats } from '@/api/server/getServerResourceUsage';
-import { bytesToString, ip } from '@/lib/formatters';
+import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import Spinner from '@/components/elements/Spinner';
 import { Server as ServerIcon, Cpu, HardDrive, Globe, Layers } from 'lucide-react';
 

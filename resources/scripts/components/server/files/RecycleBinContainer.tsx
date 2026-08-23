@@ -91,7 +91,7 @@ export default () => {
     const selectedTrashItems = items.filter((i) => selectedIds.includes(i.id));
 
     return (
-        <ServerContentBlock title={'Recycle Bin'} showFlashKey={'files'}>
+        <ServerContentBlock title={'Sampah'} showFlashKey={'files'}>
             <SpinnerOverlay visible={loading && !items.length && !!spinnerMessage} size={'large'} fixed>
                 {spinnerMessage}
             </SpinnerOverlay>
@@ -107,7 +107,7 @@ export default () => {
             </Dialog.Confirm>
 
             {/* Breadcrumb Bar identical to File Manager */}
-            <div className={'flex flex-wrap-reverse md:flex-nowrap items-center justify-between gap-3 mb-4'}>
+            <div className={'flex items-center justify-between gap-3 mb-4'}>
                 <div css={tw`flex flex-grow-0 items-center text-sm text-neutral-500 overflow-x-hidden`}>
                     <FileActionCheckbox
                         type={'checkbox'}
@@ -120,24 +120,20 @@ export default () => {
                         container
                     </NavLink>
                     /
-                    <span css={tw`px-1 text-neutral-300`}>recycle-bin</span>
+                    <span css={tw`px-1 text-neutral-300`}>trash</span>
                 </div>
 
-                <div className={'flex items-center gap-2'}>
-                    <NavLink
-                        to={`/server/${match.params.id}/files`}
-                        className={'px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white rounded-lg text-xs font-semibold transition-colors no-underline'}
-                    >
-                        Back to Files
-                    </NavLink>
+                <div className={'flex items-center gap-2 pr-2'}>
                     {items.length > 0 && (
-                        <Button.Danger
+                        <button
+                            type={'button'}
                             onClick={() => setShowEmptyConfirm(true)}
-                            className={'!py-2 !px-3 text-xs flex items-center gap-1.5 font-medium'}
+                            className={'p-2 rounded-xl text-neutral-400 hover:text-red-400 hover:bg-neutral-800 transition-colors focus:outline-none'}
+                            title={'Kosongkan Tong Sampah'}
+                            aria-label={'Kosongkan Tong Sampah'}
                         >
-                            <Trash2 size={14} />
-                            Empty Trash
-                        </Button.Danger>
+                            <Trash2 size={18} />
+                        </button>
                     )}
                 </div>
             </div>
@@ -146,7 +142,7 @@ export default () => {
             {loading && !items.length ? (
                 <Spinner size={'large'} centered />
             ) : !items.length ? (
-                <p css={tw`text-sm text-neutral-400 text-center py-8`}>Recycle bin is empty.</p>
+                <p css={tw`text-sm text-neutral-400 text-center py-8`}>Sampah kosong.</p>
             ) : (
                 <div>
                     {items.map((item) => (

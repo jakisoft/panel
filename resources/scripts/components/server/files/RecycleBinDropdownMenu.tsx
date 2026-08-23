@@ -4,7 +4,9 @@ import { faEllipsisH, faUndo, faTrashAlt, IconDefinition } from '@fortawesome/fr
 import DropdownMenu from '@/components/elements/DropdownMenu';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
-import { TrashItem, restoreTrashItem, deleteTrashItemPermanently } from '@/api/server/files/recycleBin';
+import { format } from 'date-fns';
+import { Clock, Calendar, Folder } from 'lucide-react';
+import { TrashItem, restoreTrashItem, deleteTrashItemPermanently, formatDaysRemaining } from '@/api/server/files/recycleBin';
 import { ServerContext } from '@/state/server';
 import useFlash from '@/plugins/useFlash';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
@@ -96,8 +98,33 @@ const RecycleBinDropdownMenu = ({ item, onItemRemoved }: Props) => {
                     </div>
                 )}
             >
-                <Row onClick={doRestore} icon={faUndo} title={'Pulihkan (Restore)'} />
-                <Row onClick={() => setShowDeleteConfirm(true)} icon={faTrashAlt} title={'Hapus Permanen'} $danger />
+                {/* Trash Item Metadata Info & Countdown */}
+                <div css={tw`p-3 border-b border-neutral-700/60 text-xs text-neutral-300 min-w-[230px]`}>
+                    <div css={tw`font-bold text-neutral-100 mb-2 truncate text-xs`} title={item.name}>
+                        {item.name}
+                    </div>
+                    <div css={tw`space-y-1.5`}>
+                        <div css={tw`flex items-center gap-1.5 text-neutral-400 text-[11px]`}>
+                            <Calendar size={12} className={'shrink-0 text-neutral-400'} />
+                            <span>Dihapus: <span className={'text-neutral-200 font-medium'}>{format(new Date(item.deletedAt), 'dd MMM yyyy HH:mm')}</span></span>
+                        </div>
+                        <div css={tw`flex items-center gap-1.5 text-neutral-400 text-[11px]`}>
+                            <Clock size={12} className={'shrink-0 text-amber-400'} />
+                            <span>Otomatis hapus: <span className={'text-amber-300 font-medium'}>{formatDaysRemaining(item.deletedAt)}</span></span>
+                        </div>
+                        {item.originalDirectory && (
+                            <div css={tw`flex items-center gap-1.5 text-neutral-400 text-[11px] truncate`}>
+                                <Folder size={12} className={'shrink-0 text-neutral-400'} />
+                                <span className={'truncate'} title={item.originalDirectory}>Asal: <span className={'font-mono text-neutral-300'}>{item.originalDirectory}</span></span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div css={tw`pt-1`}>
+                    <Row onClick={doRestore} icon={faUndo} title={'Pulihkan (Restore)'} />
+                    <Row onClick={() => setShowDeleteConfirm(true)} icon={faTrashAlt} title={'Hapus Permanen'} $danger />
+                </div>
             </DropdownMenu>
         </>
     );

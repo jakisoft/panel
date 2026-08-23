@@ -104,6 +104,13 @@ export default {
             exact: true,
         },
         {
+            path: '/files/trash',
+            permission: 'file.*',
+            name: undefined,
+            component: RecycleBinContainer,
+            exact: true,
+        },
+        {
             path: '/files/recycle-bin',
             permission: 'file.*',
             name: undefined,

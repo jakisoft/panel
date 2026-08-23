@@ -6,16 +6,44 @@ import { ApplicationStore } from '@/state';
 import SearchContainer from '@/components/dashboard/search/SearchContainer';
 import { useSidebar } from '@/components/SidebarContext';
 import UserDropdown from '@/components/navigation/UserDropdown';
+import jksoftIcon from '@/assets/images/jksoft-icon.svg';
 import jksoftLogo from '@/assets/images/jksoft-logo.svg';
 
 export default () => {
     const name = useStoreState((state: ApplicationStore) => state.settings.data?.name || 'JKSoft Cloud');
-    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo) || jksoftLogo;
+    const logo = useStoreState((state: ApplicationStore) => state.settings.data?.logo);
     const logoDisplay = useStoreState((state: ApplicationStore) => state.settings.data?.logo_display || 'both');
     const { toggle } = useSidebar();
 
-    const showLogo = logoDisplay === 'both' || logoDisplay === 'logo_only';
-    const showText = logoDisplay === 'text_only';
+    const isDefaultLogo = !logo || logo.includes('jksoft-logo.svg') || logo.includes('jksoft-icon.svg');
+
+    const renderBrand = () => {
+        if (logoDisplay === 'text_only') {
+            return <span className={'font-bold text-base text-neutral-100 tracking-tight truncate'}>{name}</span>;
+        }
+
+        if (logoDisplay === 'logo_only') {
+            return (
+                <img
+                    src={logo || (isDefaultLogo ? jksoftLogo : logo)}
+                    alt={name}
+                    className={'h-8 sm:h-9 max-w-[190px] object-contain'}
+                />
+            );
+        }
+
+        // 'both' (default)
+        return (
+            <div className={'flex items-center gap-2.5 min-w-0'}>
+                <img
+                    src={isDefaultLogo ? jksoftIcon : (logo || jksoftIcon)}
+                    alt={name}
+                    className={isDefaultLogo ? 'h-8 w-8 object-contain shrink-0 rounded-lg shadow-sm' : 'h-8 sm:h-9 max-w-[140px] object-contain shrink-0'}
+                />
+                <span className={'font-bold text-base text-neutral-100 tracking-tight truncate'}>{name}</span>
+            </div>
+        );
+    };
 
     return (
         <header className={'w-full bg-neutral-900/95 backdrop-blur border-b border-neutral-800 shadow-md sticky top-0 z-30'}>
@@ -34,14 +62,9 @@ export default () => {
 
                     <Link
                         to={'/'}
-                        className={'flex items-center gap-2.5 no-underline text-neutral-100 hover:text-white transition-colors'}
+                        className={'flex items-center gap-2.5 no-underline text-neutral-100 hover:text-white transition-colors min-w-0'}
                     >
-                        {showLogo && (
-                            <img src={logo} alt={name} className={'h-8 sm:h-9 max-w-[200px] object-contain'} />
-                        )}
-                        {showText && (
-                            <span className={'font-bold text-base text-neutral-100 tracking-tight'}>{name}</span>
-                        )}
+                        {renderBrand()}
                     </Link>
                 </div>
 

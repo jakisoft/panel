@@ -5,6 +5,7 @@ export interface SiteSettings {
     logo?: string;
     logo_display?: 'both' | 'logo_only' | 'text_only';
     favicon?: string;
+    footer_url?: string;
     locale: string;
     recaptcha: {
         enabled: boolean;

@@ -102,24 +102,33 @@
                             <div class="form-group col-md-6">
                                 <label class="control-label">Panel Favicon (URL / Upload)</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="faviconUrlInput" name="app:favicon" value="{{ old('app:favicon', config('app.favicon')) }}" placeholder="/favicons/favicon.ico atau https://domain.com/favicon.png" />
+                                    <input type="text" class="form-control" id="faviconUrlInput" name="app:favicon" value="{{ old('app:favicon', config('app.favicon')) }}" placeholder="/assets/svgs/jksoft-icon.svg atau https://domain.com/favicon.svg" />
                                     <span class="input-group-btn">
                                         <label class="btn btn-default" style="margin-bottom: 0;">
                                             <i class="fa fa-upload"></i> Upload
-                                            <input type="file" id="faviconFileInput" name="app:favicon_file" accept="image/x-icon,image/png,image/svg+xml,image/jpeg" style="display: none;">
+                                            <input type="file" id="faviconFileInput" name="app:favicon_file" accept="image/x-icon,image/png,image/svg+xml,image/jpeg,image/webp" style="display: none;">
                                         </label>
                                     </span>
                                 </div>
-                                <p class="text-muted"><small>Icon tab browser (Favicon). Masukkan URL atau upload file (.ico, .png, .svg).</small></p>
+                                <p class="text-muted"><small>Icon tab browser (Favicon). Masukkan URL atau upload file (.svg, .ico, .png).</small></p>
 
                                 <div style="margin-top: 10px; display: flex; align-items: center; gap: 15px; background: #1b2228; padding: 12px; border-radius: 6px; border: 1px solid #333;">
                                     <div style="flex: 1; display: flex; align-items: center; gap: 10px;">
                                         <span style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: bold;">Preview:</span>
-                                        <img id="faviconPreviewImg" src="{{ old('app:favicon', config('app.favicon', '/favicons/favicon.ico')) }}" alt="Favicon Preview" style="width: 32px; height: 32px; object-fit: contain;">
+                                        <img id="faviconPreviewImg" src="{{ old('app:favicon', config('app.favicon', '/assets/svgs/jksoft-icon.svg')) }}" alt="Favicon Preview" style="width: 32px; height: 32px; object-fit: contain;">
                                     </div>
                                     <button type="button" id="faviconTrashBtn" class="btn btn-danger btn-sm" title="Hapus kustomisasi & kembalikan ke default" style="display: none;">
                                         <i class="fa fa-trash"></i> Reset Default
                                     </button>
+                                </div>
+                            </div>
+
+                            <!-- Footer URL Link -->
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Tautan Footer (Footer Link URL)</label>
+                                <div>
+                                    <input type="text" class="form-control" name="app:footer_url" value="{{ old('app:footer_url', config('app.footer_url', 'https://github.com/jakisoft/panel')) }}" placeholder="https://github.com/jakisoft/panel" />
+                                    <p class="text-muted"><small>Tautan tujuan saat pengguna mengklik nama aplikasi di footer (berlaku di semua halaman: Auth, Dashboard, Akun, Server, dan Admin). Teks footer otomatis menggunakan Company Name.</small></p>
                                 </div>
                             </div>
 
@@ -167,7 +176,7 @@
     <script>
         $(document).ready(function () {
             var defaultLogo = '/assets/svgs/jksoft-logo.svg';
-            var defaultFavicon = '/favicons/favicon.ico';
+            var defaultFavicon = '/assets/svgs/jksoft-icon.svg';
 
             var logoInput = $('#logoUrlInput');
             var logoFileInput = $('#logoFileInput');
