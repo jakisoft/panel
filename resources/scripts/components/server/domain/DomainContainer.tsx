@@ -16,12 +16,17 @@ import {
     AlertTriangle,
     Check,
     Radio,
+    Activity,
+    Lock,
+    Play,
+    Zap,
 } from 'lucide-react';
 import getDomain from '@/api/server/domain/getDomain';
 import setSubdomainApi from '@/api/server/domain/setSubdomain';
 import setCustomDomainApi from '@/api/server/domain/setCustomDomain';
 import disableDomainApi from '@/api/server/domain/disableDomain';
 import getDomainLogsApi from '@/api/server/domain/getDomainLogs';
+import getDomainHealthApi, { DomainHealthResult } from '@/api/server/domain/getDomainHealth';
 import { ServerDomainData } from '@/api/server/domain/types';
 
 export default () => {
@@ -43,7 +48,9 @@ export default () => {
     const [customDomainInput, setCustomDomainInput] = useState('');
     const [tunnelTokenInput, setTunnelTokenInput] = useState('');
 
-    // Tunnel Logs
+    // Live Health & Logs
+    const [healthResult, setHealthResult] = useState<DomainHealthResult | null>(null);
+    const [healthChecking, setHealthChecking] = useState(false);
     const [logs, setLogs] = useState<string>('');
     const [logsLoading, setLogsLoading] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -81,6 +88,20 @@ export default () => {
             });
     };
 
+    const fetchHealth = () => {
+        setHealthChecking(true);
+        getDomainHealthApi(uuid)
+            .then((res) => {
+                setHealthResult(res);
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+            .finally(() => {
+                setHealthChecking(false);
+            });
+    };
+
     const fetchLogs = () => {
         setLogsLoading(true);
         getDomainLogsApi(uuid)
@@ -100,12 +121,15 @@ export default () => {
     }, [uuid]);
 
     useEffect(() => {
+        if (domainData?.is_active) {
+            fetchHealth();
+        }
         if (domainData?.mode === 'custom' && domainData?.is_active) {
             fetchLogs();
         }
-    }, [domainData?.mode, domainData?.is_active]);
+    }, [domainData?.is_active, domainData?.mode]);
 
-    // Handle Subdomain Submit
+    // Handle Subdomain Submit / Re-activate
     const handleSubdomainSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedPoolId || !subdomainInput.trim()) {
@@ -137,14 +161,23 @@ export default () => {
             });
     };
 
-    // Handle Custom Domain Submit
+    // Handle Custom Domain Submit / Re-activate
     const handleCustomDomainSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!customDomainInput.trim() || !tunnelTokenInput.trim()) {
+        if (!customDomainInput.trim()) {
             addFlash({
                 key: 'domain',
                 type: 'error',
-                message: 'Silakan isi domain kustom dan token Cloudflare Tunnel Anda.',
+                message: 'Silakan masukkan nama domain kustom Anda.',
+            });
+            return;
+        }
+
+        if (!tunnelTokenInput.trim() && !domainData?.has_tunnel_token) {
+            addFlash({
+                key: 'domain',
+                type: 'error',
+                message: 'Token Cloudflare Tunnel wajib diisi saat konfigurasi awal.',
             });
             return;
         }
@@ -170,9 +203,9 @@ export default () => {
             });
     };
 
-    // Handle Disable / Turn Off Domain
+    // Handle Disable / Turn Off Domain (Preserves data)
     const handleDisable = () => {
-        if (!confirm('Nonaktifkan konfigurasi domain? Semua DNS record atau tunnel yang terhubung ke server ini akan dihapus.')) {
+        if (!confirm('Nonaktifkan routing domain? DNS record di Cloudflare / Tunnel akan dimatikan dari jaringan, tetapi pengaturan Anda tetap tersimpan.')) {
             return;
         }
 
@@ -184,11 +217,9 @@ export default () => {
                 addFlash({
                     key: 'domain',
                     type: 'warning',
-                    message: res.message || 'Konfigurasi domain telah dinonaktifkan.',
+                    message: res.message || 'Domain dinonaktifkan. Pengaturan Anda tetap tersimpan dan siap diaktifkan kembali kapan saja.',
                 });
-                setSubdomainInput('');
-                setCustomDomainInput('');
-                setTunnelTokenInput('');
+                setHealthResult(null);
                 loadData();
             })
             .catch((error) => {
@@ -209,8 +240,27 @@ export default () => {
         return <Spinner size={'large'} centered />;
     }
 
+    if (domainData?.feature_enabled === false) {
+        return (
+            <ServerContentBlock title={'Domain Configuration'}>
+                <div className={'bg-neutral-900 border border-neutral-800 rounded-2xl p-10 text-center shadow-xl'}>
+                    <div className={'w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto mb-4'}>
+                        <Lock size={28} />
+                    </div>
+                    <h2 className={'text-lg font-bold text-neutral-100'}>Fitur Domain Tidak Tersedia</h2>
+                    <p className={'text-sm text-neutral-400 max-w-md mx-auto mt-2'}>
+                        Fitur domain atau routing Cloudflare tidak diizinkan untuk server ini. Silakan hubungi administrator panel untuk mengaktifkan izin domain pada server Anda.
+                    </p>
+                </div>
+            </ServerContentBlock>
+        );
+    }
+
     const isSubdomainActive = domainData?.mode === 'subdomain' && domainData?.is_active;
     const isCustomActive = domainData?.mode === 'custom' && domainData?.is_active;
+    const hasSavedSubdomain = !!domainData?.subdomain;
+    const hasSavedCustom = !!domainData?.custom_domain;
+
     const selectedPool = domainData?.available_pools.find((p) => p.id === selectedPoolId);
     const previewDomain = subdomainInput.trim() && selectedPool ? `${subdomainInput.trim().toLowerCase()}.${selectedPool.domain}` : null;
 
@@ -228,7 +278,7 @@ export default () => {
                         <div>
                             <h2 className={'text-lg font-bold text-neutral-100'}>Konfigurasi Domain & Jaringan</h2>
                             <p className={'text-xs text-neutral-400 mt-0.5'}>
-                                Hubungkan subdomain panel otomatis atau domain kustom Anda sendiri ke port server ini.
+                                Hubungkan subdomain panel otomatis atau domain kustom Cloudflare Tunnel ke port server ini.
                             </p>
                         </div>
                     </div>
@@ -249,7 +299,7 @@ export default () => {
                         ) : (
                             <span className={'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-neutral-800/80 text-neutral-400 border border-neutral-700'}>
                                 <XCircle size={13} />
-                                Domain Nonaktif
+                                Domain Nonaktif (Tersimpan)
                             </span>
                         )}
                     </div>
@@ -260,7 +310,7 @@ export default () => {
                     <div className={'mt-4 pt-4 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 bg-neutral-950/60 p-4 rounded-xl'}>
                         <div className={'min-w-0'}>
                             <span className={'text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-0.5'}>
-                                Alamat Domain Saat Ini:
+                                Alamat Domain Aktif:
                             </span>
                             <div className={'flex items-center gap-2'}>
                                 <span className={'text-base font-extrabold text-cyan-300 tracking-tight truncate'}>
@@ -276,7 +326,17 @@ export default () => {
                                 className={'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-200 transition-colors border border-neutral-700'}
                             >
                                 {copied ? <Check size={13} className={'text-emerald-400'} /> : <Copy size={13} />}
-                                <span>{copied ? 'Tersalin!' : 'Salin Domain'}</span>
+                                <span>{copied ? 'Tersalin!' : 'Salin'}</span>
+                            </button>
+
+                            <button
+                                type={'button'}
+                                onClick={fetchHealth}
+                                disabled={healthChecking}
+                                className={'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-cyan-300 transition-colors border border-neutral-700'}
+                            >
+                                <Activity size={13} className={healthChecking ? 'animate-spin' : ''} />
+                                <span>Cek Status</span>
                             </button>
 
                             <button
@@ -286,9 +346,24 @@ export default () => {
                                 className={'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors border border-red-500/20'}
                             >
                                 <XCircle size={13} />
-                                <span>Matikan Domain</span>
+                                <span>Matikan</span>
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {/* Health Check Status Card */}
+                {healthResult && (
+                    <div className={'mt-3 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800/80 text-xs flex items-center justify-between gap-3'}>
+                        <div className={'flex items-center gap-2.5 min-w-0'}>
+                            <Zap size={15} className={healthResult.connected ? 'text-emerald-400' : 'text-amber-400'} />
+                            <span className={'text-neutral-300'}>{healthResult.message}</span>
+                        </div>
+                        {healthResult.latency_ms !== undefined && (
+                            <span className={'px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 font-mono text-neutral-400'}>
+                                {healthResult.latency_ms} ms
+                            </span>
+                        )}
                     </div>
                 )}
             </div>
@@ -393,30 +468,42 @@ export default () => {
                             <div className={'p-3.5 rounded-xl bg-neutral-950/60 border border-neutral-800 text-xs text-neutral-400 flex items-start gap-2.5'}>
                                 <AlertTriangle size={16} className={'text-amber-400 shrink-0 mt-0.5'} />
                                 <span>
-                                    Mengaktifkan subdomain ini akan secara otomatis menonaktifkan dan membersihkan custom domain / tunnel lama jika sebelumnya aktif.
+                                    Mengaktifkan subdomain ini akan secara otomatis menonaktifkan dan membersihkan custom domain / tunnel jika sebelumnya aktif.
                                 </span>
                             </div>
 
                             <div className={'pt-2 flex justify-end gap-3'}>
-                                {isSubdomainActive && (
+                                {isSubdomainActive ? (
+                                    <>
+                                        <button
+                                            type={'button'}
+                                            onClick={handleDisable}
+                                            disabled={submitting}
+                                            className={'px-4 py-2.5 rounded-xl text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors'}
+                                        >
+                                            Matikan Subdomain
+                                        </button>
+
+                                        <button
+                                            type={'submit'}
+                                            disabled={submitting || !domainData?.available_pools || domainData.available_pools.length === 0}
+                                            className={'px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'}
+                                        >
+                                            {submitting && <Spinner size={'small'} />}
+                                            <span>Perbarui Subdomain</span>
+                                        </button>
+                                    </>
+                                ) : (
                                     <button
-                                        type={'button'}
-                                        onClick={handleDisable}
-                                        disabled={submitting}
-                                        className={'px-4 py-2.5 rounded-xl text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors'}
+                                        type={'submit'}
+                                        disabled={submitting || !domainData?.available_pools || domainData.available_pools.length === 0}
+                                        className={'px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'}
                                     >
-                                        Nonaktifkan Subdomain
+                                        {submitting && <Spinner size={'small'} />}
+                                        <Play size={13} />
+                                        <span>{hasSavedSubdomain ? 'Aktifkan Kembali Subdomain' : 'Aktifkan Subdomain'}</span>
                                     </button>
                                 )}
-
-                                <button
-                                    type={'submit'}
-                                    disabled={submitting || !domainData?.available_pools || domainData.available_pools.length === 0}
-                                    className={'px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'}
-                                >
-                                    {submitting && <Spinner size={'small'} />}
-                                    <span>{isSubdomainActive ? 'Perbarui Subdomain' : 'Aktifkan Subdomain'}</span>
-                                </button>
                             </div>
                         </div>
                     </form>
@@ -461,7 +548,7 @@ export default () => {
                                 <textarea
                                     value={tunnelTokenInput}
                                     onChange={(e) => setTunnelTokenInput(e.target.value)}
-                                    placeholder={domainData?.has_tunnel_token ? '(Token sudah tersimpan - isi jika ingin mengganti token baru)' : 'Tempel token Cloudflare Tunnel Anda di sini (diawali eyJh...)'}
+                                    placeholder={domainData?.has_tunnel_token ? '(Token sudah tersimpan - kosongkan jika tidak ingin diubah)' : 'Tempel token Cloudflare Tunnel Anda di sini (diawali eyJh...)'}
                                     rows={3}
                                     className={'w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs font-mono focus:outline-none focus:border-cyan-500 transition-colors'}
                                     required={!domainData?.has_tunnel_token}
@@ -479,25 +566,37 @@ export default () => {
                             </div>
 
                             <div className={'pt-2 flex justify-end gap-3'}>
-                                {isCustomActive && (
+                                {isCustomActive ? (
+                                    <>
+                                        <button
+                                            type={'button'}
+                                            onClick={handleDisable}
+                                            disabled={submitting}
+                                            className={'px-4 py-2.5 rounded-xl text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors'}
+                                        >
+                                            Matikan Tunnel
+                                        </button>
+
+                                        <button
+                                            type={'submit'}
+                                            disabled={submitting}
+                                            className={'px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'}
+                                        >
+                                            {submitting && <Spinner size={'small'} />}
+                                            <span>Perbarui Custom Domain</span>
+                                        </button>
+                                    </>
+                                ) : (
                                     <button
-                                        type={'button'}
-                                        onClick={handleDisable}
+                                        type={'submit'}
                                         disabled={submitting}
-                                        className={'px-4 py-2.5 rounded-xl text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors'}
+                                        className={'px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'}
                                     >
-                                        Uninstall Tunnel
+                                        {submitting && <Spinner size={'small'} />}
+                                        <Play size={13} />
+                                        <span>{hasSavedCustom ? 'Aktifkan Kembali Custom Domain' : 'Hubungkan Custom Domain'}</span>
                                     </button>
                                 )}
-
-                                <button
-                                    type={'submit'}
-                                    disabled={submitting}
-                                    className={'px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'}
-                                >
-                                    {submitting && <Spinner size={'small'} />}
-                                    <span>{isCustomActive ? 'Perbarui Custom Domain' : 'Hubungkan Custom Domain'}</span>
-                                </button>
                             </div>
                         </div>
                     </form>

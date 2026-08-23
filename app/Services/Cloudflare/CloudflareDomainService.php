@@ -73,11 +73,11 @@ class CloudflareDomainService
         $serverDomain = ServerDomain::firstOrNew(['server_id' => $server->id]);
 
         // Cleanup previous custom domain/tunnel if active
-        if ($serverDomain->mode === 'custom') {
+        if ($serverDomain->mode === 'custom' && $serverDomain->is_active) {
             $this->stopTunnelProcess($server);
         }
 
-        // Delete old DNS record on Cloudflare if exists and different
+        // Delete old DNS record on Cloudflare if exists
         if ($serverDomain->dns_record_id && $serverDomain->domain_pool_id) {
             $oldPool = DomainPool::find($serverDomain->domain_pool_id);
             if ($oldPool) {
@@ -137,7 +137,7 @@ class CloudflareDomainService
             throw new Exception('Gagal mendeteksi IP atau FQDN valid dari node server.');
         }
 
-        // Create SRV Record for Minecraft / Game servers if port != default (e.g. 25565)
+        // Create SRV Record for Minecraft / Game servers
         try {
             $srvRecordId = $this->createCloudflareSrvRecord(
                 $pool->zone_id,
@@ -151,7 +151,7 @@ class CloudflareDomainService
                 $apiToken
             );
         } catch (Exception $e) {
-            // SRV record failure shouldn't completely block standard A record
+            // Non-fatal if SRV fails
         }
 
         $serverDomain->mode = 'subdomain';
@@ -160,12 +160,8 @@ class CloudflareDomainService
         $serverDomain->full_subdomain = $fullSubdomain;
         $serverDomain->dns_record_id = $dnsRecordId;
         $serverDomain->srv_record_id = $srvRecordId;
-        $serverDomain->custom_domain = null;
-        $serverDomain->tunnel_token = null;
-        $serverDomain->tunnel_id = null;
-        $serverDomain->tunnel_account_id = null;
         $serverDomain->is_active = true;
-        $serverDomain->last_log = "Subdomain {$fullSubdomain} aktif mengarah ke {$targetIp}:{$targetPort}";
+        $serverDomain->last_log = "Subdomain {$fullSubdomain} aktif terhubung ke {$targetIp}:{$targetPort}";
         $serverDomain->save();
 
         return $serverDomain;
@@ -183,16 +179,17 @@ class CloudflareDomainService
             throw new Exception('Format nama domain kustom tidak valid.');
         }
 
-        if (empty($tunnelToken)) {
+        $serverDomain = ServerDomain::firstOrNew(['server_id' => $server->id]);
+
+        $finalToken = !empty($tunnelToken) ? $tunnelToken : $serverDomain->tunnel_token;
+        if (empty($finalToken)) {
             throw new Exception('Cloudflare Tunnel Token wajib diisi.');
         }
 
         // Decode Tunnel Token to extract account_id & tunnel_id
-        $decoded = $this->decodeTunnelToken($tunnelToken);
+        $decoded = $this->decodeTunnelToken($finalToken);
         $accountId = $decoded['a'] ?? null;
         $tunnelId = $decoded['t'] ?? null;
-
-        $serverDomain = ServerDomain::firstOrNew(['server_id' => $server->id]);
 
         // Cleanup previous subdomain if was active
         if ($serverDomain->mode === 'subdomain' && $serverDomain->dns_record_id && $serverDomain->domain_pool_id) {
@@ -203,19 +200,16 @@ class CloudflareDomainService
                     $this->deleteCloudflareDnsRecord($pool->zone_id, $serverDomain->srv_record_id, $pool->api_token);
                 }
             }
+            $serverDomain->dns_record_id = null;
+            $serverDomain->srv_record_id = null;
         }
 
         // Start cloudflared docker container for this server
-        $this->startTunnelProcess($server, $tunnelToken);
+        $this->startTunnelProcess($server, $finalToken);
 
         $serverDomain->mode = 'custom';
-        $serverDomain->domain_pool_id = null;
-        $serverDomain->subdomain = null;
-        $serverDomain->full_subdomain = null;
-        $serverDomain->dns_record_id = null;
-        $serverDomain->srv_record_id = null;
         $serverDomain->custom_domain = $customDomain;
-        $serverDomain->tunnel_token = $tunnelToken;
+        $serverDomain->tunnel_token = $finalToken;
         $serverDomain->tunnel_id = $tunnelId;
         $serverDomain->tunnel_account_id = $accountId;
         $serverDomain->is_active = true;
@@ -226,7 +220,8 @@ class CloudflareDomainService
     }
 
     /**
-     * Disable all domain configurations and cleanup completely.
+     * Disable all active network routes (deletes live DNS & stops tunnel)
+     * but PRESERVES configuration values in database so user doesn't have to re-type.
      */
     public function disableDomain(Server $server): bool
     {
@@ -249,22 +244,176 @@ class CloudflareDomainService
         // 2. If custom tunnel mode was active, stop and remove container
         $this->stopTunnelProcess($server);
 
-        // 3. Reset database record
-        $serverDomain->mode = 'none';
-        $serverDomain->domain_pool_id = null;
-        $serverDomain->subdomain = null;
-        $serverDomain->full_subdomain = null;
+        // 3. Mark inactive but PRESERVE user configuration
         $serverDomain->dns_record_id = null;
         $serverDomain->srv_record_id = null;
-        $serverDomain->custom_domain = null;
-        $serverDomain->tunnel_token = null;
-        $serverDomain->tunnel_id = null;
-        $serverDomain->tunnel_account_id = null;
         $serverDomain->is_active = false;
-        $serverDomain->last_log = 'Konfigurasi domain dinonaktifkan dan resource telah dibersihkan.';
+        $serverDomain->last_log = 'Konfigurasi dinonaktifkan (DNS/Tunnel dihapus dari jaringan, pengaturan tetap tersimpan).';
         $serverDomain->save();
 
         return true;
+    }
+
+    /**
+     * Check live health / connectivity status for a server's domain.
+     */
+    public function checkDomainHealth(Server $server): array
+    {
+        $serverDomain = ServerDomain::where('server_id', $server->id)->first();
+        if (!$serverDomain || !$serverDomain->is_active) {
+            return [
+                'connected' => false,
+                'status' => 'inactive',
+                'message' => 'Domain saat ini dalam keadaan nonaktif.',
+            ];
+        }
+
+        $server->loadMissing('allocation');
+        $port = $server->allocation ? $server->allocation->port : 25565;
+
+        if ($serverDomain->mode === 'subdomain') {
+            $domain = $serverDomain->full_subdomain;
+            $resolvedIp = gethostbyname($domain);
+            $dnsResolved = ($resolvedIp !== $domain);
+
+            // Test TCP socket ping to port
+            $portOpen = false;
+            $startTime = microtime(true);
+            $socket = @fsockopen($resolvedIp, $port, $errno, $errstr, 2);
+            $latency = round((microtime(true) - $startTime) * 1000);
+
+            if ($socket) {
+                $portOpen = true;
+                fclose($socket);
+            }
+
+            return [
+                'connected' => $dnsResolved,
+                'status' => $dnsResolved ? 'connected' : 'propagating',
+                'mode' => 'subdomain',
+                'domain' => $domain,
+                'resolved_ip' => $resolvedIp,
+                'dns_resolved' => $dnsResolved,
+                'port_open' => $portOpen,
+                'latency_ms' => $latency,
+                'message' => $dnsResolved ? "DNS telah terpropagasi ke {$resolvedIp} (Latency: {$latency}ms)" : "DNS masih dalam proses propagasi Cloudflare.",
+            ];
+        }
+
+        if ($serverDomain->mode === 'custom') {
+            $containerName = "cloudflared_{$server->uuid}";
+            exec("docker inspect -f '{{.State.Running}}' " . escapeshellarg($containerName) . " 2>/dev/null", $output, $returnCode);
+            $containerRunning = ($returnCode === 0 && isset($output[0]) && trim($output[0]) === 'true');
+
+            return [
+                'connected' => $containerRunning,
+                'status' => $containerRunning ? 'connected' : 'stopped',
+                'mode' => 'custom',
+                'domain' => $serverDomain->custom_domain,
+                'container_running' => $containerRunning,
+                'message' => $containerRunning ? 'Konektor Cloudflare Tunnel aktif dan berjalan normal.' : 'Konektor Cloudflare Tunnel sedang berhenti.',
+            ];
+        }
+
+        return [
+            'connected' => false,
+            'status' => 'none',
+            'message' => 'Tidak ada domain yang dikonfigurasi.',
+        ];
+    }
+
+    /**
+     * Test Master Domain / Zone status with Cloudflare API.
+     */
+    public function checkMasterDomain(DomainPool $pool): array
+    {
+        $token = $pool->api_token ?: $this->getGlobalApiToken();
+        if (empty($token)) {
+            return [
+                'success' => false,
+                'message' => 'API Token belum dikonfigurasi.',
+            ];
+        }
+
+        $url = "https://api.cloudflare.com/client/v4/zones/{$pool->zone_id}";
+
+        $startTime = microtime(true);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer {$token}",
+            'Content-Type: application/json',
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $latency = round((microtime(true) - $startTime) * 1000);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if ($httpCode === 200 && isset($data['result']['name'])) {
+            return [
+                'success' => true,
+                'zone_name' => $data['result']['name'],
+                'zone_status' => $data['result']['status'] ?? 'active',
+                'nameservers' => $data['result']['name_servers'] ?? [],
+                'latency_ms' => $latency,
+                'message' => "Zone {$data['result']['name']} terverifikasi Aktif di Cloudflare ({$latency}ms).",
+            ];
+        }
+
+        $errorMsg = $data['errors'][0]['message'] ?? "HTTP Status $httpCode";
+        return [
+            'success' => false,
+            'message' => "Gagal menghubungi Cloudflare: {$errorMsg}",
+        ];
+    }
+
+    /**
+     * Test Global Cloudflare API Token validity.
+     */
+    public function testGlobalApiToken(?string $token = null): array
+    {
+        $apiToken = $token ?: $this->getGlobalApiToken();
+        if (empty($apiToken)) {
+            return [
+                'success' => false,
+                'message' => 'Token API Cloudflare kosong.',
+            ];
+        }
+
+        $url = 'https://api.cloudflare.com/client/v4/user/tokens/verify';
+
+        $startTime = microtime(true);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer {$apiToken}",
+            'Content-Type: application/json',
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $latency = round((microtime(true) - $startTime) * 1000);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if ($httpCode === 200 && ($data['result']['status'] ?? '') === 'active') {
+            return [
+                'success' => true,
+                'message' => "API Token Cloudflare valid & aktif! (Respon: {$latency}ms)",
+            ];
+        }
+
+        $errorMsg = $data['errors'][0]['message'] ?? 'Token tidak valid atau otorisasi ditolak.';
+        return [
+            'success' => false,
+            'message' => "Validasi Token Gagal: {$errorMsg}",
+        ];
     }
 
     /**
@@ -291,7 +440,6 @@ class CloudflareDomainService
         $clean = trim($token);
         $json = base64_decode($clean, true);
         if ($json === false) {
-            // Some tokens may be raw
             return [];
         }
 
@@ -305,11 +453,8 @@ class CloudflareDomainService
     protected function startTunnelProcess(Server $server, string $token): void
     {
         $containerName = "cloudflared_{$server->uuid}";
-
-        // Stop existing if running
         exec("docker rm -f " . escapeshellarg($containerName) . " >/dev/null 2>&1");
 
-        // Run cloudflared container
         $runCmd = sprintf(
             'docker run -d --name %s --restart unless-stopped --network host cloudflare/cloudflared:latest tunnel run --token %s 2>&1',
             escapeshellarg($containerName),
@@ -317,11 +462,6 @@ class CloudflareDomainService
         );
 
         exec($runCmd, $output, $returnCode);
-
-        if ($returnCode !== 0) {
-            // Note: If docker daemon is not available locally or permission denied, log warning
-            // but don't crash entire flow
-        }
     }
 
     /**

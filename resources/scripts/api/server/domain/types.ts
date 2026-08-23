@@ -12,6 +12,7 @@ export interface ServerAllocation {
 }
 
 export interface ServerDomainData {
+    feature_enabled: boolean;
     mode: 'none' | 'subdomain' | 'custom';
     is_active: boolean;
     subdomain: string | null;

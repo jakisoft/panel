@@ -107,6 +107,9 @@ Route::group(['prefix' => 'domains'], function () {
     Route::get('/', [Admin\DomainPoolController::class, 'index'])->name('admin.domains');
     Route::post('/', [Admin\DomainPoolController::class, 'store'])->name('admin.domains.store');
     Route::post('/global', [Admin\DomainPoolController::class, 'updateGlobalSettings'])->name('admin.domains.global');
+    Route::post('/test/global', [Admin\DomainPoolController::class, 'testGlobalToken'])->name('admin.domains.test.global');
+    Route::post('/test/{pool}', [Admin\DomainPoolController::class, 'testDomain'])->name('admin.domains.test.domain');
+    Route::delete('/server/{serverDomain}', [Admin\DomainPoolController::class, 'forceDeleteServerDomain'])->name('admin.domains.server.delete');
     Route::delete('/{pool}', [Admin\DomainPoolController::class, 'delete'])->name('admin.domains.delete');
 });
 

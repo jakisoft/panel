@@ -130,6 +130,16 @@
                         </div>
                         <p class="text-muted small">The total number of backups that can be created for this server.</p>
                     </div>
+                    <div class="form-group col-xs-6">
+                        <label for="pDomainFeature" class="control-label">Domain & Cloudflare Routing</label>
+                        <div>
+                            <select id="pDomainFeature" name="domain_feature_enabled" class="form-control">
+                                <option value="1" {{ old('domain_feature_enabled', 1) == 1 ? 'selected' : '' }}>Diaktifkan (Enabled)</option>
+                                <option value="0" {{ old('domain_feature_enabled', 1) == 0 ? 'selected' : '' }}>Dinonaktifkan (Disabled)</option>
+                            </select>
+                        </div>
+                        <p class="text-muted small">Izinkan server ini menggunakan fitur Subdomain Panel otomatis atau Custom Domain Cloudflare Zero Trust.</p>
+                    </div>
                 </div>
             </div>
         </div>

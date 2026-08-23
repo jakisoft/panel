@@ -10,6 +10,7 @@ use Pterodactyl\Models\DomainPool;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Services\Cloudflare\CloudflareDomainService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DomainController extends ClientApiController
@@ -18,6 +19,16 @@ class DomainController extends ClientApiController
         private CloudflareDomainService $domainService
     ) {
         parent::__construct();
+    }
+
+    /**
+     * Check if domain feature is enabled for this server.
+     */
+    private function validateServerFeature(Server $server): void
+    {
+        if (!$server->domain_feature_enabled) {
+            throw new AccessDeniedHttpException('Fitur domain tidak diizinkan oleh administrator untuk server ini.');
+        }
     }
 
     /**
@@ -32,6 +43,7 @@ class DomainController extends ClientApiController
 
         return new JsonResponse([
             'data' => [
+                'feature_enabled' => (bool) $server->domain_feature_enabled,
                 'mode' => $domain ? $domain->mode : 'none',
                 'is_active' => $domain ? (bool) $domain->is_active : false,
                 'subdomain' => $domain ? $domain->subdomain : null,
@@ -56,6 +68,8 @@ class DomainController extends ClientApiController
      */
     public function setSubdomain(Request $request, Server $server): JsonResponse
     {
+        $this->validateServerFeature($server);
+
         $request->validate([
             'domain_pool_id' => 'required|integer|exists:domain_pools,id',
             'subdomain' => 'required|string|min:2|max:63',
@@ -89,16 +103,18 @@ class DomainController extends ClientApiController
      */
     public function setCustomDomain(Request $request, Server $server): JsonResponse
     {
+        $this->validateServerFeature($server);
+
         $request->validate([
             'custom_domain' => 'required|string|min:4|max:191',
-            'tunnel_token' => 'required|string|min:10',
+            'tunnel_token' => 'nullable|string',
         ]);
 
         try {
             $domain = $this->domainService->activateCustomDomain(
                 $server,
                 $request->input('custom_domain'),
-                $request->input('tunnel_token')
+                $request->input('tunnel_token', '')
             );
 
             Activity::event('server:domain.custom')
@@ -116,7 +132,7 @@ class DomainController extends ClientApiController
     }
 
     /**
-     * Disable all domain configurations.
+     * Disable all domain configurations (preserves saved inputs in DB).
      */
     public function disable(Request $request, Server $server): JsonResponse
     {
@@ -127,11 +143,21 @@ class DomainController extends ClientApiController
 
             return new JsonResponse([
                 'success' => true,
-                'message' => 'Konfigurasi domain berhasil dinonaktifkan dan resource dibersihkan.',
+                'message' => 'Konfigurasi domain dinonaktifkan (DNS/Tunnel dihapus dari jaringan, data tetap tersimpan).',
             ]);
         } catch (Exception $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
+    }
+
+    /**
+     * Check live health and DNS/Tunnel connectivity.
+     */
+    public function health(Request $request, Server $server): JsonResponse
+    {
+        $health = $this->domainService->checkDomainHealth($server);
+
+        return new JsonResponse($health);
     }
 
     /**
