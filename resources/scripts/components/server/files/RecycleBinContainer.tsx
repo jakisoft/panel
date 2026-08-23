@@ -313,7 +313,34 @@ export default () => {
         );
     };
 
-    const selectedTrashItems = items.filter((i) => selectedIds.includes(i.id));
+    const selectedTrashItems: TrashItem[] = isSearchActive
+        ? deepTrashResults
+              .filter((r) => selectedIds.includes(r.key))
+              .map(
+                  (r) =>
+                      items.find((i) => i.id === r.path || i.id === r.key) || {
+                          id: r.path,
+                          name: r.name,
+                          originalDirectory: '/',
+                          trashPath: `/.trash/${r.path}`,
+                          isFile: r.isFile,
+                          size: r.size,
+                          deletedAt: r.deletedAt,
+                      }
+              )
+        : isRootTrash
+        ? items.filter((i) => selectedIds.includes(i.id))
+        : subFiles
+              .filter((f) => selectedIds.includes(f.name))
+              .map((f) => ({
+                  id: f.name,
+                  name: f.name,
+                  originalDirectory: currentSubPath,
+                  trashPath: join('/.trash', currentSubPath, f.name),
+                  isFile: f.isFile,
+                  size: f.size,
+                  deletedAt: f.modifiedAt ? new Date(f.modifiedAt).getTime() : Date.now(),
+              }));
 
     // Build breadcrumbs for subfolder navigation in trash
     const pathSegments = currentSubPath
@@ -438,45 +465,64 @@ export default () => {
                 <Spinner size={'large'} centered />
             ) : isSearchActive ? (
                 /* Deep Recursive Trash Search Results */
-                !deepTrashResults.length ? (
+                isScanningTrash && !deepTrashResults.length ? (
+                    <Spinner size={'large'} centered />
+                ) : !deepTrashResults.length ? (
                     <p css={tw`text-sm text-neutral-400 text-center py-8`}>
-                        {isScanningTrash ? 'Searching inside trash folders...' : `No files or folders matched "${searchQuery}".`}
+                        {`No files or folders matched "${searchQuery}".`}
                     </p>
                 ) : (
                     <div>
-                        {deepTrashResults.map((result) => (
-                            <div key={result.key} className={styles.file_row}>
-                                <FileActionCheckbox
-                                    type={'checkbox'}
-                                    className={'mx-4 shrink-0'}
-                                    checked={selectedIds.includes(result.key)}
-                                    onChange={() => toggleSelectItem(result.key)}
-                                />
-                                <NavLink
-                                    className={styles.details}
-                                    to={
-                                        result.isFile
-                                            ? `/server/${match.params.id}/files/edit#${encodePathSegments(join('/.trash', result.path))}`
-                                            : `/server/${match.params.id}/files/trash#/${encodePathSegments(result.path)}`
-                                    }
-                                >
-                                    <div css={tw`flex-none text-neutral-400 ml-2 mr-4 text-lg pl-3`}>
-                                        <FontAwesomeIcon icon={result.isFile ? faFileAlt : faFolder} />
-                                    </div>
-                                    <div css={tw`flex-1 truncate`}>
-                                        <span className={'text-neutral-200 font-medium hover:text-white'}>{result.name}</span>
-                                    </div>
-                                    {result.isFile && (
-                                        <div css={tw`w-1/6 text-right mr-4 hidden sm:block text-neutral-400 text-xs`}>
-                                            {bytesToString(result.size)}
+                        {deepTrashResults.map((result) => {
+                            const correspondingItem: TrashItem = items.find((i) => i.id === result.path || i.id === result.key) || {
+                                id: result.path,
+                                name: result.name,
+                                originalDirectory: '/',
+                                trashPath: `/.trash/${result.path}`,
+                                isFile: result.isFile,
+                                size: result.size,
+                                deletedAt: result.deletedAt,
+                            };
+
+                            return (
+                                <div key={result.key} className={styles.file_row}>
+                                    <FileActionCheckbox
+                                        type={'checkbox'}
+                                        className={'mx-4 shrink-0'}
+                                        checked={selectedIds.includes(result.key)}
+                                        onChange={() => toggleSelectItem(result.key)}
+                                    />
+                                    <NavLink
+                                        className={styles.details}
+                                        to={
+                                            result.isFile
+                                                ? `/server/${match.params.id}/files/edit#${encodePathSegments(join('/.trash', result.path))}`
+                                                : `/server/${match.params.id}/files/trash#/${encodePathSegments(result.path)}`
+                                        }
+                                    >
+                                        <div css={tw`flex-none text-neutral-400 ml-2 mr-4 text-lg pl-3`}>
+                                            <FontAwesomeIcon icon={result.isFile ? faFileAlt : faFolder} />
                                         </div>
-                                    )}
-                                    <div css={tw`w-1/5 text-right mr-4 hidden md:block text-xs text-neutral-400`} title={format(new Date(result.deletedAt), 'dd MMM yyyy HH:mm')}>
-                                        {formatDaysRemaining(result.deletedAt)}
-                                    </div>
-                                </NavLink>
-                            </div>
-                        ))}
+                                        <div css={tw`flex-1 truncate`}>
+                                            <span className={'text-neutral-200 font-medium hover:text-white'}>{result.name}</span>
+                                        </div>
+                                        {result.isFile && (
+                                            <div css={tw`w-1/6 text-right mr-4 hidden sm:block text-neutral-400 text-xs`}>
+                                                {bytesToString(result.size)}
+                                            </div>
+                                        )}
+                                        <div css={tw`w-1/5 text-right mr-4 hidden md:block text-xs text-neutral-400`} title={format(new Date(result.deletedAt), 'dd MMM yyyy HH:mm')}>
+                                            {formatDaysRemaining(result.deletedAt)}
+                                        </div>
+                                    </NavLink>
+                                    <RecycleBinDropdownMenu item={correspondingItem} onItemRemoved={onItemRemoved} />
+                                </div>
+                            );
+                        })}
+                        <RecycleBinMassActionsBar
+                            selectedItems={selectedTrashItems}
+                            onActionCompleted={onMassActionCompleted}
+                        />
                     </div>
                 )
             ) : isRootTrash ? (

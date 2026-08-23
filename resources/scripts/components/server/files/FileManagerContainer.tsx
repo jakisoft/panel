@@ -21,13 +21,14 @@ import RecycleBinButton from '@/components/server/files/RecycleBinButton';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { useStoreActions } from '@/state/hooks';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
+import SelectFileCheckbox, { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
+import FileDropdownMenu from '@/components/server/files/FileDropdownMenu';
 import { encodePathSegments, hashToPath } from '@/helpers';
 import { join } from 'pathe';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileAlt, faFolder } from '@fortawesome/free-solid-svg-icons';
+import { faFileAlt, faFileArchive, faFileImport, faFolder } from '@fortawesome/free-solid-svg-icons';
 import { bytesToString } from '@/lib/formatters';
-import { format } from 'date-fns';
+import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import styles from './style.module.css';
 
 interface DeepSearchResult {
@@ -230,7 +231,7 @@ export default () => {
                         </button>
 
                         {isSearching ? (
-                            <div className={'flex-1 min-w-0 mr-4 flex items-center gap-2'}>
+                            <div className={'flex-1 min-w-0 mr-4'}>
                                 <input
                                     type={'text'}
                                     value={searchQuery}
@@ -246,7 +247,6 @@ export default () => {
                                     autoFocus
                                     className={'w-full max-w-md px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-sm text-neutral-100 placeholder-neutral-500 rounded-xl focus:outline-none focus:border-cyan-500 transition-colors shadow-inner'}
                                 />
-                                {isScanning && <Spinner size={'small'} />}
                             </div>
                         ) : (
                             <FileManagerBreadcrumbs />
@@ -274,28 +274,28 @@ export default () => {
                 <Spinner size={'large'} centered />
             ) : isSearchActive ? (
                 /* Deep Recursive Search Results */
-                !deepResults.length ? (
+                isScanning && !deepResults.length ? (
+                    <Spinner size={'large'} centered />
+                ) : !deepResults.length ? (
                     <p css={tw`text-sm text-neutral-400 text-center py-8`}>
-                        {isScanning ? 'Searching subfolders...' : `No files or folders matched "${searchQuery}".`}
+                        {`No files or folders matched "${searchQuery}".`}
                     </p>
                 ) : (
                     <div>
                         {deepResults.map((result) => {
                             const isDeep = result.directory !== directory;
                             return (
-                                <div key={result.key} className={styles.file_row}>
-                                    <FileActionCheckbox
-                                        type={'checkbox'}
-                                        className={'mx-4 shrink-0'}
-                                        checked={selectedFiles.includes(result.name)}
-                                        onChange={() => {
-                                            setSelectedFiles(
-                                                selectedFiles.includes(result.name)
-                                                    ? selectedFiles.filter((n) => n !== result.name)
-                                                    : [...selectedFiles, result.name]
-                                            );
-                                        }}
-                                    />
+                                <div
+                                    key={result.key}
+                                    className={styles.file_row}
+                                    onContextMenu={(e) => {
+                                        e.preventDefault();
+                                        window.dispatchEvent(
+                                            new CustomEvent(`pterodactyl:files:ctx:${result.fileObject.key}`, { detail: e.clientX })
+                                        );
+                                    }}
+                                >
+                                    <SelectFileCheckbox name={result.name} />
                                     <NavLink
                                         className={styles.details}
                                         to={
@@ -304,8 +304,18 @@ export default () => {
                                                 : `/server/${id}/files#${encodePathSegments(join(result.directory, result.name))}`
                                         }
                                     >
-                                        <div css={tw`flex-none text-neutral-400 ml-2 mr-4 text-lg pl-3`}>
-                                            <FontAwesomeIcon icon={result.isFile ? faFileAlt : faFolder} />
+                                        <div css={tw`flex-none text-neutral-400 ml-6 mr-4 text-lg pl-3`}>
+                                            <FontAwesomeIcon
+                                                icon={
+                                                    result.isFile
+                                                        ? result.fileObject.isSymlink
+                                                            ? faFileImport
+                                                            : result.fileObject.isArchiveType()
+                                                            ? faFileArchive
+                                                            : faFileAlt
+                                                        : faFolder
+                                                }
+                                            />
                                         </div>
                                         <div css={tw`flex-1 truncate`}>
                                             <span className={'text-neutral-200 font-medium hover:text-white'}>{result.name}</span>
@@ -321,12 +331,16 @@ export default () => {
                                             </div>
                                         )}
                                         <div css={tw`w-1/5 text-right mr-4 hidden md:block text-xs text-neutral-400`}>
-                                            {format(new Date(result.modifiedAt), 'dd MMM yyyy HH:mm')}
+                                            {Math.abs(differenceInHours(result.modifiedAt, new Date())) > 48
+                                                ? format(result.modifiedAt, 'MMM do, yyyy h:mma')
+                                                : formatDistanceToNow(result.modifiedAt, { addSuffix: true })}
                                         </div>
                                     </NavLink>
+                                    <FileDropdownMenu file={result.fileObject} />
                                 </div>
                             );
                         })}
+                        <MassActionsBar />
                     </div>
                 )
             ) : (
@@ -341,7 +355,7 @@ export default () => {
                                     <div css={tw`rounded bg-yellow-400 mb-px p-3`}>
                                         <p css={tw`text-yellow-900 text-sm text-center`}>
                                             This directory is too large to display in the browser, limiting the output
-                                            to the first 250 files.
+                                             to the first 250 files.
                                         </p>
                                     </div>
                                 )}
