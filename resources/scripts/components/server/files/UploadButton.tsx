@@ -210,6 +210,14 @@ const UploadComponent = ({ className }: WithClassname) => {
         }
     };
 
+    useEffect(() => {
+        if (folderUploadInput.current) {
+            folderUploadInput.current.setAttribute('webkitdirectory', '');
+            folderUploadInput.current.setAttribute('directory', '');
+            folderUploadInput.current.setAttribute('mozdirectory', '');
+        }
+    }, []);
+
     return (
         <>
             <Portal>
@@ -239,13 +247,11 @@ const UploadComponent = ({ className }: WithClassname) => {
             <input
                 type={'file'}
                 ref={fileUploadInput}
-                css={tw`hidden`}
+                className={'hidden'}
                 onChange={(e) => {
-                    if (!e.currentTarget.files) return;
+                    if (!e.currentTarget.files || e.currentTarget.files.length === 0) return;
                     onFileSubmission(e.currentTarget.files);
-                    if (fileUploadInput.current) {
-                        fileUploadInput.current.files = null;
-                    }
+                    e.currentTarget.value = '';
                 }}
                 multiple
             />
@@ -254,15 +260,12 @@ const UploadComponent = ({ className }: WithClassname) => {
             <input
                 type={'file'}
                 ref={folderUploadInput}
-                css={tw`hidden`}
+                className={'hidden'}
                 onChange={(e) => {
-                    if (!e.currentTarget.files) return;
+                    if (!e.currentTarget.files || e.currentTarget.files.length === 0) return;
                     onFileSubmission(e.currentTarget.files);
-                    if (folderUploadInput.current) {
-                        folderUploadInput.current.files = null;
-                    }
+                    e.currentTarget.value = '';
                 }}
-                {...{ webkitdirectory: '', directory: '' }}
                 multiple
             />
 
