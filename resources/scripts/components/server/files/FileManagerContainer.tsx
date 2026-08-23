@@ -208,14 +208,16 @@ export default () => {
         <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
             <ErrorBoundary>
                 <div className={'flex flex-col-reverse md:flex-row md:items-center justify-between gap-3 mb-4'}>
-                    {/* Left: Checkbox + Filter Button + Breadcrumbs / Search Bar */}
+                    {/* Left: Checkbox (when not searching) + Filter Button + Breadcrumbs / Search Bar */}
                     <div className={'flex items-center flex-1 min-w-0 mr-3 overflow-hidden'}>
-                        <FileActionCheckbox
-                            type={'checkbox'}
-                            className={'mx-4 shrink-0'}
-                            checked={selectedFilesLength === (displayedCount === 0 ? -1 : displayedCount)}
-                            onChange={onSelectAllClick}
-                        />
+                        {!isSearching && (
+                            <FileActionCheckbox
+                                type={'checkbox'}
+                                className={'mx-4 shrink-0'}
+                                checked={selectedFilesLength === (visibleDirectFiles.length === 0 ? -1 : visibleDirectFiles.length)}
+                                onChange={onSelectAllClick}
+                            />
+                        )}
                         <button
                             type={'button'}
                             onClick={() => {
@@ -223,7 +225,9 @@ export default () => {
                                 setSearchQuery('');
                                 setDeepResults([]);
                             }}
-                            className={'p-1.5 mr-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors focus:outline-none shrink-0'}
+                            className={`p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors focus:outline-none shrink-0 ${
+                                isSearching ? 'mx-3' : 'mr-2'
+                            }`}
                             title={isSearching ? 'Close Search' : 'Filter / Search Files & Folders'}
                             aria-label={isSearching ? 'Close Search' : 'Filter / Search Files & Folders'}
                         >
@@ -295,7 +299,6 @@ export default () => {
                                         );
                                     }}
                                 >
-                                    <SelectFileCheckbox name={result.name} />
                                     <NavLink
                                         className={styles.details}
                                         to={
@@ -304,7 +307,7 @@ export default () => {
                                                 : `/server/${id}/files#${encodePathSegments(join(result.directory, result.name))}`
                                         }
                                     >
-                                        <div css={tw`flex-none text-neutral-400 ml-6 mr-4 text-lg pl-3`}>
+                                        <div css={tw`flex-none text-neutral-400 ml-4 mr-4 text-lg pl-3`}>
                                             <FontAwesomeIcon
                                                 icon={
                                                     result.isFile
@@ -340,7 +343,6 @@ export default () => {
                                 </div>
                             );
                         })}
-                        <MassActionsBar />
                     </div>
                 )
             ) : (

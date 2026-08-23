@@ -366,15 +366,17 @@ export default () => {
             {/* Breadcrumb & Action Bar */}
             <div className={'flex items-center justify-between gap-3 mb-4'}>
                 <div className={'flex items-center flex-1 min-w-0 overflow-hidden'}>
-                    <FileActionCheckbox
-                        type={'checkbox'}
-                        className={'mx-4 shrink-0'}
-                        checked={selectedIds.length === (currentTotalCount === 0 ? -1 : currentTotalCount)}
-                        onChange={onSelectAllClick}
-                    />
+                    {!isSearching && (
+                        <FileActionCheckbox
+                            type={'checkbox'}
+                            className={'mx-4 shrink-0'}
+                            checked={selectedIds.length === (currentTotalCount === 0 ? -1 : currentTotalCount)}
+                            onChange={onSelectAllClick}
+                        />
+                    )}
 
                     {isSearching ? (
-                        <div className={'flex-1 min-w-0 mr-4'}>
+                        <div className={'flex-1 min-w-0 mr-4 ml-3'}>
                             <input
                                 type={'text'}
                                 value={searchQuery}
@@ -486,12 +488,6 @@ export default () => {
 
                             return (
                                 <div key={result.key} className={styles.file_row}>
-                                    <FileActionCheckbox
-                                        type={'checkbox'}
-                                        className={'mx-4 shrink-0'}
-                                        checked={selectedIds.includes(result.key)}
-                                        onChange={() => toggleSelectItem(result.key)}
-                                    />
                                     <NavLink
                                         className={styles.details}
                                         to={
@@ -500,7 +496,7 @@ export default () => {
                                                 : `/server/${match.params.id}/files/trash#/${encodePathSegments(result.path)}`
                                         }
                                     >
-                                        <div css={tw`flex-none text-neutral-400 ml-2 mr-4 text-lg pl-3`}>
+                                        <div css={tw`flex-none text-neutral-400 ml-4 mr-4 text-lg pl-3`}>
                                             <FontAwesomeIcon icon={result.isFile ? faFileAlt : faFolder} />
                                         </div>
                                         <div css={tw`flex-1 truncate`}>
@@ -519,10 +515,6 @@ export default () => {
                                 </div>
                             );
                         })}
-                        <RecycleBinMassActionsBar
-                            selectedItems={selectedTrashItems}
-                            onActionCompleted={onMassActionCompleted}
-                        />
                     </div>
                 )
             ) : isRootTrash ? (
