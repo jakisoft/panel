@@ -50,7 +50,7 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
                 className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-                {renderLeft || <div className={'w-12 shrink-0'} />}
+                {renderLeft || null}
                 <span className={'shrink-0'}>/</span>
                 <span className={'px-1 text-neutral-300 shrink-0'}>home</span>
                 <span className={'shrink-0'}>/</span>
@@ -74,7 +74,7 @@ export default ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
             className={'flex items-center text-sm text-neutral-500 overflow-x-auto whitespace-nowrap py-1'}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-            {renderLeft || <div className={'w-12 shrink-0'} />}
+            {renderLeft || null}
             <span className={'shrink-0'}>/</span>
             <span className={'px-1 text-neutral-300 shrink-0'}>home</span>
             <span className={'shrink-0'}>/</span>
