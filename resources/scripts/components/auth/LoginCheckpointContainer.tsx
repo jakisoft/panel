@@ -9,6 +9,7 @@ import useFlash from '@/plugins/useFlash';
 import AuthField from '@/components/auth/AuthField';
 import AuthButton from '@/components/auth/AuthButton';
 import Reaptcha from 'reaptcha';
+import ReCaptchaPortal from '@/components/auth/ReCaptchaPortal';
 import { ShieldCheck, Key, ArrowLeft, ArrowRight, Smartphone } from 'lucide-react';
 
 interface Values {
@@ -113,7 +114,7 @@ const LoginCheckpointContainer = ({ history, location }: RouteComponentProps<Rec
                     </div>
 
                     {recaptchaEnabled && (
-                        <Reaptcha
+                        <ReCaptchaPortal
                             ref={ref}
                             size={'invisible'}
                             badge={'bottomright'}

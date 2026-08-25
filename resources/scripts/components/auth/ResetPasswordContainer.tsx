@@ -10,6 +10,7 @@ import { object, ref as yupRef, string } from 'yup';
 import AuthField from '@/components/auth/AuthField';
 import AuthButton from '@/components/auth/AuthButton';
 import Reaptcha from 'reaptcha';
+import ReCaptchaPortal from '@/components/auth/ReCaptchaPortal';
 import useFlash from '@/plugins/useFlash';
 import { Lock, Mail, Key, ArrowLeft } from 'lucide-react';
 
@@ -136,7 +137,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                     </div>
 
                     {recaptchaEnabled && (
-                        <Reaptcha
+                        <ReCaptchaPortal
                             ref={ref}
                             size={'invisible'}
                             badge={'bottomright'}

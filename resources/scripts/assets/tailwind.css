@@ -64,10 +64,20 @@
   animation: fadeIn 0.2s ease-out forwards;
 }
 
-/* Google reCAPTCHA watermark badge positioning strictly at bottom-right corner */
-.grecaptcha-badge,
-iframe[src*="recaptcha"],
-div:has(> .grecaptcha-badge) {
+/* Google reCAPTCHA Enterprise / v2 / v3 watermark badge positioning strictly at bottom-right corner */
+.recaptcha-portal-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.recaptcha-portal-container > * {
+  pointer-events: auto;
+}
+
+.grecaptcha-badge {
   position: fixed !important;
   bottom: 16px !important;
   right: 16px !important;
@@ -78,4 +88,5 @@ div:has(> .grecaptcha-badge) {
   border-radius: 6px !important;
   overflow: hidden !important;
 }
+
 

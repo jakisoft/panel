@@ -9,6 +9,7 @@ import AuthButton from '@/components/auth/AuthButton';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import Reaptcha from 'reaptcha';
+import ReCaptchaPortal from '@/components/auth/ReCaptchaPortal';
 import useFlash from '@/plugins/useFlash';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
 
@@ -93,7 +94,7 @@ export default () => {
                     </div>
 
                     {recaptchaEnabled && (
-                        <Reaptcha
+                        <ReCaptchaPortal
                             ref={ref}
                             size={'invisible'}
                             badge={'bottomright'}

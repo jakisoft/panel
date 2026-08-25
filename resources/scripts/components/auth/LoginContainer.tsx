@@ -8,6 +8,7 @@ import { object, string } from 'yup';
 import AuthField from '@/components/auth/AuthField';
 import AuthButton from '@/components/auth/AuthButton';
 import Reaptcha from 'reaptcha';
+import ReCaptchaPortal from '@/components/auth/ReCaptchaPortal';
 import useFlash from '@/plugins/useFlash';
 import { User, Lock, LogIn } from 'lucide-react';
 
@@ -103,7 +104,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                     </div>
 
                     {recaptchaEnabled && (
-                        <Reaptcha
+                        <ReCaptchaPortal
                             ref={ref}
                             size={'invisible'}
                             badge={'bottomright'}
