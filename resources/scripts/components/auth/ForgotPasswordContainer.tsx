@@ -5,9 +5,9 @@ import { httpErrorToHuman } from '@/api/http';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
 import AuthField from '@/components/auth/AuthField';
+import AuthButton from '@/components/auth/AuthButton';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
-import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
@@ -82,16 +82,14 @@ export default () => {
                     />
 
                     <div className={'pt-2'}>
-                        <Button
+                        <AuthButton
                             type={'submit'}
-                            size={'xlarge'}
                             disabled={isSubmitting}
                             isLoading={isSubmitting}
-                            className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                            icon={<Send size={17} />}
                         >
-                            <Send size={17} />
-                            <span>Kirim Tautan Reset</span>
-                        </Button>
+                            Kirim Tautan Reset
+                        </AuthButton>
                     </div>
 
                     {recaptchaEnabled && (
@@ -109,7 +107,7 @@ export default () => {
                         />
                     )}
 
-                    <div className={'pt-2 text-center'}>
+                    <div className={'pt-1 text-center'}>
                         <Link
                             to={'/auth/login'}
                             className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}

@@ -9,7 +9,7 @@ import { ApplicationStore } from '@/state';
 import { Formik, FormikHelpers } from 'formik';
 import { object, ref, string } from 'yup';
 import AuthField from '@/components/auth/AuthField';
-import Button from '@/components/elements/Button';
+import AuthButton from '@/components/auth/AuthButton';
 import { Lock, Mail, Key, ArrowLeft } from 'lucide-react';
 
 interface Values {
@@ -69,11 +69,11 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                             <label className={'block text-xs sm:text-sm font-semibold text-neutral-300'}>
                                 Alamat Email Akun
                             </label>
-                            <div className={'flex items-center rounded-xl bg-neutral-900/50 border border-neutral-800 p-2.5 sm:p-3 text-neutral-400 cursor-not-allowed'}>
-                                <div className={'pl-1 pr-2.5 text-neutral-500'}>
+                            <div className={'flex items-center w-full h-12 rounded-xl bg-neutral-900/50 border border-neutral-800 px-3.5 text-neutral-400 cursor-not-allowed'}>
+                                <div className={'pr-2.5 text-neutral-500'}>
                                     <Mail size={18} />
                                 </div>
-                                <span className={'text-xs sm:text-sm font-mono text-neutral-300 truncate'}>
+                                <span className={'text-sm font-mono text-neutral-300 truncate'}>
                                     {email}
                                 </span>
                             </div>
@@ -105,19 +105,17 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                     </div>
 
                     <div className={'pt-2'}>
-                        <Button
-                            size={'xlarge'}
+                        <AuthButton
                             type={'submit'}
                             disabled={isSubmitting}
                             isLoading={isSubmitting}
-                            className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                            icon={<Key size={17} />}
                         >
-                            <Key size={17} />
-                            <span>Simpan Kata Sandi Baru</span>
-                        </Button>
+                            Simpan Kata Sandi Baru
+                        </AuthButton>
                     </div>
 
-                    <div className={'pt-2 text-center'}>
+                    <div className={'pt-1 text-center'}>
                         <Link
                             to={'/auth/login'}
                             className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}

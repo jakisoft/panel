@@ -47,20 +47,20 @@ export default ({
                         )}
 
                         <div
-                            className={`group relative flex items-center rounded-xl bg-neutral-900/90 border transition-all duration-200 ${
+                            className={`group relative flex items-center w-full h-12 rounded-xl bg-neutral-900/95 border transition-all duration-200 ${
                                 hasError
                                     ? 'border-red-500/80 ring-2 ring-red-500/20'
-                                    : 'border-neutral-750 hover:border-neutral-650 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/25'
+                                    : 'border-neutral-750 hover:border-neutral-600 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/25'
                             } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
                         >
                             {/* Left Lucide Icon */}
                             {Icon && (
-                                <div className={'pl-3.5 pr-1 flex items-center justify-center text-neutral-400 group-focus-within:text-primary-400 transition-colors pointer-events-none'}>
+                                <div className={'w-11 h-12 flex items-center justify-center text-neutral-400 group-focus-within:text-primary-400 transition-colors shrink-0 pointer-events-none'}>
                                     <Icon size={18} />
                                 </div>
                             )}
 
-                            {/* Main HTML Input */}
+                            {/* Main Input */}
                             <input
                                 id={name}
                                 {...field}
@@ -69,8 +69,8 @@ export default ({
                                 disabled={disabled}
                                 autoComplete={autoComplete}
                                 autoFocus={autoFocus}
-                                className={`w-full py-2.5 sm:py-3 bg-transparent text-xs sm:text-sm text-neutral-100 placeholder:text-neutral-500 outline-none border-none ${
-                                    Icon ? 'pl-2' : 'pl-3.5'
+                                className={`w-full h-full bg-transparent text-sm text-neutral-100 placeholder:text-neutral-500 outline-none border-none ${
+                                    Icon ? 'pl-0' : 'pl-3.5'
                                 } ${isPassword ? 'pr-11' : 'pr-3.5'}`}
                             />
 
@@ -80,16 +80,16 @@ export default ({
                                     type={'button'}
                                     tabIndex={-1}
                                     onClick={() => setShowPassword((prev) => !prev)}
-                                    className={'absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-colors focus:outline-none'}
+                                    className={'absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800 transition-colors focus:outline-none'}
                                     title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                                 >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                                 </button>
                             )}
                         </div>
 
-                        {/* Error or Help Text */}
+                        {/* Error or Description */}
                         {hasError ? (
                             <p className={'text-xs font-medium text-red-400 pt-0.5 animate-fadeIn'}>
                                 {errorMessage?.charAt(0).toUpperCase() + errorMessage?.slice(1)}

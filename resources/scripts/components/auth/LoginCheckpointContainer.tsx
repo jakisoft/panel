@@ -8,7 +8,7 @@ import { useFormikContext, withFormik } from 'formik';
 import useFlash from '@/plugins/useFlash';
 import { FlashStore } from '@/state/flashes';
 import AuthField from '@/components/auth/AuthField';
-import Button from '@/components/elements/Button';
+import AuthButton from '@/components/auth/AuthButton';
 import { ShieldCheck, Key, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface Values {
@@ -47,19 +47,17 @@ const LoginCheckpointContainer = () => {
             />
 
             <div className={'pt-2'}>
-                <Button
-                    size={'xlarge'}
+                <AuthButton
                     type={'submit'}
                     disabled={isSubmitting}
                     isLoading={isSubmitting}
-                    className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                    icon={<ArrowRight size={17} />}
                 >
-                    <span>Lanjutkan Verifikasi</span>
-                    <ArrowRight size={17} />
-                </Button>
+                    Lanjutkan Verifikasi
+                </AuthButton>
             </div>
 
-            <div className={'pt-2 text-center'}>
+            <div className={'pt-1 text-center'}>
                 <button
                     type={'button'}
                     onClick={() => {
@@ -73,7 +71,7 @@ const LoginCheckpointContainer = () => {
                 </button>
             </div>
 
-            <div className={'pt-2 text-center'}>
+            <div className={'pt-1 text-center'}>
                 <Link
                     to={'/auth/login'}
                     className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}

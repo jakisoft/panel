@@ -22,7 +22,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, subtitle, ...props }
     const renderBrand = () => {
         if (logoDisplay === 'text_only') {
             return (
-                <span className={'font-black text-lg sm:text-xl text-white tracking-tight truncate'}>
+                <span className={'font-black text-lg sm:text-xl text-white tracking-tight truncate max-w-[200px]'}>
                     {name}
                 </span>
             );
@@ -33,7 +33,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, subtitle, ...props }
                 <img
                     src={logo || (isDefaultLogo ? jksoftLogo : logo)}
                     alt={name}
-                    className={'h-10 sm:h-11 max-w-[200px] object-contain'}
+                    className={'h-10 sm:h-11 max-w-[180px] object-contain'}
                 />
             );
         }
@@ -44,7 +44,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, subtitle, ...props }
                 <img
                     src={isDefaultLogo ? jksoftIcon : (logo || jksoftIcon)}
                     alt={name}
-                    className={isDefaultLogo ? 'h-10 w-10 object-contain rounded-2xl shadow-md' : 'h-10 max-w-[160px] object-contain'}
+                    className={isDefaultLogo ? 'h-10 w-10 object-contain rounded-2xl shadow-md' : 'h-10 max-w-[150px] object-contain'}
                 />
                 <span className={'font-black text-lg sm:text-xl text-white tracking-tight truncate'}>
                     {name}
@@ -54,15 +54,15 @@ export default forwardRef<HTMLFormElement, Props>(({ title, subtitle, ...props }
     };
 
     return (
-        <div className={'w-full max-w-[440px] px-4 mx-auto select-none'}>
+        <div className={'w-full max-w-[480px] px-4 mx-auto select-none'}>
             <Form {...props} ref={ref}>
-                <div className={'w-full bg-neutral-900/95 backdrop-blur-2xl border border-neutral-800/90 shadow-2xl shadow-black/80 rounded-3xl p-6 sm:p-8 mx-auto relative overflow-hidden'}>
-                    {/* Decorative top subtle gradient line */}
+                <div className={'w-full bg-neutral-900 border border-neutral-800 shadow-2xl shadow-black/80 rounded-3xl p-6 sm:p-8 mx-auto relative overflow-hidden'}>
+                    {/* Top Accent Line */}
                     <div className={'absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-cyan-400 to-primary-600'} />
 
-                    {/* Top Header: Logo / Brand Badge */}
-                    <div className={'flex items-center justify-between gap-4 pb-5 mb-5 border-b border-neutral-800/80'}>
-                        <div>
+                    {/* Header: Title and Brand */}
+                    <div className={'flex items-center justify-between gap-4 pb-5 mb-5 border-b border-neutral-800'}>
+                        <div className={'min-w-0'}>
                             {title && (
                                 <h2 className={'text-xl sm:text-2xl font-black text-white tracking-tight'}>
                                     {title}
@@ -80,7 +80,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, subtitle, ...props }
                     {/* Flash Messages */}
                     <FlashMessageRender className={'mb-4'} />
 
-                    {/* Form Body Content */}
+                    {/* Form Controls Container */}
                     <div className={'space-y-4'}>
                         {props.children}
                     </div>

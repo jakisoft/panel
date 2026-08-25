@@ -48,3 +48,14 @@
 .aos-card-enter {
   animation: aosFadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Google reCAPTCHA watermark badge positioning strictly at bottom-right corner */
+.grecaptcha-badge {
+  position: fixed !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  z-index: 9999 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}

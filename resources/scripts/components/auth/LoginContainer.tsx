@@ -6,7 +6,7 @@ import { useStoreState } from 'easy-peasy';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import AuthField from '@/components/auth/AuthField';
-import Button from '@/components/elements/Button';
+import AuthButton from '@/components/auth/AuthButton';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import { User, Lock, LogIn } from 'lucide-react';
@@ -92,16 +92,14 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                     </div>
 
                     <div className={'pt-2'}>
-                        <Button
+                        <AuthButton
                             type={'submit'}
-                            size={'xlarge'}
                             isLoading={isSubmitting}
                             disabled={isSubmitting}
-                            className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                            icon={<LogIn size={18} />}
                         >
-                            <LogIn size={18} />
-                            <span>Masuk Sekarang</span>
-                        </Button>
+                            Masuk Sekarang
+                        </AuthButton>
                     </div>
 
                     {recaptchaEnabled && (
@@ -119,7 +117,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         />
                     )}
 
-                    <div className={'pt-2 text-center'}>
+                    <div className={'pt-1 text-center'}>
                         <Link
                             to={'/auth/password'}
                             className={'text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}
