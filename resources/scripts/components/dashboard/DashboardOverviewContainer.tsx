@@ -9,8 +9,8 @@ import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import useSWR from 'swr';
 import { PaginatedResult } from '@/api/http';
-import InViewServerRow from '@/components/dashboard/InViewServerRow';
-import { StatCardsSkeleton, ServerCardsSkeleton } from '@/components/dashboard/DashboardSkeleton';
+import { StatCardsSkeleton, ShimmerBlock } from '@/components/dashboard/DashboardSkeleton';
+import RealtimeLineChart, { ChartSeries } from '@/components/dashboard/charts/RealtimeLineChart';
 import CSContactButton from '@/components/dashboard/CSContactButton';
 import {
     Server as ServerIcon,
@@ -20,7 +20,8 @@ import {
     ArrowRight,
     Activity,
     CheckCircle2,
-    SlidersHorizontal,
+    BarChart3,
+    PieChart,
 } from 'lucide-react';
 
 type Timer = ReturnType<typeof setInterval>;
@@ -29,9 +30,10 @@ interface OverviewLiveStats {
     [uuid: string]: ServerStats;
 }
 
+const MAX_HISTORY_POINTS = 20;
+
 export default () => {
     const user = useStoreState((state: ApplicationStore) => state.user.data!);
-    const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin);
 
     const { data: serversData, error } = useSWR<PaginatedResult<Server>>(
         ['/api/client/servers/overview'],
@@ -39,6 +41,13 @@ export default () => {
     );
 
     const [liveStats, setLiveStats] = useState<OverviewLiveStats>({});
+    const [storageTab, setStorageTab] = useState<'combined' | 'memory' | 'disk'>('combined');
+
+    // Historical streaming series for realtime wave charts (20 points each)
+    const [cpuHistory, setCpuHistory] = useState<number[]>(() => Array(MAX_HISTORY_POINTS).fill(0));
+    const [memoryHistory, setMemoryHistory] = useState<number[]>(() => Array(MAX_HISTORY_POINTS).fill(0));
+    const [diskHistory, setDiskHistory] = useState<number[]>(() => Array(MAX_HISTORY_POINTS).fill(0));
+
     const servers = serversData?.items || [];
     const totalServers = serversData?.pagination.total || servers.length;
 
@@ -49,14 +58,50 @@ export default () => {
         let activeInterval: Timer | null = null;
 
         const pollAllServers = () => {
-            servers.forEach((server) => {
-                if (server.status !== 'suspended' && !server.isNodeUnderMaintenance) {
+            const promises = servers
+                .filter((s) => s.status !== 'suspended' && !s.isNodeUnderMaintenance)
+                .map((server) =>
                     getServerResourceUsage(server.uuid)
-                        .then((stats) => {
-                            setLiveStats((prev) => ({ ...prev, [server.uuid]: stats }));
-                        })
-                        .catch(() => null);
-                }
+                        .then((stats) => ({ uuid: server.uuid, stats }))
+                        .catch(() => null)
+                );
+
+            Promise.all(promises).then((results) => {
+                const nextStats: OverviewLiveStats = {};
+                let currentCpuSum = 0;
+                let currentMemUsed = 0;
+                let currentMemLimit = 0;
+                let currentDiskUsed = 0;
+                let currentDiskLimit = 0;
+
+                results.forEach((res) => {
+                    if (res && res.stats) {
+                        nextStats[res.uuid] = res.stats;
+                    }
+                });
+
+                setLiveStats((prev) => ({ ...prev, ...nextStats }));
+
+                servers.forEach((s) => {
+                    const stats = nextStats[s.uuid] || liveStats[s.uuid];
+                    if (stats) {
+                        currentCpuSum += stats.cpuUsagePercent;
+                        currentMemUsed += stats.memoryUsageInBytes;
+                        currentDiskUsed += stats.diskUsageInBytes;
+                    }
+                    if (s.limits.memory > 0) currentMemLimit += mbToBytes(s.limits.memory);
+                    if (s.limits.disk > 0) currentDiskLimit += mbToBytes(s.limits.disk);
+                });
+
+                // Calculate current percentages for charts
+                const ramPct = currentMemLimit > 0 ? (currentMemUsed / currentMemLimit) * 100 : Math.min(100, currentMemUsed / (1024 * 1024 * 1024 * 4) * 100);
+                const diskPct = currentDiskLimit > 0 ? (currentDiskUsed / currentDiskLimit) * 100 : Math.min(100, currentDiskUsed / (1024 * 1024 * 1024 * 20) * 100);
+                const avgCpu = servers.length > 0 ? currentCpuSum / servers.length : currentCpuSum;
+
+                // Push new points and roll history to the left
+                setCpuHistory((prev) => [...prev.slice(1), Math.max(0, avgCpu)]);
+                setMemoryHistory((prev) => [...prev.slice(1), Math.max(0, ramPct)]);
+                setDiskHistory((prev) => [...prev.slice(1), Math.max(0, diskPct)]);
             });
         };
 
@@ -91,7 +136,7 @@ export default () => {
         };
     }, [serversData]);
 
-    // Aggregate Metrics
+    // Aggregate Current Realtime Metrics
     let runningServersCount = 0;
     let totalDiskUsed = 0;
     let totalDiskLimit = 0;
@@ -142,25 +187,63 @@ export default () => {
 
     const isLoading = !serversData && !error;
 
+    // Series construction for Chart 1 (Storage & Memory)
+    const chart1Series: ChartSeries[] = [];
+    if (storageTab === 'combined' || storageTab === 'memory') {
+        chart1Series.push({
+            id: 'ram',
+            name: 'Memory (RAM)',
+            color: '#38bdf8', // Cyan
+            fillColor: '#38bdf8',
+            data: memoryHistory,
+            currentLabel: `${bytesToString(totalMemoryUsed)} (${memPercent.toFixed(1)}%)`,
+            unit: '%',
+        });
+    }
+    if (storageTab === 'combined' || storageTab === 'disk') {
+        chart1Series.push({
+            id: 'disk',
+            name: 'Storage (Disk)',
+            color: '#a855f7', // Violet
+            fillColor: '#a855f7',
+            data: diskHistory,
+            currentLabel: `${bytesToString(totalDiskUsed)} (${diskPercent.toFixed(1)}%)`,
+            unit: '%',
+        });
+    }
+
+    // Series construction for Chart 2 (CPU Load)
+    const chart2Series: ChartSeries[] = [
+        {
+            id: 'cpu',
+            name: 'Beban CPU',
+            color: '#f59e0b', // Amber/Gold
+            fillColor: '#f59e0b',
+            data: cpuHistory,
+            currentLabel: `${totalCpuUsed.toFixed(1)}% (Rata-rata ${(servers.length > 0 ? totalCpuUsed / servers.length : 0).toFixed(1)}%)`,
+            unit: '%',
+        },
+    ];
+
     return (
         <PageContentBlock title={'Dashboard Overview'}>
             {/* ── Top Hero Header ─────────────────────────────────────── */}
             <div className={'mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6 bg-gradient-to-r from-neutral-900 via-neutral-900 to-neutral-850 border border-neutral-800 rounded-3xl shadow-lg relative overflow-hidden'}>
-                {/* Background decorative glow */}
+                {/* Decorative background glow */}
                 <div className={'absolute top-0 right-0 w-80 h-full bg-primary-500/5 blur-3xl pointer-events-none'} />
 
                 <div className={'relative z-10 min-w-0'}>
                     <div className={'flex items-center gap-2 mb-1.5'}>
                         <span className={'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}>
                             <span className={'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse'} />
-                            Sistem Realtime Aktif
+                            Streaming Realtime Aktif
                         </span>
                     </div>
                     <h1 className={'text-xl sm:text-2xl font-black text-white tracking-tight'}>
                         Hai, {user.username}!
                     </h1>
                     <p className={'text-xs sm:text-sm text-neutral-400 mt-1 max-w-xl'}>
-                        Pantau performa komputasi, pemakaian storage, dan status instans server Anda secara terpusat.
+                        Pantau analitik beban komputasi, pemakaian memori, dan storage secara realtime di diagram bawah.
                     </p>
                 </div>
 
@@ -170,7 +253,7 @@ export default () => {
                         className={'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-xs sm:text-sm font-semibold shadow-md shadow-primary-600/30 transition-all hover:scale-102 active:scale-98 no-underline'}
                     >
                         <ServerIcon size={16} />
-                        <span>Kelola Semua Server</span>
+                        <span>Buka Daftar Server</span>
                         <ArrowRight size={14} />
                     </Link>
                 </div>
@@ -238,7 +321,7 @@ export default () => {
                                 </span>
                             </div>
                             <p className={'text-[11px] text-neutral-400 mt-1 truncate'}>
-                                {hasUnlimitedDisk ? '✦ Termasuk alokasi Unlimited' : `${diskPercent.toFixed(1)}% dari total kuota storage`}
+                                {hasUnlimitedDisk ? '✦ Termasuk alokasi Unlimited' : `${diskPercent.toFixed(1)}% dari kuota storage`}
                             </p>
                         </div>
 
@@ -319,45 +402,64 @@ export default () => {
                 </div>
             )}
 
-            {/* ── Server Overview Section ─────────────────────────────── */}
-            <div className={'mb-4 flex items-center justify-between'}>
-                <div>
-                    <h2 className={'text-base sm:text-lg font-bold text-white tracking-tight'}>
-                        Ringkasan Instans Server
-                    </h2>
-                    <p className={'text-xs text-neutral-400 mt-0.5'}>
-                        Status realtime dan metrik komputasi instans server Anda.
-                    </p>
-                </div>
-
-                <Link
-                    to={'/server'}
-                    className={'inline-flex items-center gap-1.5 text-xs font-semibold text-primary-400 hover:text-primary-300 no-underline transition-colors'}
-                >
-                    <span>Lihat Semua Server</span>
-                    <ArrowRight size={13} />
-                </Link>
-            </div>
-
+            {/* ── 2 Realtime Wave Line Charts ─────────────────────────── */}
             {isLoading ? (
-                <ServerCardsSkeleton count={4} />
-            ) : servers.length > 0 ? (
-                <div className={'grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4'}>
-                    {servers.map((server) => (
-                        <InViewServerRow key={server.uuid} server={server} />
-                    ))}
+                <div className={'grid grid-cols-1 lg:grid-cols-2 gap-6'}>
+                    <div className={'p-6 rounded-3xl bg-neutral-900 border border-neutral-800 space-y-4'}>
+                        <ShimmerBlock className={'w-48 h-6'} />
+                        <ShimmerBlock className={'w-full h-48 rounded-2xl'} />
+                    </div>
+                    <div className={'p-6 rounded-3xl bg-neutral-900 border border-neutral-800 space-y-4'}>
+                        <ShimmerBlock className={'w-48 h-6'} />
+                        <ShimmerBlock className={'w-full h-48 rounded-2xl'} />
+                    </div>
                 </div>
             ) : (
-                <div className={'p-8 sm:p-12 text-center rounded-3xl bg-neutral-900 border border-neutral-800'}>
-                    <ServerIcon size={36} className={'mx-auto text-neutral-600 mb-3'} />
-                    <h3 className={'text-base font-bold text-neutral-200'}>Tidak Ada Server</h3>
-                    <p className={'text-xs text-neutral-400 mt-1 max-w-sm mx-auto'}>
-                        Saat ini belum ada server yang terhubung dengan akun Anda.
-                    </p>
+                <div className={'grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6'}>
+                    {/* Chart 1: Storage & Memory Wave Line Chart with 3 Tabs */}
+                    <RealtimeLineChart
+                        title={'Analisis Storage & Memori'}
+                        subtitle={'Fluktuasi live pemakaian alokasi disk dan RAM'}
+                        icon={<PieChart size={20} />}
+                        series={chart1Series}
+                        yMax={100}
+                        yLeftFormatter={(val) => `${Math.round(val)}%`}
+                        yRightFormatter={(val) => (val >= 90 ? 'Maks' : val >= 50 ? 'Med' : val >= 25 ? 'Low' : '0%')}
+                        tabs={[
+                            { id: 'combined', label: 'Gabungan', icon: <BarChart3 size={13} /> },
+                            { id: 'memory', label: 'Memory (RAM)', icon: <Layers size={13} /> },
+                            { id: 'disk', label: 'Storage (Disk)', icon: <HardDrive size={13} /> },
+                        ]}
+                        activeTab={storageTab}
+                        onTabChange={(tabId) => setStorageTab(tabId as any)}
+                        badge={
+                            <span className={'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-300 border border-cyan-500/20'}>
+                                <span className={'w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse'} />
+                                Live Wave
+                            </span>
+                        }
+                    />
+
+                    {/* Chart 2: Realtime CPU Load Wave Line Chart */}
+                    <RealtimeLineChart
+                        title={'Analisis Beban CPU'}
+                        subtitle={'Aktivitas live komputasi seluruh instans server'}
+                        icon={<Activity size={20} />}
+                        series={chart2Series}
+                        yMax={100}
+                        yLeftFormatter={(val) => `${Math.round(val)}%`}
+                        yRightFormatter={(val) => `${Math.round(val)}%`}
+                        badge={
+                            <span className={'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
+                                <span className={'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse'} />
+                                Core Load
+                            </span>
+                        }
+                    />
                 </div>
             )}
 
-            {/* ── Floating CS Contact Button (Main Page) ──────────────── */}
+            {/* ── Floating CS Contact Button ──────────────────────────── */}
             <CSContactButton />
         </PageContentBlock>
     );
