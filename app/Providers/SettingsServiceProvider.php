@@ -72,14 +72,7 @@ class SettingsServiceProvider extends ServiceProvider
         'cs:enabled',
         'cs:title',
         'cs:subtitle',
-        'cs:whatsapp',
-        'cs:telegram',
-        'cs:discord',
-        'cs:email',
-        'footer:social_enabled',
-        'footer:github',
-        'footer:tiktok',
-        'footer:instagram',
+        'cs:items',
     ];
 
     /**

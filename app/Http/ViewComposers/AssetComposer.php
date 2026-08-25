@@ -34,17 +34,8 @@ class AssetComposer
             'cs_contact' => [
                 'enabled' => filter_var(config('cs.enabled', true), FILTER_VALIDATE_BOOLEAN),
                 'title' => config('cs.title', 'Customer Support'),
-                'subtitle' => config('cs.subtitle', 'Butuh bantuan? Hubungi tim support kami'),
-                'whatsapp' => config('cs.whatsapp', ''),
-                'telegram' => config('cs.telegram', ''),
-                'discord' => config('cs.discord', ''),
-                'email' => config('cs.email', ''),
-            ],
-            'social_links' => [
-                'enabled' => filter_var(config('footer.social_enabled', true), FILTER_VALIDATE_BOOLEAN),
-                'github' => config('footer.github', 'https://github.com/jakisoft/panel'),
-                'tiktok' => config('footer.tiktok', ''),
-                'instagram' => config('footer.instagram', ''),
+                'subtitle' => config('cs.subtitle', 'Butuh bantuan? Hubungi tim support kami 24/7'),
+                'items' => is_string(config('cs.items')) ? (json_decode(config('cs.items'), true) ?: []) : (is_array(config('cs.items')) ? config('cs.items') : []),
             ],
         ]);
     }

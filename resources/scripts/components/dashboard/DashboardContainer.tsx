@@ -14,7 +14,6 @@ import { PaginatedResult } from '@/api/http';
 import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
 import CSContactButton from '@/components/dashboard/CSContactButton';
-import DashboardFooter from '@/components/dashboard/DashboardFooter';
 
 export default () => {
     const { search } = useLocation();
@@ -57,7 +56,7 @@ export default () => {
     return (
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
             {rootAdmin && (
-                <div css={tw`mb-2 flex justify-end items-center`}>
+                <div css={tw`mb-3 flex justify-end items-center`}>
                     <p css={tw`uppercase text-xs text-neutral-400 mr-2`}>
                         {showOnlyAdmin ? "Showing others' servers" : 'Showing your servers'}
                     </p>
@@ -74,9 +73,11 @@ export default () => {
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) =>
                         items.length > 0 ? (
-                            items.map((server, index) => (
-                                <ServerRow key={server.uuid} server={server} css={index > 0 ? tw`mt-3` : undefined} />
-                            ))
+                            <div className={'grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4'}>
+                                {items.map((server) => (
+                                    <ServerRow key={server.uuid} server={server} />
+                                ))}
+                            </div>
                         ) : (
                             <p css={tw`text-center text-sm text-neutral-400`}>
                                 {showOnlyAdmin
@@ -87,9 +88,6 @@ export default () => {
                     }
                 </Pagination>
             )}
-
-            {/* ── Dashboard Footer with Left-Corner Socials & Right-Corner Copyright ── */}
-            <DashboardFooter />
 
             {/* ── Floating CS Contact Button (Bottom-Right, Main Page Only) ── */}
             <CSContactButton />
