@@ -65,23 +65,30 @@
     @parent
     <script>
     $('#configTokenBtn').on('click', function (event) {
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Generating...');
+
         $.ajax({
             method: 'POST',
             url: '{{ route('admin.nodes.view.configuration.token', $node->id) }}',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         }).done(function (data) {
-            swal({
+            var cmd = 'cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}';
+            window.CustomDialog.show({
                 type: 'success',
-                title: 'Token created.',
-                text: '<p>To auto-configure your node run the following command:<br /><small><pre>cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}</pre></small></p>',
-                html: true
-            })
+                title: 'Auto-Deploy Token Generated',
+                text: 'Jalankan perintah berikut di server node Anda untuk mengonfigurasi Wings secara otomatis:',
+                code: cmd,
+                confirmButtonText: 'Selesai'
+            });
         }).fail(function () {
-            swal({
-                title: 'Error',
-                text: 'Something went wrong creating your token.',
+            window.CustomDialog.show({
+                title: 'Gagal Membuat Token',
+                text: 'Terjadi kesalahan saat membuat auto-deploy token untuk node ini.',
                 type: 'error'
             });
+        }).always(function () {
+            $btn.prop('disabled', false).html('Generate Token');
         });
     });
     </script>

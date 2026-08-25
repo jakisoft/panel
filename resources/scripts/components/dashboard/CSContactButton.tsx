@@ -204,14 +204,14 @@ export default () => {
                                             'group flex items-center justify-between gap-3 p-3 rounded-xl bg-neutral-850 hover:bg-neutral-800 border border-neutral-750/70 hover:border-primary-500/50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg no-underline'
                                         }
                                     >
-                                        <div className={'flex items-center gap-3 min-w-0'}>
+                                        <div className={'flex items-center gap-3 min-w-0 flex-1 overflow-hidden'}>
                                             <div
                                                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${iconData.border} ${iconData.bg} transition-transform group-hover:scale-105 shadow-sm`}
                                                 style={{ color: iconData.color }}
                                             >
                                                 {iconData.Component}
                                             </div>
-                                            <div className={'min-w-0'}>
+                                            <div className={'min-w-0 flex-1 overflow-hidden'}>
                                                 <p className={'text-xs sm:text-sm font-semibold text-neutral-100 group-hover:text-white truncate'}>
                                                     {item.name}
                                                 </p>

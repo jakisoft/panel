@@ -292,6 +292,174 @@
                 Copyright &copy; 2015 - {{ date('Y') }} <a href="{{ config('app.footer_url', 'https://github.com/jakisoft/panel') }}" target="_blank" rel="noopener noreferrer">{{ config('app.name', 'JKSoft Cloud') }}</a>. All rights reserved.
             </footer>
         </div>
+        <!-- Modern Custom Admin Dialog Modal (Replaces SweetAlert) -->
+        <div id="adminCustomModal" class="admin-custom-modal-backdrop" style="display: none;">
+            <div class="admin-custom-modal-dialog">
+                <div class="admin-custom-modal-content">
+                    <div class="admin-custom-modal-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div id="adminModalIconBadge" class="admin-modal-icon-badge warning">
+                                <i id="adminModalIcon" class="fa fa-exclamation-triangle"></i>
+                            </div>
+                            <h4 id="adminModalTitle" class="admin-custom-modal-title">Konfirmasi Tindakan</h4>
+                        </div>
+                        <button type="button" class="admin-custom-modal-close" id="adminModalCloseBtn">&times;</button>
+                    </div>
+                    <div class="admin-custom-modal-body" id="adminModalBody">
+                        <div id="adminModalText"></div>
+                        <div id="adminModalCodeContainer" style="display: none; margin-top: 14px;">
+                            <div class="admin-modal-code-box">
+                                <textarea id="adminModalCodeInput" readonly rows="3"></textarea>
+                                <button type="button" id="adminModalCopyBtn" class="btn btn-sm btn-primary" style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                                    <i class="fa fa-copy"></i> <span id="adminModalCopyBtnText">Salin Perintah</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-custom-modal-footer">
+                        <button type="button" id="adminModalCancelBtn" class="btn btn-default">Batal</button>
+                        <button type="button" id="adminModalConfirmBtn" class="btn btn-danger">Lanjutkan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .admin-custom-modal-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(15, 23, 42, 0.8);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 16px;
+                opacity: 0;
+                transition: opacity 0.18s ease-in-out;
+            }
+            .admin-custom-modal-backdrop.show {
+                opacity: 1;
+            }
+            .admin-custom-modal-dialog {
+                width: 100%;
+                max-width: 540px;
+                transform: scale(0.94);
+                transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .admin-custom-modal-backdrop.show .admin-custom-modal-dialog {
+                transform: scale(1);
+            }
+            .admin-custom-modal-content {
+                background: #1e293b;
+                border: 1px solid #334155;
+                border-radius: 14px;
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+                color: #f8fafc;
+                overflow: hidden;
+            }
+            .admin-custom-modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 18px 20px 14px 20px;
+                border-bottom: 1px solid #334155;
+            }
+            .admin-custom-modal-title {
+                margin: 0;
+                font-size: 16px;
+                font-weight: 700;
+                color: #f8fafc;
+            }
+            .admin-custom-modal-close {
+                background: transparent;
+                border: none;
+                color: #94a3b8;
+                font-size: 22px;
+                line-height: 1;
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 6px;
+                transition: all 0.15s ease;
+            }
+            .admin-custom-modal-close:hover {
+                color: #ffffff;
+                background: #334155;
+            }
+            .admin-modal-icon-badge {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 17px;
+                flex-shrink: 0;
+            }
+            .admin-modal-icon-badge.danger {
+                background: rgba(239, 68, 68, 0.18);
+                color: #f87171;
+                border: 1px solid rgba(239, 68, 68, 0.35);
+            }
+            .admin-modal-icon-badge.warning {
+                background: rgba(245, 158, 11, 0.18);
+                color: #fbbf24;
+                border: 1px solid rgba(245, 158, 11, 0.35);
+            }
+            .admin-modal-icon-badge.success {
+                background: rgba(16, 185, 129, 0.18);
+                color: #34d399;
+                border: 1px solid rgba(16, 185, 129, 0.35);
+            }
+            .admin-modal-icon-badge.info {
+                background: rgba(59, 130, 246, 0.18);
+                color: #60a5fa;
+                border: 1px solid rgba(59, 130, 246, 0.35);
+            }
+            .admin-custom-modal-body {
+                padding: 20px;
+                font-size: 13.5px;
+                color: #cbd5e1;
+                line-height: 1.6;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+            .admin-modal-code-box {
+                background: #0f172a;
+                border: 1px solid #334155;
+                border-radius: 10px;
+                padding: 14px;
+                position: relative;
+            }
+            .admin-modal-code-box textarea {
+                width: 100%;
+                background: transparent;
+                border: none;
+                color: #38bdf8;
+                font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+                font-size: 12.5px;
+                resize: none;
+                outline: none;
+                line-height: 1.6;
+                padding: 0;
+                margin-bottom: 12px;
+                display: block;
+            }
+            .admin-custom-modal-footer {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 10px;
+                padding: 14px 20px;
+                background: #0f172a;
+                border-top: 1px solid #334155;
+            }
+        </style>
+
         @section('footer-scripts')
             <script src="/js/keyboard.polyfill.js" type="application/javascript"></script>
             <script>keyboardeventKeyPolyfill.polyfill();</script>
@@ -306,31 +474,211 @@
             {!! Theme::js('js/admin/functions.js?t={cache-version}') !!}
             <script src="/js/autocomplete.js" type="application/javascript"></script>
 
+            <script>
+                // Modern Custom Dialog System for Admin
+                (function() {
+                    var $modal = $('#adminCustomModal');
+                    var $title = $('#adminModalTitle');
+                    var $iconBadge = $('#adminModalIconBadge');
+                    var $icon = $('#adminModalIcon');
+                    var $text = $('#adminModalText');
+                    var $codeContainer = $('#adminModalCodeContainer');
+                    var $codeInput = $('#adminModalCodeInput');
+                    var $copyBtn = $('#adminModalCopyBtn');
+                    var $copyBtnText = $('#adminModalCopyBtnText');
+                    var $confirmBtn = $('#adminModalConfirmBtn');
+                    var $cancelBtn = $('#adminModalCancelBtn');
+                    var $closeBtn = $('#adminModalCloseBtn');
+
+                    var currentCallback = null;
+                    var currentCancelCallback = null;
+
+                    function closeModal() {
+                        $modal.removeClass('show');
+                        setTimeout(function() {
+                            $modal.hide();
+                            $codeContainer.hide();
+                            $codeInput.val('');
+                        }, 180);
+                    }
+
+                    window.CustomDialog = {
+                        show: function(opts, cb, cancelCb) {
+                            if (typeof opts === 'string') {
+                                opts = { title: opts };
+                            }
+                            opts = opts || {};
+                            currentCallback = cb || null;
+                            currentCancelCallback = cancelCb || null;
+
+                            var title = opts.title || (opts.type === 'error' ? 'Terjadi Kesalahan' : (opts.showCancelButton ? 'Konfirmasi Tindakan' : 'Informasi'));
+                            var type = opts.type || (opts.showCancelButton ? 'warning' : 'info');
+                            var text = opts.text || opts.htmlText || opts.description || '';
+                            var showCancel = opts.showCancelButton !== false && opts.showCancelButton !== undefined ? opts.showCancelButton : false;
+                            var confirmText = opts.confirmButtonText || opts.confirm || 'Lanjutkan';
+                            var cancelText = opts.cancelButtonText || 'Batal';
+
+                            $title.text(title);
+
+                            // Setup Icon
+                            $iconBadge.removeClass('danger warning success info').addClass(type === 'error' ? 'danger' : type);
+                            if (type === 'error' || type === 'danger') {
+                                $icon.attr('class', 'fa fa-times-circle');
+                                $confirmBtn.attr('class', 'btn btn-danger');
+                            } else if (type === 'warning') {
+                                $icon.attr('class', 'fa fa-exclamation-triangle');
+                                $confirmBtn.attr('class', 'btn btn-danger');
+                            } else if (type === 'success') {
+                                $icon.attr('class', 'fa fa-check-circle');
+                                $confirmBtn.attr('class', 'btn btn-success');
+                            } else {
+                                $icon.attr('class', 'fa fa-info-circle');
+                                $confirmBtn.attr('class', 'btn btn-primary');
+                            }
+
+                            // Detect Code Command or Auto-Deploy Token
+                            var codeMatch = text.match(/<pre[^>]*>([\s\S]*?)<\/pre>/i) || (opts.code ? [null, opts.code] : null);
+                            if (codeMatch) {
+                                var codeContent = codeMatch[1].replace(/<[^>]+>/g, '').trim();
+                                var cleanText = text.replace(/<p[^>]*>To auto-configure[\s\S]*?<\/p>/i, '').replace(/<pre[\s\S]*?<\/pre>/i, '').trim();
+                                
+                                $text.html(cleanText || 'Jalankan perintah berikut di terminal server Anda:');
+                                $codeInput.val(codeContent);
+                                $codeContainer.show();
+                            } else {
+                                $codeContainer.hide();
+                                if (opts.html) {
+                                    $text.html(text);
+                                } else {
+                                    $text.text(text);
+                                }
+                            }
+
+                            $confirmBtn.text(confirmText);
+                            $cancelBtn.text(cancelText);
+
+                            if (showCancel) {
+                                $cancelBtn.show();
+                            } else {
+                                $cancelBtn.hide();
+                            }
+
+                            $modal.show();
+                            setTimeout(function() {
+                                $modal.addClass('show');
+                            }, 10);
+                        },
+                        close: function() {
+                            closeModal();
+                        }
+                    };
+
+                    // Global SweetAlert (swal) Override
+                    window.swal = function(arg1, arg2, arg3) {
+                        var opts = {};
+                        var cb = null;
+
+                        if (typeof arg1 === 'object') {
+                            opts = arg1;
+                            cb = arg2;
+                        } else {
+                            opts = {
+                                title: arg1,
+                                text: arg2,
+                                type: arg3 || 'info'
+                            };
+                        }
+
+                        window.CustomDialog.show(opts, cb);
+                    };
+                    window.swal.close = function() {
+                        window.CustomDialog.close();
+                    };
+
+                    // Events
+                    $confirmBtn.on('click', function() {
+                        closeModal();
+                        if (typeof currentCallback === 'function') {
+                            currentCallback(true);
+                        }
+                    });
+
+                    $cancelBtn.on('click', function() {
+                        closeModal();
+                        if (typeof currentCancelCallback === 'function') {
+                            currentCancelCallback();
+                        }
+                    });
+
+                    $closeBtn.on('click', function() {
+                        closeModal();
+                    });
+
+                    $modal.on('click', function(e) {
+                        if ($(e.target).is($modal)) {
+                            closeModal();
+                        }
+                    });
+
+                    // Copy Code Button
+                    $copyBtn.on('click', function() {
+                        var code = $codeInput.val();
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(code).then(function() {
+                                $copyBtnText.text('Tersalin!');
+                                $copyBtn.removeClass('btn-primary').addClass('btn-success');
+                                setTimeout(function() {
+                                    $copyBtnText.text('Salin Perintah');
+                                    $copyBtn.removeClass('btn-success').addClass('btn-primary');
+                                }, 2000);
+                            });
+                        } else {
+                            $codeInput.select();
+                            document.execCommand('copy');
+                            $copyBtnText.text('Tersalin!');
+                            $copyBtn.removeClass('btn-primary').addClass('btn-success');
+                            setTimeout(function() {
+                                $copyBtnText.text('Salin Perintah');
+                                $copyBtn.removeClass('btn-success').addClass('btn-primary');
+                            }, 2000);
+                        }
+                    });
+
+                    // Keydown Escape
+                    $(document).on('keydown', function(e) {
+                        if (e.key === 'Escape' && $modal.hasClass('show')) {
+                            closeModal();
+                        }
+                    });
+                })();
+            </script>
+
             @if(Auth::user()->root_admin)
                 <script>
                     $('#logoutButton').on('click', function (event) {
                         event.preventDefault();
 
-                        var that = this;
-                        swal({
-                            title: 'Do you want to log out?',
+                        window.CustomDialog.show({
+                            title: 'Konfirmasi Keluar',
+                            text: 'Apakah Anda yakin ingin keluar dari akun Anda? Sesi login Anda akan diakhiri.',
                             type: 'warning',
                             showCancelButton: true,
                             confirmButtonColor: '#d9534f',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Log out'
+                            confirmButtonText: 'Ya, Keluar',
+                            cancelButtonText: 'Batal'
                         }, function () {
-                             $.ajax({
+                            $.ajax({
                                 type: 'POST',
                                 url: '{{ route('auth.logout') }}',
                                 data: {
                                     _token: '{{ csrf_token() }}'
-                                },complete: function () {
-                                    window.location.href = '{{route('auth.login')}}';
+                                },
+                                complete: function () {
+                                    window.location.href = '{{ route('auth.login') }}';
                                 }
+                            });
                         });
                     });
-                });
                 </script>
             @endif
 

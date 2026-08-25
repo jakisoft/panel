@@ -60,31 +60,29 @@
     <script>
     $('#deletebtn').click(function (event) {
         event.preventDefault();
-        swal({
-            title: '',
+        window.CustomDialog.show({
+            title: 'Hapus Server Ini?',
             type: 'warning',
-            text: 'Are you sure that you want to delete this server? There is no going back, all data will immediately be removed.',
+            text: 'Apakah Anda yakin ingin menghapus server ini? Tindakan ini tidak dapat dibatalkan, seluruh data server akan dihapus secara permanen.',
             showCancelButton: true,
-            confirmButtonText: 'Delete',
-            confirmButtonColor: '#d9534f',
-            closeOnConfirm: false
+            confirmButtonText: 'Ya, Hapus Server',
+            cancelButtonText: 'Batal'
         }, function () {
-            $('#deleteform').submit()
+            $('#deleteform').submit();
         });
     });
 
     $('#forcedeletebtn').click(function (event) {
         event.preventDefault();
-        swal({
-            title: '',
+        window.CustomDialog.show({
+            title: 'Hapus Paksa Server Ini?',
             type: 'warning',
-            text: 'Are you sure that you want to delete this server? There is no going back, all data will immediately be removed.',
+            text: 'PERINGATAN: Tindakan hapus paksa akan menghapus server dari panel meskipun daemon tidak merespons. Seluruh data akan hilang.',
             showCancelButton: true,
-            confirmButtonText: 'Delete',
-            confirmButtonColor: '#d9534f',
-            closeOnConfirm: false
+            confirmButtonText: 'Ya, Hapus Paksa',
+            cancelButtonText: 'Batal'
         }, function () {
-            $('#forcedeleteform').submit()
+            $('#forcedeleteform').submit();
         });
     });
     </script>
