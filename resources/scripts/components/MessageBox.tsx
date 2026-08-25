@@ -52,7 +52,7 @@ const MessageBox = ({ title, children, type }: Props) => (
             <span
                 className={'title'}
                 css={[
-                    tw`flex rounded-md uppercase px-2 py-0.5 text-[10px] font-bold mr-2.5 leading-tight shrink-0 tracking-wider`,
+                    tw`flex rounded-md uppercase px-2 py-0.5 text-[10px] font-bold mr-2.5 leading-tight flex-shrink-0 tracking-wider`,
                     getBackground(type),
                 ]}
             >

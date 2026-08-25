@@ -55,7 +55,11 @@ export default ({
                         >
                             {/* Left Lucide Icon */}
                             {Icon && (
-                                <div className={'w-11 h-12 flex items-center justify-center text-neutral-500 group-focus-within:text-primary-400 group-hover:text-neutral-400 transition-colors shrink-0 pointer-events-none'}>
+                                <div
+                                    className={
+                                        'w-11 h-12 flex items-center justify-center text-neutral-500 group-focus-within:text-primary-400 group-hover:text-neutral-400 transition-colors shrink-0 pointer-events-none'
+                                    }
+                                >
                                     <Icon size={18} />
                                 </div>
                             )}
@@ -80,7 +84,9 @@ export default ({
                                     type={'button'}
                                     tabIndex={-1}
                                     onClick={() => setShowPassword((prev) => !prev)}
-                                    className={'absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/80 active:scale-95 transition-all focus:outline-none'}
+                                    className={
+                                        'absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/80 active:scale-95 transition-all focus:outline-none'
+                                    }
                                     title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                                 >
@@ -89,14 +95,19 @@ export default ({
                             )}
                         </div>
 
-                        {/* Error or Description */}
-                        {hasError ? (
-                            <p className={'text-xs font-medium text-red-400 flex items-center gap-1.5 pt-0.5 animate-fadeIn'}>
+                        {hasError && errorMessage ? (
+                            <p
+                                className={
+                                    'text-xs font-medium text-red-400 flex items-center gap-1.5 pt-0.5 animate-fadeIn'
+                                }
+                            >
                                 <AlertCircle size={13} className={'shrink-0'} />
-                                <span>{errorMessage?.charAt(0).toUpperCase() + errorMessage?.slice(1)}</span>
+                                <span>{errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)}</span>
                             </p>
                         ) : description ? (
-                            <p className={'text-[11px] sm:text-xs text-neutral-400/90 pt-0.5 leading-normal'}>{description}</p>
+                            <p className={'text-[11px] sm:text-xs text-neutral-400/90 pt-0.5 leading-normal'}>
+                                {description}
+                            </p>
                         ) : null}
                     </div>
                 );
