@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useRouteMatch, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
+    Server as ServerIcon,
     LogOut,
     X,
     Shield,
@@ -107,13 +108,22 @@ export default () => {
 
                 {/* Scrollable Server Navigation Menu */}
                 <nav className={'flex-1 overflow-y-auto px-3 py-3 space-y-1'}>
-                    <Link
-                        to={'/'}
-                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors mb-2 border-b border-neutral-800/80 pb-2.5'}
-                    >
-                        <LayoutDashboard size={18} />
-                        <span>Dashboard Utama</span>
-                    </Link>
+                    <div className={'space-y-1 mb-2 border-b border-neutral-800/80 pb-2.5'}>
+                        <Link
+                            to={'/'}
+                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                        >
+                            <LayoutDashboard size={18} />
+                            <span>Dashboard Utama</span>
+                        </Link>
+                        <Link
+                            to={'/server'}
+                            className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                        >
+                            <ServerIcon size={18} />
+                            <span>Daftar Server</span>
+                        </Link>
+                    </div>
 
                     <div className={'px-3 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-neutral-500'}>
                         Menu Server

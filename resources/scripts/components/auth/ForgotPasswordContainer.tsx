@@ -1,17 +1,16 @@
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import requestPasswordResetEmail from '@/api/auth/requestPasswordResetEmail';
 import { httpErrorToHuman } from '@/api/http';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
-import Field from '@/components/elements/Field';
+import AuthField from '@/components/auth/AuthField';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
-import tw from 'twin.macro';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import { Mail, ArrowLeft, Send } from 'lucide-react';
 
 interface Values {
     email: string;
@@ -31,32 +30,27 @@ export default () => {
     const handleSubmission = ({ email }: Values, { setSubmitting, resetForm }: FormikHelpers<Values>) => {
         clearFlashes();
 
-        // If there is no token in the state yet, request the token and then abort this submit request
-        // since it will be re-submitted when the recaptcha data is returned by the component.
         if (recaptchaEnabled && !token) {
             ref.current!.execute().catch((error) => {
                 console.error(error);
-
                 setSubmitting(false);
                 addFlash({ type: 'error', title: 'Error', message: httpErrorToHuman(error) });
             });
-
             return;
         }
 
         requestPasswordResetEmail(email, token)
             .then((response) => {
                 resetForm();
-                addFlash({ type: 'success', title: 'Success', message: response });
+                addFlash({ type: 'success', title: 'Berhasil', message: response });
             })
             .catch((error) => {
                 console.error(error);
-                addFlash({ type: 'error', title: 'Error', message: httpErrorToHuman(error) });
+                addFlash({ type: 'error', title: 'Gagal', message: httpErrorToHuman(error) });
             })
             .then(() => {
                 setToken('');
                 if (ref.current) ref.current.reset();
-
                 setSubmitting(false);
             });
     };
@@ -67,26 +61,39 @@ export default () => {
             initialValues={{ email: '' }}
             validationSchema={object().shape({
                 email: string()
-                    .email('A valid email address must be provided to continue.')
-                    .required('A valid email address must be provided to continue.'),
+                    .email('Format alamat email tidak valid.')
+                    .required('Alamat email akun wajib diisi untuk melanjutkan.'),
             })}
         >
-            {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Forgot Password'} css={tw`w-full flex`}>
-                    <Field
-                        light
-                        label={'Email'}
-                        description={
-                            'Enter your account email address to receive instructions on resetting your password.'
-                        }
+            {({ isSubmitting, submitForm }) => (
+                <LoginFormContainer
+                    title={'Lupa Kata Sandi'}
+                    subtitle={'Masukkan email Anda untuk menerima instruksi pemulihan'}
+                >
+                    <AuthField
                         name={'email'}
                         type={'email'}
+                        label={'Alamat Email Akun'}
+                        icon={Mail}
+                        placeholder={'contoh@domain.com'}
+                        description={'Tautan reset kata sandi akan dikirimkan ke alamat email terdaftar ini.'}
+                        disabled={isSubmitting}
+                        autoFocus
                     />
-                    <div css={tw`mt-6`}>
-                        <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>
-                            Send Email
+
+                    <div className={'pt-2'}>
+                        <Button
+                            type={'submit'}
+                            size={'xlarge'}
+                            disabled={isSubmitting}
+                            isLoading={isSubmitting}
+                            className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                        >
+                            <Send size={17} />
+                            <span>Kirim Tautan Reset</span>
                         </Button>
                     </div>
+
                     {recaptchaEnabled && (
                         <Reaptcha
                             ref={ref}
@@ -97,17 +104,18 @@ export default () => {
                                 submitForm();
                             }}
                             onExpire={() => {
-                                setSubmitting(false);
                                 setToken('');
                             }}
                         />
                     )}
-                    <div css={tw`mt-6 text-center`}>
+
+                    <div className={'pt-2 text-center'}>
                         <Link
                             to={'/auth/login'}
-                            css={tw`text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
+                            className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}
                         >
-                            Return to Login
+                            <ArrowLeft size={14} />
+                            <span>Kembali ke Halaman Login</span>
                         </Link>
                     </div>
                 </LoginFormContainer>

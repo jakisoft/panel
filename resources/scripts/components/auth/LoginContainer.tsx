@@ -5,11 +5,11 @@ import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
-import Field from '@/components/elements/Field';
-import tw from 'twin.macro';
+import AuthField from '@/components/auth/AuthField';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
+import { User, Lock, LogIn } from 'lucide-react';
 
 interface Values {
     username: string;
@@ -30,16 +30,12 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes();
 
-        // If there is no token in the state yet, request the token and then abort this submit request
-        // since it will be re-submitted when the recaptcha data is returned by the component.
         if (recaptchaEnabled && !token) {
             ref.current!.execute().catch((error) => {
                 console.error(error);
-
                 setSubmitting(false);
                 clearAndAddHttpError({ error });
             });
-
             return;
         }
 
@@ -50,15 +46,12 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                     window.location = response.intended || '/';
                     return;
                 }
-
                 history.replace('/auth/login/checkpoint', { token: response.confirmationToken });
             })
             .catch((error) => {
                 console.error(error);
-
                 setToken('');
                 if (ref.current) ref.current.reset();
-
                 setSubmitting(false);
                 clearAndAddHttpError({ error });
             });
@@ -69,21 +62,48 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
             onSubmit={onSubmit}
             initialValues={{ username: '', password: '' }}
             validationSchema={object().shape({
-                username: string().required('A username or email must be provided.'),
-                password: string().required('Please enter your account password.'),
+                username: string().required('Username atau email wajib diisi.'),
+                password: string().required('Kata sandi akun wajib diisi.'),
             })}
         >
-            {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Login to Continue'} css={tw`w-full flex`}>
-                    <Field light type={'text'} label={'Username or Email'} name={'username'} disabled={isSubmitting} />
-                    <div css={tw`mt-6`}>
-                        <Field light type={'password'} label={'Password'} name={'password'} disabled={isSubmitting} />
+            {({ isSubmitting, submitForm }) => (
+                <LoginFormContainer
+                    title={'Masuk Akun'}
+                    subtitle={'Silakan masuk untuk mengelola server Anda'}
+                >
+                    <AuthField
+                        name={'username'}
+                        label={'Username atau Email'}
+                        icon={User}
+                        placeholder={'Masukkan username atau email...'}
+                        disabled={isSubmitting}
+                        autoFocus
+                    />
+
+                    <div className={'pt-1'}>
+                        <AuthField
+                            name={'password'}
+                            type={'password'}
+                            label={'Kata Sandi'}
+                            icon={Lock}
+                            placeholder={'Masukkan kata sandi akun...'}
+                            disabled={isSubmitting}
+                        />
                     </div>
-                    <div css={tw`mt-6`}>
-                        <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>
-                            Login
+
+                    <div className={'pt-2'}>
+                        <Button
+                            type={'submit'}
+                            size={'xlarge'}
+                            isLoading={isSubmitting}
+                            disabled={isSubmitting}
+                            className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                        >
+                            <LogIn size={18} />
+                            <span>Masuk Sekarang</span>
                         </Button>
                     </div>
+
                     {recaptchaEnabled && (
                         <Reaptcha
                             ref={ref}
@@ -94,17 +114,17 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                                 submitForm();
                             }}
                             onExpire={() => {
-                                setSubmitting(false);
                                 setToken('');
                             }}
                         />
                     )}
-                    <div css={tw`mt-6 text-center`}>
+
+                    <div className={'pt-2 text-center'}>
                         <Link
                             to={'/auth/password'}
-                            css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
+                            className={'text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}
                         >
-                            Forgot password?
+                            Lupa Kata Sandi?
                         </Link>
                     </div>
                 </LoginFormContainer>

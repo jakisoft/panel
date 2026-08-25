@@ -8,10 +8,9 @@ import { Actions, useStoreActions } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import { Formik, FormikHelpers } from 'formik';
 import { object, ref, string } from 'yup';
-import Field from '@/components/elements/Field';
-import Input from '@/components/elements/Input';
-import tw from 'twin.macro';
+import AuthField from '@/components/auth/AuthField';
 import Button from '@/components/elements/Button';
+import { Lock, Mail, Key, ArrowLeft } from 'lucide-react';
 
 interface Values {
     password: string;
@@ -37,9 +36,8 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
             })
             .catch((error) => {
                 console.error(error);
-
                 setSubmitting(false);
-                addFlash({ type: 'error', title: 'Error', message: httpErrorToHuman(error) });
+                addFlash({ type: 'error', title: 'Gagal', message: httpErrorToHuman(error) });
             });
     };
 
@@ -52,43 +50,80 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
             }}
             validationSchema={object().shape({
                 password: string()
-                    .required('A new password is required.')
-                    .min(8, 'Your new password should be at least 8 characters in length.'),
+                    .required('Kata sandi baru wajib diisi.')
+                    .min(8, 'Kata sandi baru minimal harus 8 karakter.'),
                 passwordConfirmation: string()
-                    .required('Your new password does not match.')
+                    .required('Konfirmasi kata sandi baru tidak cocok.')
                     // @ts-expect-error this is valid
-                    .oneOf([ref('password'), null], 'Your new password does not match.'),
+                    .oneOf([ref('password'), null], 'Konfirmasi kata sandi tidak cocok.'),
             })}
         >
             {({ isSubmitting }) => (
-                <LoginFormContainer title={'Reset Password'} css={tw`w-full flex`}>
-                    <div>
-                        <label>Email</label>
-                        <Input value={email} isLight disabled />
-                    </div>
-                    <div css={tw`mt-6`}>
-                        <Field
-                            light
-                            label={'New Password'}
+                <LoginFormContainer
+                    title={'Atur Ulang Kata Sandi'}
+                    subtitle={'Buat kata sandi baru yang aman untuk akun Anda'}
+                >
+                    {/* Readonly Email Display */}
+                    {email && (
+                        <div className={'w-full space-y-1.5'}>
+                            <label className={'block text-xs sm:text-sm font-semibold text-neutral-300'}>
+                                Alamat Email Akun
+                            </label>
+                            <div className={'flex items-center rounded-xl bg-neutral-900/50 border border-neutral-800 p-2.5 sm:p-3 text-neutral-400 cursor-not-allowed'}>
+                                <div className={'pl-1 pr-2.5 text-neutral-500'}>
+                                    <Mail size={18} />
+                                </div>
+                                <span className={'text-xs sm:text-sm font-mono text-neutral-300 truncate'}>
+                                    {email}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className={'pt-1'}>
+                        <AuthField
                             name={'password'}
                             type={'password'}
-                            description={'Passwords must be at least 8 characters in length.'}
+                            label={'Kata Sandi Baru'}
+                            icon={Lock}
+                            placeholder={'Masukkan kata sandi baru...'}
+                            description={'Kata sandi harus terdiri dari minimal 8 karakter.'}
+                            disabled={isSubmitting}
+                            autoFocus
                         />
                     </div>
-                    <div css={tw`mt-6`}>
-                        <Field light label={'Confirm New Password'} name={'passwordConfirmation'} type={'password'} />
+
+                    <div className={'pt-1'}>
+                        <AuthField
+                            name={'passwordConfirmation'}
+                            type={'password'}
+                            label={'Konfirmasi Kata Sandi Baru'}
+                            icon={Lock}
+                            placeholder={'Ulangi kata sandi baru...'}
+                            disabled={isSubmitting}
+                        />
                     </div>
-                    <div css={tw`mt-6`}>
-                        <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>
-                            Reset Password
+
+                    <div className={'pt-2'}>
+                        <Button
+                            size={'xlarge'}
+                            type={'submit'}
+                            disabled={isSubmitting}
+                            isLoading={isSubmitting}
+                            className={'w-full flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-600/30'}
+                        >
+                            <Key size={17} />
+                            <span>Simpan Kata Sandi Baru</span>
                         </Button>
                     </div>
-                    <div css={tw`mt-6 text-center`}>
+
+                    <div className={'pt-2 text-center'}>
                         <Link
                             to={'/auth/login'}
-                            css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
+                            className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}
                         >
-                            Return to Login
+                            <ArrowLeft size={14} />
+                            <span>Kembali ke Halaman Login</span>
                         </Link>
                     </div>
                 </LoginFormContainer>
