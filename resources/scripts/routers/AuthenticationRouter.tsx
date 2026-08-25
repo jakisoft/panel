@@ -13,12 +13,12 @@ export default () => {
     const { path } = useRouteMatch();
 
     return (
-        <div className={'min-h-screen w-full flex flex-col justify-center items-center py-10 sm:py-16 px-3 sm:px-6 relative overflow-hidden bg-neutral-950 text-neutral-100'}>
-            {/* Ambient Background Glow */}
-            <div className={'absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-primary-600/10 blur-[130px] pointer-events-none rounded-full'} />
-            <div className={'absolute -bottom-40 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-cyan-600/5 blur-[130px] pointer-events-none rounded-full'} />
+        <div className={'min-h-screen w-full flex flex-col justify-center items-center py-10 sm:py-16 px-4 relative overflow-hidden bg-neutral-950 text-neutral-100 selection:bg-primary-500/30 selection:text-white'}>
+            {/* Ambient Background Glows */}
+            <div className={'absolute -top-32 left-1/2 -translate-x-1/2 w-[550px] h-[320px] bg-primary-600/15 blur-[120px] pointer-events-none rounded-full'} />
+            <div className={'absolute -bottom-32 left-1/2 -translate-x-1/2 w-[550px] h-[320px] bg-cyan-600/10 blur-[120px] pointer-events-none rounded-full'} />
 
-            <div className={'w-full max-w-md relative z-10'}>
+            <div className={'w-full max-w-[450px] relative z-10'}>
                 <Switch location={location}>
                     <Route path={`${path}/login`} component={LoginContainer} exact />
                     <Route path={`${path}/login/checkpoint`} component={LoginCheckpointContainer} />

@@ -68,7 +68,7 @@ export default () => {
             {({ isSubmitting, submitForm }) => (
                 <LoginFormContainer
                     title={'Lupa Kata Sandi'}
-                    subtitle={'Masukkan email Anda untuk menerima instruksi pemulihan'}
+                    subtitle={'Masukkan email terdaftar untuk menerima instruksi pemulihan akun'}
                 >
                     <AuthField
                         name={'email'}
@@ -88,7 +88,7 @@ export default () => {
                             isLoading={isSubmitting}
                             icon={<Send size={17} />}
                         >
-                            Kirim Tautan Reset
+                            Kirim Tautan Pemulihan
                         </AuthButton>
                     </div>
 
@@ -107,7 +107,7 @@ export default () => {
                         />
                     )}
 
-                    <div className={'pt-1 text-center'}>
+                    <div className={'pt-2 text-center border-t border-neutral-800/70 mt-2'}>
                         <Link
                             to={'/auth/login'}
                             className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}

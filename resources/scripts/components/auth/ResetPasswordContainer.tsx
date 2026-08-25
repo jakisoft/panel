@@ -61,15 +61,15 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
             {({ isSubmitting }) => (
                 <LoginFormContainer
                     title={'Atur Ulang Kata Sandi'}
-                    subtitle={'Buat kata sandi baru yang aman untuk akun Anda'}
+                    subtitle={'Buat kata sandi baru yang kuat untuk mengamankan akun Anda'}
                 >
                     {/* Readonly Email Display */}
                     {email && (
-                        <div className={'w-full space-y-1.5'}>
-                            <label className={'block text-xs sm:text-sm font-semibold text-neutral-300'}>
+                        <div className={'w-full space-y-1.5 text-left'}>
+                            <label className={'block text-xs font-semibold text-neutral-300 tracking-wide select-none'}>
                                 Alamat Email Akun
                             </label>
-                            <div className={'flex items-center w-full h-12 rounded-xl bg-neutral-900/50 border border-neutral-800 px-3.5 text-neutral-400 cursor-not-allowed'}>
+                            <div className={'flex items-center w-full h-12 rounded-xl bg-neutral-950/70 border border-neutral-800 px-3.5 text-neutral-400 cursor-not-allowed'}>
                                 <div className={'pr-2.5 text-neutral-500'}>
                                     <Mail size={18} />
                                 </div>
@@ -80,7 +80,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                         </div>
                     )}
 
-                    <div className={'pt-1'}>
+                    <div className={'pt-0.5'}>
                         <AuthField
                             name={'password'}
                             type={'password'}
@@ -93,7 +93,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                         />
                     </div>
 
-                    <div className={'pt-1'}>
+                    <div className={'pt-0.5'}>
                         <AuthField
                             name={'passwordConfirmation'}
                             type={'password'}
@@ -115,7 +115,7 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                         </AuthButton>
                     </div>
 
-                    <div className={'pt-1 text-center'}>
+                    <div className={'pt-2 text-center border-t border-neutral-800/70 mt-2'}>
                         <Link
                             to={'/auth/login'}
                             className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}

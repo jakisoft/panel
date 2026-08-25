@@ -9,7 +9,7 @@ import useFlash from '@/plugins/useFlash';
 import { FlashStore } from '@/state/flashes';
 import AuthField from '@/components/auth/AuthField';
 import AuthButton from '@/components/auth/AuthButton';
-import { ShieldCheck, Key, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Key, ArrowLeft, ArrowRight, Smartphone } from 'lucide-react';
 
 interface Values {
     code: string;
@@ -28,14 +28,14 @@ const LoginCheckpointContainer = () => {
 
     return (
         <LoginFormContainer
-            title={'Autentikasi 2FA'}
-            subtitle={'Verifikasi identitas tambahan diperlukan'}
+            title={'Autentikasi 2-Faktor'}
+            subtitle={'Langkah verifikasi keamanan tambahan diperlukan'}
         >
             <AuthField
                 name={isMissingDevice ? 'recoveryCode' : 'code'}
-                label={isMissingDevice ? 'Kode Pemulihan (Recovery Code)' : 'Kode Autentikasi 2FA'}
+                label={isMissingDevice ? 'Kode Pemulihan Cadangan' : 'Kode Autentikasi 2FA'}
                 icon={isMissingDevice ? Key : ShieldCheck}
-                placeholder={isMissingDevice ? 'Masukkan kode pemulihan...' : 'Contoh: 123456'}
+                placeholder={isMissingDevice ? 'Masukkan kode cadangan...' : 'Contoh: 123456'}
                 description={
                     isMissingDevice
                         ? 'Masukkan salah satu kode cadangan/pemulihan yang Anda simpan saat mengaktifkan 2FA.'
@@ -57,7 +57,7 @@ const LoginCheckpointContainer = () => {
                 </AuthButton>
             </div>
 
-            <div className={'pt-1 text-center'}>
+            <div className={'pt-2 text-center'}>
                 <button
                     type={'button'}
                     onClick={() => {
@@ -65,13 +65,14 @@ const LoginCheckpointContainer = () => {
                         setFieldValue('recoveryCode', '');
                         setIsMissingDevice((s) => !s);
                     }}
-                    className={'text-xs font-semibold text-neutral-400 hover:text-neutral-200 transition-colors focus:outline-none'}
+                    className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-neutral-200 transition-colors focus:outline-none'}
                 >
-                    {!isMissingDevice ? 'Kehilangan Perangkat 2FA? Gunakan Kode Cadangan' : 'Gunakan Aplikasi Authenticator'}
+                    {isMissingDevice ? <Smartphone size={13} /> : <Key size={13} />}
+                    <span>{!isMissingDevice ? 'Kehilangan perangkat 2FA? Gunakan kode cadangan' : 'Gunakan aplikasi authenticator'}</span>
                 </button>
             </div>
 
-            <div className={'pt-1 text-center'}>
+            <div className={'pt-2 text-center border-t border-neutral-800/70 mt-2'}>
                 <Link
                     to={'/auth/login'}
                     className={'inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}

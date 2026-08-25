@@ -68,8 +68,8 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
         >
             {({ isSubmitting, submitForm }) => (
                 <LoginFormContainer
-                    title={'Masuk Akun'}
-                    subtitle={'Silakan masuk untuk mengelola server Anda'}
+                    title={'Masuk ke Akun'}
+                    subtitle={'Silakan masukkan kredensial akun Anda untuk mengelola server'}
                 >
                     <AuthField
                         name={'username'}
@@ -80,7 +80,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         autoFocus
                     />
 
-                    <div className={'pt-1'}>
+                    <div className={'pt-0.5'}>
                         <AuthField
                             name={'password'}
                             type={'password'}
@@ -91,7 +91,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         />
                     </div>
 
-                    <div className={'pt-2'}>
+                    <div className={'pt-1.5'}>
                         <AuthButton
                             type={'submit'}
                             isLoading={isSubmitting}
@@ -117,7 +117,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         />
                     )}
 
-                    <div className={'pt-1 text-center'}>
+                    <div className={'pt-2 text-center'}>
                         <Link
                             to={'/auth/password'}
                             className={'text-xs font-semibold text-neutral-400 hover:text-primary-400 no-underline transition-colors'}
