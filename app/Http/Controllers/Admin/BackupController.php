@@ -59,6 +59,11 @@ class BackupController extends Controller
                 'refresh_token' => (string) $this->getSetting('gdrive.refresh_token', ''),
                 'folder_id' => (string) $this->getSetting('gdrive.folder_id', ''),
             ],
+            'telegram' => [
+                'enabled' => filter_var($this->getSetting('telegram.enabled', false), FILTER_VALIDATE_BOOLEAN),
+                'bot_token' => (string) $this->getSetting('telegram.bot_token', ''),
+                'owner_id' => (string) $this->getSetting('telegram.owner_id', ''),
+            ],
             'default_provider' => (string) $this->getSetting('default_provider', 'local'),
         ]);
     }
@@ -70,6 +75,7 @@ class BackupController extends Controller
     {
         $r2Enabled = $request->boolean('r2_enabled');
         $gdriveEnabled = $request->boolean('gdrive_enabled');
+        $telegramEnabled = $request->boolean('telegram_enabled');
 
         // Validation for Cloudflare R2 if enabled
         if ($r2Enabled) {
@@ -101,6 +107,19 @@ class BackupController extends Controller
             }
         }
 
+        // Validation for Telegram Bot if enabled
+        if ($telegramEnabled) {
+            $existingToken = (string) $this->getSetting('telegram.bot_token', '');
+            if (!$request->filled('telegram_bot_token') && empty($existingToken)) {
+                $this->alert->danger('Telegram Bot diaktifkan: Bot Token wajib diisi.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+            if (!$request->filled('telegram_owner_id') && empty($this->getSetting('telegram.owner_id', ''))) {
+                $this->alert->danger('Telegram Bot diaktifkan: Owner ID / Chat ID wajib diisi.')->flash();
+                return redirect()->route('admin.backup')->withInput();
+            }
+        }
+
         $keys = [
             'default_provider' => $request->input('default_provider', 'local'),
             'panel_auto_enabled' => $request->boolean('panel_auto_enabled') ? 'true' : 'false',
@@ -114,6 +133,8 @@ class BackupController extends Controller
             'gdrive:client_id' => $request->input('gdrive_client_id', ''),
             'gdrive:refresh_token' => $request->input('gdrive_refresh_token', ''),
             'gdrive:folder_id' => $request->input('gdrive_folder_id', ''),
+            'telegram:enabled' => $telegramEnabled ? 'true' : 'false',
+            'telegram:owner_id' => $request->input('telegram_owner_id', ''),
         ];
 
         if ($request->filled('r2_secret_access_key')) {
@@ -122,6 +143,10 @@ class BackupController extends Controller
 
         if ($request->filled('gdrive_client_secret')) {
             $keys['gdrive:client_secret'] = $request->input('gdrive_client_secret');
+        }
+
+        if ($request->filled('telegram_bot_token')) {
+            $keys['telegram:bot_token'] = $request->input('telegram_bot_token');
         }
 
         foreach ($keys as $key => $value) {
@@ -305,5 +330,18 @@ class BackupController extends Controller
                 'message' => 'Error: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Test Telegram Bot Connection.
+     */
+    public function testTelegram(Request $request): JsonResponse
+    {
+        $botToken = $request->input('bot_token') ?: (string) $this->getSetting('telegram.bot_token', '');
+        $ownerId = $request->input('owner_id') ?: (string) $this->getSetting('telegram.owner_id', '');
+
+        $result = $this->backupService->testTelegramConnection($botToken, $ownerId);
+
+        return response()->json($result, $result['success'] ? 200 : 400);
     }
 }

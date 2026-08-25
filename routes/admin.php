@@ -68,12 +68,14 @@ Route::group(['prefix' => 'settings'], function () {
     Route::get('/', [Admin\Settings\IndexController::class, 'index'])->name('admin.settings');
     Route::get('/mail', [Admin\Settings\MailController::class, 'index'])->name('admin.settings.mail');
     Route::get('/advanced', [Admin\Settings\AdvancedController::class, 'index'])->name('admin.settings.advanced');
+    Route::get('/cs', [Admin\Settings\CSContactController::class, 'index'])->name('admin.settings.cs');
 
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
 
     Route::patch('/', [Admin\Settings\IndexController::class, 'update']);
     Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
     Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
+    Route::patch('/cs', [Admin\Settings\CSContactController::class, 'update']);
 });
 
 /*
@@ -93,6 +95,7 @@ Route::group(['prefix' => 'backup'], function () {
     Route::post('/restore', [Admin\BackupController::class, 'restore'])->name('admin.backup.restore');
     Route::post('/test/r2', [Admin\BackupController::class, 'testR2'])->name('admin.backup.test.r2');
     Route::post('/test/gdrive', [Admin\BackupController::class, 'testGDrive'])->name('admin.backup.test.gdrive');
+    Route::post('/test/telegram', [Admin\BackupController::class, 'testTelegram'])->name('admin.backup.test.telegram');
 });
 
 

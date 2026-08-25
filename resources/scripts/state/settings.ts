@@ -11,6 +11,21 @@ export interface SiteSettings {
         enabled: boolean;
         siteKey: string;
     };
+    cs_contact?: {
+        enabled: boolean;
+        title: string;
+        subtitle: string;
+        whatsapp?: string;
+        telegram?: string;
+        discord?: string;
+        email?: string;
+    };
+    social_links?: {
+        enabled: boolean;
+        github?: string;
+        tiktok?: string;
+        instagram?: string;
+    };
 }
 
 export interface SettingsStore {

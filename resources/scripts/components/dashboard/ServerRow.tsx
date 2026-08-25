@@ -10,6 +10,61 @@ const isAlarmState = (current: number, limit: number): boolean => limit > 0 && c
 
 type Timer = ReturnType<typeof setInterval>;
 
+/* ─── Vertically Aligned Metric Capsule ───────────────────────────────── */
+const MetricCapsule = ({
+    icon: Icon,
+    label,
+    value,
+    limit,
+    percent,
+    alarm,
+    barColor,
+}: {
+    icon: React.ElementType;
+    label: string;
+    value: string;
+    limit: string;
+    percent: number;
+    alarm: boolean;
+    barColor: string;
+}) => (
+    <div
+        className={
+            'flex-1 min-w-[90px] sm:min-w-[110px] bg-neutral-800/50 border border-neutral-700/40 rounded-xl px-3 py-2 flex flex-col justify-between transition-colors'
+        }
+    >
+        {/* Row 1: Icon + Label on left, Limit on right — perfectly aligned */}
+        <div className={'flex items-center justify-between gap-1 text-[10px] uppercase font-semibold text-neutral-400'}>
+            <div className={'flex items-center gap-1.5 shrink-0'}>
+                <Icon size={13} className={alarm ? 'text-rose-400' : 'text-neutral-400'} />
+                <span className={'tracking-wider'}>{label}</span>
+            </div>
+            <span className={'text-[9px] font-normal text-neutral-500 truncate text-right'}>{limit}</span>
+        </div>
+
+        {/* Row 2: Live Metric Value */}
+        <div className={'my-1'}>
+            <p
+                className={`text-xs sm:text-sm font-bold tabular-nums tracking-tight truncate ${
+                    alarm ? 'text-rose-400' : 'text-neutral-100'
+                }`}
+            >
+                {value}
+            </p>
+        </div>
+
+        {/* Row 3: Progress Bar */}
+        <div className={'w-full h-1 bg-neutral-700/50 rounded-full overflow-hidden'}>
+            <div
+                className={`h-full rounded-full transition-all duration-300 ease-out ${
+                    alarm ? 'bg-rose-500' : barColor
+                }`}
+                style={{ width: `${Math.max(percent, 0)}%` }}
+            />
+        </div>
+    </div>
+);
+
 export default ({ server, className }: { server: Server; className?: string }) => {
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
@@ -24,15 +79,41 @@ export default ({ server, className }: { server: Server; className?: string }) =
         setIsSuspended(stats?.isSuspended || server.status === 'suspended');
     }, [stats?.isSuspended, server.status]);
 
+    /* ── Real-time Auto-Update Polling (2.5s interval with visibility detection) ── */
     useEffect(() => {
         if (isSuspended || server.isNodeUnderMaintenance) return;
 
-        getStats().then(() => {
-            interval.current = setInterval(() => getStats(), 30000);
-        });
+        let activeInterval: Timer | null = null;
+
+        const startPolling = () => {
+            getStats();
+            if (!activeInterval) {
+                // Poll every 2.5 seconds for realtime movement like console
+                activeInterval = setInterval(() => getStats(), 2500);
+            }
+        };
+
+        const stopPolling = () => {
+            if (activeInterval) {
+                clearInterval(activeInterval);
+                activeInterval = null;
+            }
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                startPolling();
+            } else {
+                stopPolling();
+            }
+        };
+
+        startPolling();
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
-            interval.current && clearInterval(interval.current);
+            stopPolling();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, [isSuspended, server.isNodeUnderMaintenance]);
 
@@ -49,19 +130,19 @@ export default ({ server, className }: { server: Server; className?: string }) =
         : null;
 
     const getStatusTheme = () => {
-        if (isSuspended) return { bar: 'before:bg-rose-500/60', icon: 'text-rose-400 group-hover:text-rose-300' };
-        if (server.isNodeUnderMaintenance) return { bar: 'before:bg-purple-500/60', icon: 'text-purple-400 group-hover:text-purple-300' };
-        if (server.isTransferring) return { bar: 'before:bg-sky-500/60', icon: 'text-sky-400 group-hover:text-sky-300' };
-        if (server.status === 'installing' || server.status === 'restoring_backup') return { bar: 'before:bg-amber-500/60', icon: 'text-amber-400 group-hover:text-amber-300' };
-        if (stats?.status === 'running' || stats?.status === 'starting') return { bar: 'before:bg-emerald-500/60 group-hover:before:bg-emerald-400', icon: 'text-emerald-400 group-hover:text-emerald-300' };
-        if (stats?.status === 'stopping') return { bar: 'before:bg-rose-500/60', icon: 'text-rose-400 group-hover:text-rose-300' };
+        if (isSuspended) return { bar: 'before:bg-rose-500/70', icon: 'text-rose-400 group-hover:text-rose-300' };
+        if (server.isNodeUnderMaintenance) return { bar: 'before:bg-purple-500/70', icon: 'text-purple-400 group-hover:text-purple-300' };
+        if (server.isTransferring) return { bar: 'before:bg-sky-500/70', icon: 'text-sky-400 group-hover:text-sky-300' };
+        if (server.status === 'installing' || server.status === 'restoring_backup') return { bar: 'before:bg-amber-500/70', icon: 'text-amber-400 group-hover:text-amber-300' };
+        if (stats?.status === 'running' || stats?.status === 'starting') return { bar: 'before:bg-emerald-500/70 group-hover:before:bg-emerald-400', icon: 'text-emerald-400 group-hover:text-emerald-300' };
+        if (stats?.status === 'stopping') return { bar: 'before:bg-rose-500/70', icon: 'text-rose-400 group-hover:text-rose-300' };
         return { bar: 'before:bg-rose-500/40', icon: 'text-rose-400/80 group-hover:text-rose-300' };
     };
 
     const getStatusBadge = () => {
         if (isSuspended) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
                     <span className={'w-1.5 h-1.5 rounded-full bg-rose-400'} />
                     Suspended
                 </span>
@@ -69,7 +150,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (server.isNodeUnderMaintenance) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20'}>
                     <span className={'w-1.5 h-1.5 rounded-full bg-purple-400'} />
                     Maintenance
                 </span>
@@ -77,7 +158,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (server.isTransferring) {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20'}>
                     <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-400'} /></span>
                     Transferring
                 </span>
@@ -85,7 +166,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (server.status === 'installing') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
                     <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400'} /></span>
                     Installing
                 </span>
@@ -93,7 +174,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (server.status === 'restoring_backup') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20'}>
                     <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400'} /></span>
                     Restoring
                 </span>
@@ -108,7 +189,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (stats.status === 'running') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'}>
                     <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400'} /></span>
                     Running
                 </span>
@@ -116,7 +197,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (stats.status === 'starting') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'}>
                     <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400'} /></span>
                     Starting
                 </span>
@@ -124,14 +205,14 @@ export default ({ server, className }: { server: Server; className?: string }) =
         }
         if (stats.status === 'stopping') {
             return (
-                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
+                <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
                     <span className={'relative flex h-1.5 w-1.5'}><span className={'animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-40'} /><span className={'relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-400'} /></span>
                     Stopping
                 </span>
             );
         }
         return (
-            <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
+            <span className={'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20'}>
                 <span className={'w-1.5 h-1.5 rounded-full bg-rose-400'} />
                 Offline
             </span>
@@ -151,14 +232,14 @@ export default ({ server, className }: { server: Server; className?: string }) =
     return (
         <Link
             to={`/server/${server.id}`}
-            className={`group relative block p-4 sm:p-5 bg-neutral-900/80 hover:bg-neutral-850/90 border border-neutral-800/80 hover:border-neutral-700/80 rounded-2xl transition-all duration-200 no-underline text-neutral-200 shadow-sm hover:shadow-lg hover:shadow-black/25 overflow-hidden before:absolute before:left-0 before:top-3 before:bottom-3 before:w-1 before:rounded-r-full ${theme.bar} before:transition-all ${
+            className={`group relative block p-4 sm:p-5 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 rounded-2xl transition-all duration-200 no-underline text-neutral-200 shadow-sm hover:shadow-lg hover:shadow-black/30 overflow-hidden before:absolute before:left-0 before:top-3 before:bottom-3 before:w-1 before:rounded-r-full ${theme.bar} before:transition-all ${
                 className || ''
             }`}
         >
             <div className={'flex flex-col lg:flex-row lg:items-center justify-between gap-4'}>
-                {/* Left Side: Server Icon on left, Name on top, IP:Port on bottom */}
+                {/* ── Left Side: Server Icon, Name, IP:Port, Description ──── */}
                 <div className={'flex items-center gap-3.5 min-w-0 flex-1 pl-1'}>
-                    <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-neutral-800/80 border border-neutral-700/40 flex items-center justify-center shrink-0 group-hover:bg-neutral-750 transition-all duration-200 shadow-inner ${theme.icon}`}>
+                    <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-neutral-800 border border-neutral-700/50 flex items-center justify-center shrink-0 group-hover:bg-neutral-750 transition-all duration-200 shadow-inner ${theme.icon}`}>
                         <ServerIcon size={22} />
                     </div>
                     <div className={'min-w-0 flex-1 flex flex-col justify-center gap-1'}>
@@ -172,7 +253,7 @@ export default ({ server, className }: { server: Server; className?: string }) =
                         </div>
                         <div className={'flex items-center gap-2 flex-wrap min-w-0'}>
                             {allocationString && (
-                                <span className={'inline-flex items-center gap-1 text-[11px] font-mono text-neutral-400 bg-neutral-800/70 border border-neutral-700/40 px-2 py-0.5 rounded-md shrink-0'}>
+                                <span className={'inline-flex items-center gap-1 text-[11px] font-mono text-neutral-400 bg-neutral-800/80 border border-neutral-700/50 px-2 py-0.5 rounded-md shrink-0'}>
                                     <Globe size={11} className={'text-neutral-500'} />
                                     {allocationString}
                                 </span>
@@ -186,75 +267,42 @@ export default ({ server, className }: { server: Server; className?: string }) =
                     </div>
                 </div>
 
-                {/* Right Side: Resource Stats Capsules & Status Badge */}
+                {/* ── Right Side: Vertically Aligned Metrics + Status Badge ── */}
                 <div className={'flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 shrink-0'}>
                     {stats && !isSuspended && !server.isNodeUnderMaintenance ? (
-                        <div className={'grid grid-cols-3 sm:flex items-center gap-2.5 w-full sm:w-auto'}>
-                            {/* CPU */}
-                            <div className={'bg-neutral-800/40 border border-neutral-700/30 rounded-xl px-3 py-2 min-w-[85px] sm:min-w-[100px] text-center sm:text-left flex flex-col justify-between'}>
-                                <div className={'flex items-center justify-between gap-1 text-[10px] uppercase font-semibold text-neutral-400'}>
-                                    <div className={'flex items-center gap-1'}>
-                                        <Cpu size={12} className={alarms.cpu ? 'text-rose-300' : 'text-neutral-400'} />
-                                        <span>CPU</span>
-                                    </div>
-                                    <span className={'text-[9px] font-normal text-neutral-400 hidden sm:inline'}>{cpuLimit}</span>
-                                </div>
-                                <p className={`text-xs font-semibold mt-1 truncate ${alarms.cpu ? 'text-rose-300' : 'text-neutral-100'}`}>
-                                    {stats.cpuUsagePercent.toFixed(1)}%
-                                </p>
-                                {server.limits.cpu > 0 && (
-                                    <div className={'w-full h-1 bg-neutral-700/40 rounded-full overflow-hidden mt-1.5'}>
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-300 ${alarms.cpu ? 'bg-rose-400/80' : 'bg-cyan-500/60'}`}
-                                            style={{ width: `${cpuPercent}%` }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
+                        <div className={'grid grid-cols-3 sm:flex items-stretch gap-2.5 w-full sm:w-auto'}>
+                            {/* CPU Metric Capsule */}
+                            <MetricCapsule
+                                icon={Cpu}
+                                label={'CPU'}
+                                value={`${stats.cpuUsagePercent.toFixed(1)}%`}
+                                limit={cpuLimit}
+                                percent={cpuPercent}
+                                alarm={alarms.cpu}
+                                barColor={'bg-cyan-500'}
+                            />
 
-                            {/* RAM */}
-                            <div className={'bg-neutral-800/40 border border-neutral-700/30 rounded-xl px-3 py-2 min-w-[85px] sm:min-w-[110px] text-center sm:text-left flex flex-col justify-between'}>
-                                <div className={'flex items-center justify-between gap-1 text-[10px] uppercase font-semibold text-neutral-400'}>
-                                    <div className={'flex items-center gap-1'}>
-                                        <Layers size={12} className={alarms.memory ? 'text-rose-300' : 'text-neutral-400'} />
-                                        <span>RAM</span>
-                                    </div>
-                                    <span className={'text-[9px] font-normal text-neutral-400 hidden sm:inline'}>{memoryLimit}</span>
-                                </div>
-                                <p className={`text-xs font-semibold mt-1 truncate ${alarms.memory ? 'text-rose-300' : 'text-neutral-100'}`}>
-                                    {bytesToString(stats.memoryUsageInBytes)}
-                                </p>
-                                {server.limits.memory > 0 && (
-                                    <div className={'w-full h-1 bg-neutral-700/40 rounded-full overflow-hidden mt-1.5'}>
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-300 ${alarms.memory ? 'bg-rose-400/80' : 'bg-emerald-500/60'}`}
-                                            style={{ width: `${memPercent}%` }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
+                            {/* RAM Metric Capsule */}
+                            <MetricCapsule
+                                icon={Layers}
+                                label={'RAM'}
+                                value={bytesToString(stats.memoryUsageInBytes)}
+                                limit={memoryLimit}
+                                percent={memPercent}
+                                alarm={alarms.memory}
+                                barColor={'bg-emerald-500'}
+                            />
 
-                            {/* DISK */}
-                            <div className={'bg-neutral-800/40 border border-neutral-700/30 rounded-xl px-3 py-2 min-w-[85px] sm:min-w-[110px] text-center sm:text-left flex flex-col justify-between'}>
-                                <div className={'flex items-center justify-between gap-1 text-[10px] uppercase font-semibold text-neutral-400'}>
-                                    <div className={'flex items-center gap-1'}>
-                                        <HardDrive size={12} className={alarms.disk ? 'text-rose-300' : 'text-neutral-400'} />
-                                        <span>DISK</span>
-                                    </div>
-                                    <span className={'text-[9px] font-normal text-neutral-400 hidden sm:inline'}>{diskLimit}</span>
-                                </div>
-                                <p className={`text-xs font-semibold mt-1 truncate ${alarms.disk ? 'text-rose-300' : 'text-neutral-100'}`}>
-                                    {bytesToString(stats.diskUsageInBytes)}
-                                </p>
-                                {server.limits.disk > 0 && (
-                                    <div className={'w-full h-1 bg-neutral-700/40 rounded-full overflow-hidden mt-1.5'}>
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-300 ${alarms.disk ? 'bg-rose-400/80' : 'bg-violet-500/60'}`}
-                                            style={{ width: `${diskPercent}%` }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
+                            {/* DISK Metric Capsule */}
+                            <MetricCapsule
+                                icon={HardDrive}
+                                label={'Disk'}
+                                value={bytesToString(stats.diskUsageInBytes)}
+                                limit={diskLimit}
+                                percent={diskPercent}
+                                alarm={alarms.disk}
+                                barColor={'bg-violet-500'}
+                            />
                         </div>
                     ) : (
                         <div className={'text-xs text-neutral-500 italic py-1'}>

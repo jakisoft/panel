@@ -25,6 +25,12 @@ return [
         'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID', ''),
     ],
 
+    'telegram' => [
+        'enabled' => (bool) env('TELEGRAM_BACKUP_ENABLED', false),
+        'bot_token' => env('TELEGRAM_BACKUP_BOT_TOKEN', ''),
+        'owner_id' => env('TELEGRAM_BACKUP_OWNER_ID', ''),
+    ],
+
     'disks' => [
         'wings' => [
             'adapter' => 'wings',

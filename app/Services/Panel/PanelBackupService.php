@@ -73,8 +73,13 @@ class PanelBackupService
             }
 
             // 6. Upload to Google Drive if enabled
-            if (config('backups.gdrive.enabled')) {
+            if (config('backups.gdrive.enabled') || config('backup.gdrive.enabled')) {
                 $this->uploadToGDrive($archivePath, $archiveName);
+            }
+
+            // 7. Upload to Telegram Bot if enabled
+            if (config('backups.telegram.enabled') || config('backup.telegram.enabled')) {
+                $this->uploadToTelegram($archivePath, $archiveName);
             }
 
             return [
@@ -478,6 +483,116 @@ class PanelBackupService
             }
         } catch (Exception $e) {
             // Log cloud upload error without failing local backup
+        }
+    }
+
+    private function uploadToTelegram(string $filePath, string $filename): void
+    {
+        try {
+            $botToken = config('backups.telegram.bot_token') ?: config('backup.telegram.bot_token');
+            $ownerId = config('backups.telegram.owner_id') ?: config('backup.telegram.owner_id');
+
+            if (empty($botToken) || empty($ownerId) || !File::exists($filePath)) {
+                return;
+            }
+
+            $size = File::size($filePath);
+            $sizeHuman = $this->formatBytes($size);
+            $appName = config('app.name', 'JKSoft Cloud');
+            $date = date('Y-m-d H:i:s T');
+            $host = request()->getHost() ?: gethostname();
+
+            $caption = "📦 <b>Panel Backup Created</b>\n\n"
+                     . "🏷 <b>Panel:</b> {$appName}\n"
+                     . "📁 <b>File:</b> <code>{$filename}</code>\n"
+                     . "📊 <b>Size:</b> {$sizeHuman}\n"
+                     . "⏰ <b>Time:</b> {$date}\n"
+                     . "🌐 <b>Host:</b> <code>{$host}</code>\n\n"
+                     . "<i>Arsip backup otomatis panel berhasil diunggah ke Telegram.</i>";
+
+            $url = "https://api.telegram.org/bot{$botToken}/sendDocument";
+
+            $postFields = [
+                'chat_id' => $ownerId,
+                'caption' => $caption,
+                'parse_mode' => 'HTML',
+                'document' => new \CURLFile($filePath, 'application/gzip', $filename),
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            $response = curl_exec($ch);
+            curl_close($ch);
+        } catch (Exception $e) {
+            // Log cloud upload error without failing local backup
+        }
+    }
+
+    /**
+     * Test connection to Telegram Bot API with a test message.
+     */
+    public function testTelegramConnection(?string $botToken = null, ?string $ownerId = null): array
+    {
+        $botToken = $botToken ?: (config('backups.telegram.bot_token') ?: config('backup.telegram.bot_token'));
+        $ownerId = $ownerId ?: (config('backups.telegram.owner_id') ?: config('backup.telegram.owner_id'));
+
+        if (empty($botToken)) {
+            return ['success' => false, 'message' => 'Bot Token Telegram wajib diisi.'];
+        }
+
+        if (empty($ownerId)) {
+            return ['success' => false, 'message' => 'Owner ID / Chat ID Telegram wajib diisi.'];
+        }
+
+        try {
+            $appName = config('app.name', 'JKSoft Cloud');
+            $date = date('Y-m-d H:i:s T');
+            $message = "🤖 <b>Telegram Backup Bot Connected!</b>\n\n"
+                     . "✅ Bot berhasil terhubung dengan panel <b>{$appName}</b>.\n"
+                     . "⏰ Waktu: {$date}\n\n"
+                     . "<i>File backup panel otomatis akan dikirimkan ke chat ini saat auto-backup berjalan.</i>";
+
+            $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'chat_id' => $ownerId,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+            ]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            $result = json_decode($response, true);
+
+            if ($httpCode === 200 && ($result['ok'] ?? false)) {
+                $botUsername = $result['result']['from']['username'] ?? 'Bot';
+                return [
+                    'success' => true,
+                    'message' => "Koneksi berhasil! Pesan test telah terkirim via @{$botUsername} ke Chat ID: {$ownerId}.",
+                ];
+            }
+
+            $errorDesc = $result['description'] ?? 'Gagal menghubungi Telegram API (HTTP ' . $httpCode . ')';
+            return [
+                'success' => false,
+                'message' => "Telegram Error: {$errorDesc}",
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Gagal menguji Telegram Bot: ' . $e->getMessage(),
+            ];
         }
     }
 

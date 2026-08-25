@@ -13,6 +13,8 @@ import useSWR from 'swr';
 import { PaginatedResult } from '@/api/http';
 import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
+import CSContactButton from '@/components/dashboard/CSContactButton';
+import DashboardFooter from '@/components/dashboard/DashboardFooter';
 
 export default () => {
     const { search } = useLocation();
@@ -85,6 +87,12 @@ export default () => {
                     }
                 </Pagination>
             )}
+
+            {/* ── Dashboard Footer with Left-Corner Socials & Right-Corner Copyright ── */}
+            <DashboardFooter />
+
+            {/* ── Floating CS Contact Button (Bottom-Right, Main Page Only) ── */}
+            <CSContactButton />
         </PageContentBlock>
     );
 };
