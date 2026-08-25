@@ -427,8 +427,13 @@ input.form-autocomplete-stop[readonly] {
 
 /* fix Google Recaptcha badge */
 .grecaptcha-badge {
-    bottom: 54px !important;
-    background: white;
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 16px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 9999 !important;
+    background: transparent;
     box-shadow: none !important;
 }
 

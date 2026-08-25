@@ -65,12 +65,17 @@
 }
 
 /* Google reCAPTCHA watermark badge positioning strictly at bottom-right corner */
-.grecaptcha-badge {
+.grecaptcha-badge,
+iframe[src*="recaptcha"],
+div:has(> .grecaptcha-badge) {
   position: fixed !important;
   bottom: 16px !important;
   right: 16px !important;
+  left: auto !important;
+  top: auto !important;
   z-index: 9999 !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
   border-radius: 6px !important;
   overflow: hidden !important;
 }
+
