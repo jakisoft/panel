@@ -93,21 +93,19 @@ export default () => {
                     </div>
 
                     {recaptchaEnabled && (
-                        <div className={'hidden'}>
-                            <Reaptcha
-                                ref={ref}
-                                size={'invisible'}
-                                badge={'bottomright'}
-                                sitekey={siteKey || '_invalid_key'}
-                                onVerify={(response) => {
-                                    setToken(response);
-                                    submitForm();
-                                }}
-                                onExpire={() => {
-                                    setToken('');
-                                }}
-                            />
-                        </div>
+                        <Reaptcha
+                            ref={ref}
+                            size={'invisible'}
+                            badge={'bottomright'}
+                            sitekey={siteKey || '_invalid_key'}
+                            onVerify={(response) => {
+                                setToken(response);
+                                submitForm();
+                            }}
+                            onExpire={() => {
+                                setToken('');
+                            }}
+                        />
                     )}
 
                     <div className={'pt-2 text-center border-t border-neutral-800/70 mt-2'}>

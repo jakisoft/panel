@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import performPasswordReset from '@/api/auth/performPasswordReset';
 import { httpErrorToHuman } from '@/api/http';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
-import { Actions, useStoreActions } from 'easy-peasy';
-import { ApplicationStore } from '@/state';
+import { useStoreState } from 'easy-peasy';
 import { Formik, FormikHelpers } from 'formik';
-import { object, ref, string } from 'yup';
+import { object, ref as yupRef, string } from 'yup';
 import AuthField from '@/components/auth/AuthField';
 import AuthButton from '@/components/auth/AuthButton';
+import Reaptcha from 'reaptcha';
+import useFlash from '@/plugins/useFlash';
 import { Lock, Mail, Key, ArrowLeft } from 'lucide-react';
 
 interface Values {
@@ -18,9 +19,16 @@ interface Values {
 }
 
 export default ({ match, location }: RouteComponentProps<{ token: string }>) => {
+    const ref = useRef<Reaptcha>(null);
+    const [token, setToken] = useState('');
     const [email, setEmail] = useState('');
 
-    const { clearFlashes, addFlash } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
+    const { clearFlashes, addFlash } = useFlash();
+    const { enabled: recaptchaEnabled, siteKey } = useStoreState((state) => state.settings.data!.recaptcha);
+
+    useEffect(() => {
+        clearFlashes();
+    }, []);
 
     const parsed = new URLSearchParams(location.search);
     if (email.length === 0 && parsed.get('email')) {
@@ -29,13 +37,25 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
 
     const submit = ({ password, passwordConfirmation }: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes();
-        performPasswordReset(email, { token: match.params.token, password, passwordConfirmation })
+
+        if (recaptchaEnabled && !token) {
+            ref.current!.execute().catch((error) => {
+                console.error(error);
+                setSubmitting(false);
+                addFlash({ type: 'error', title: 'Error', message: httpErrorToHuman(error) });
+            });
+            return;
+        }
+
+        performPasswordReset(email, { token: match.params.token, password, passwordConfirmation }, token)
             .then(() => {
                 // @ts-expect-error this is valid
                 window.location = '/';
             })
             .catch((error) => {
                 console.error(error);
+                setToken('');
+                if (ref.current) ref.current.reset();
                 setSubmitting(false);
                 addFlash({ type: 'error', title: 'Gagal', message: httpErrorToHuman(error) });
             });
@@ -55,10 +75,10 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                 passwordConfirmation: string()
                     .required('Konfirmasi kata sandi baru tidak cocok.')
                     // @ts-expect-error this is valid
-                    .oneOf([ref('password'), null], 'Konfirmasi kata sandi tidak cocok.'),
+                    .oneOf([yupRef('password'), null], 'Konfirmasi kata sandi tidak cocok.'),
             })}
         >
-            {({ isSubmitting }) => (
+            {({ isSubmitting, submitForm }) => (
                 <LoginFormContainer
                     title={'Atur Ulang Kata Sandi'}
                     subtitle={'Buat kata sandi baru yang kuat untuk mengamankan akun Anda'}
@@ -114,6 +134,22 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
                             Simpan Kata Sandi Baru
                         </AuthButton>
                     </div>
+
+                    {recaptchaEnabled && (
+                        <Reaptcha
+                            ref={ref}
+                            size={'invisible'}
+                            badge={'bottomright'}
+                            sitekey={siteKey || '_invalid_key'}
+                            onVerify={(response) => {
+                                setToken(response);
+                                submitForm();
+                            }}
+                            onExpire={() => {
+                                setToken('');
+                            }}
+                        />
+                    )}
 
                     <div className={'pt-2 text-center border-t border-neutral-800/70 mt-2'}>
                         <Link

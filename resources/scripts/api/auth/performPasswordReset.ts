@@ -11,13 +11,14 @@ interface PasswordResetResponse {
     sendToLogin: boolean;
 }
 
-export default (email: string, data: Data): Promise<PasswordResetResponse> => {
+export default (email: string, data: Data, recaptchaData?: string): Promise<PasswordResetResponse> => {
     return new Promise((resolve, reject) => {
         http.post('/auth/password/reset', {
             email,
             token: data.token,
             password: data.password,
             password_confirmation: data.passwordConfirmation,
+            'g-recaptcha-response': recaptchaData,
         })
             .then((response) =>
                 resolve({
