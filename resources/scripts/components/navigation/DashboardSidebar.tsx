@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
+    Server as ServerIcon,
     Shield,
     User,
     Key,
@@ -109,7 +110,7 @@ export default () => {
 
                 {/* Navigation Menu Links */}
                 <nav className={'flex-1 overflow-y-auto px-3 py-3 space-y-1'}>
-                    {/* Dashboard */}
+                    {/* Dashboard Overview */}
                     <NavLink
                         to={'/'}
                         exact
@@ -118,6 +119,17 @@ export default () => {
                     >
                         <LayoutDashboard size={18} />
                         <span>Dashboard</span>
+                    </NavLink>
+
+                    {/* Server Management */}
+                    <NavLink
+                        to={'/server'}
+                        isActive={(match, loc) => loc.pathname === '/server' || loc.pathname === '/servers'}
+                        className={'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800/60 transition-colors'}
+                        activeClassName={'!bg-neutral-800 !text-neutral-100 !font-semibold border border-neutral-700/60 shadow-sm'}
+                    >
+                        <ServerIcon size={18} />
+                        <span>Daftar Server</span>
                     </NavLink>
 
                     {/* Admin Panel (If Root Admin) */}
